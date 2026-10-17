@@ -29,10 +29,16 @@ def test_timeout_cleanup(tmp_path):
     code="import subprocess,time,pathlib;p=subprocess.Popen(['sleep','60']);pathlib.Path("+repr(str(pidfile))+").write_text(str(p.pid));time.sleep(60)"
     with pytest.raises(subprocess.TimeoutExpired):execute([sys.executable,'-c',code],.5)
     pid=int(pidfile.read_text())
+    def exited():
+        try:
+            return psutil.Process(pid).status() == psutil.STATUS_ZOMBIE
+        except psutil.NoSuchProcess:
+            return True
     for _ in range(50):
-        if not psutil.pid_exists(pid) or psutil.Process(pid).status() == psutil.STATUS_ZOMBIE:break
+        if exited():break
         time.sleep(.01)
-    assert not psutil.pid_exists(pid) or psutil.Process(pid).status() == psutil.STATUS_ZOMBIE
+    assert exited()
+
 
 def test_fresh_worker(tmp_path):
     trial=Trial('test-quality','quality','smoke','industrial','bankai_classic_native',42,1)

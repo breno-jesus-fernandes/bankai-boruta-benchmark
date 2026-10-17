@@ -102,7 +102,7 @@ def launch(ecs, s3, outputs, state, experiment, bucket, region):
             time.sleep(5)
         instances = ecs.describe_container_instances(cluster=outputs["Cluster"], containerInstances=hosts)["containerInstances"]
         identities = {item["containerInstanceArn"]: item["ec2InstanceId"] for item in instances}
-        state.update(tasks=tasks, instances=identities, barrier=barrier, logs=outputs["Logs"])
+        state.update(tasks=tasks, instances=identities, task_instances={task["taskArn"]: identities[task["containerInstanceArn"]] for task in described}, barrier=barrier, logs=outputs["Logs"])
         s3.put_object(Bucket=bucket, Key=barrier, Body=json.dumps(state).encode())
         return state
     except Exception:

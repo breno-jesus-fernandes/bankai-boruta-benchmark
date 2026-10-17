@@ -12,6 +12,7 @@ LABEL org.opencontainers.image.revision=$VCS_REF
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/* && useradd --create-home benchmark
 WORKDIR /app
 COPY --from=build --chown=benchmark:benchmark /app /app
+RUN chown benchmark:benchmark /app
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1
 USER benchmark
 ENTRYPOINT ["bankai-benchmark"]

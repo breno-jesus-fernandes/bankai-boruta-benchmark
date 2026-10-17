@@ -15,6 +15,12 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def dependency_hash():
+    import importlib.metadata
+    return digest({name: importlib.metadata.version(name) for name in
+                   ("bankai-boruta", "bankai-random-forest", "Boruta", "lightgbm", "numpy", "scipy", "scikit-learn")})
+
+
 def source_hash():
     return digest({p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path(__file__).parent.glob("*.py"))})
 
@@ -68,7 +74,7 @@ class Trial:
     @property
     def configuration_hash(self):
         return digest(dict(profile=asdict(profile(self.dataset, self.mode)), generator=GENERATOR_VERSION,
-                           source_hash=source_hash(), downstream=DOWNSTREAM, competitor=self.competitor, threads=self.threads))
+                           source_hash=source_hash(), dependencies=dependency_hash(), downstream=DOWNSTREAM, competitor=self.competitor, threads=self.threads))
 
     @property
     def trial_id(self):

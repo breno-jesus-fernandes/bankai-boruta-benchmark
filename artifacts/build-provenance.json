@@ -1,0 +1,11 @@
+{
+  "base_revision": "61951a54f0f899c7e2c9866ef4a655ebd2f9a0ed",
+  "patch_sha256": "bbdaf16f5dd94645d960d2702a0d74e3c7d4528a1ee8e620c2d2b746c8402167",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "development_version": "0.1.0a3+benchmark.1",
+  "public_release": false,
+  "artifact_sha256": {
+    "bankai_boruta-0.1.0a3+benchmark.1.tar.gz": "18e24c913232e831e09f33e8671a0a97368c7c06102bcf66cbc6af6df5f840cb",
+    "bankai_boruta-0.1.0a3+benchmark.1-cp311-abi3-macosx_11_0_arm64.whl": "546bb84d11a62ac5d93e0791a58fa2a6933fb0d8c055e05bd7819f5619c7c40e"
+  }
+}

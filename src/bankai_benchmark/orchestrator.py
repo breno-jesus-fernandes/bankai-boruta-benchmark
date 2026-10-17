@@ -90,7 +90,7 @@ def run_trial(trial, cache, path, timeout):
         code = execute(command, timeout)
         if not path.exists():
             result = base_result(trial)
-            result.update(status="resource_failure" if code < 0 else "execution_failure", error=dict(returncode=code))
+            result.update(status="resource_failure" if code == -signal.SIGKILL else "execution_failure", error=dict(returncode=code))
             atomic_json(path, result)
     except subprocess.TimeoutExpired:
         result = base_result(trial)

@@ -19,7 +19,7 @@ docker-build:
 	$(CONTAINER_ENGINE) build --platform linux/amd64 --build-arg VCS_REF=$$(git rev-parse HEAD) -t bankai-benchmark:dev .
 
 docker-smoke: docker-build
-	$(CONTAINER_ENGINE) run --rm --platform linux/amd64 bankai-benchmark:dev smoke --experiment linux-smoke
+	$(CONTAINER_ENGINE) run --rm --platform linux/amd64 --entrypoint /app/.venv/bin/python bankai-benchmark:dev scripts/verify_linux.py
 
 aws-plan:
 	uv run bankai-aws plan $(AWS_ARGS)

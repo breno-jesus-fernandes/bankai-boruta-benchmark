@@ -25,7 +25,7 @@ def main():
             barrier = json.loads(response["Body"].read())
             if metadata["TaskARN"] not in barrier["tasks"]:
                 raise RuntimeError("Task absent from controller barrier")
-            os.environ["BENCHMARK_INSTANCE_ID"] = barrier["instances"].get(metadata.get("ContainerInstanceARN"), "recorded_in_controller_state")
+            os.environ["BENCHMARK_INSTANCE_ID"] = barrier["task_instances"][metadata["TaskARN"]]
             os.environ["BENCHMARK_LOG_LOCATION"] = barrier["logs"]+"/benchmark/benchmark/"+metadata["TaskARN"].rsplit("/", 1)[-1]
             break
         except ClientError as exc:
