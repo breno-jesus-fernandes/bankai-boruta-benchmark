@@ -71,6 +71,8 @@ def run(trial, cache, output):
         from .metrics import selection_metrics, downstream
         bundle = load_dataset(cache)
         X = np.array(bundle.X_train, copy=True, order="C"); y = np.array(bundle.y_train, copy=True)
+        # Drop the now-resident cache mappings before measuring the baseline.
+        bundle.X_train = X; bundle.y_train = y
         prepared = PreparedSelector(trial)
         gc.collect()
         process = psutil.Process(); baseline = process.memory_info().rss
