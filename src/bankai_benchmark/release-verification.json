@@ -1,0 +1,6 @@
+{
+  "verified_version": null,
+  "native_control_tests_passed": false,
+  "wheel_hashes": {},
+  "reason": "Public 0.1.0a3 cannot honor native n_jobs/max_features. The bundled development patch is smoke-only."
+}
