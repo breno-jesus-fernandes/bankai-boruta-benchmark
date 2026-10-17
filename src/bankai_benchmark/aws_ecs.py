@@ -24,7 +24,7 @@ def infrastructure(experiment, bucket, subnets, security_groups):
         resource(name, "IAM::Role", AssumeRolePolicyDocument=dict(Version="2012-10-17", Statement=[dict(Effect="Allow", Principal={"Service": service}, Action="sts:AssumeRole")]), ManagedPolicyArns=managed or [], Policies=policies or [])
     resource("Repository", "ECR::Repository", RepositoryName=experiment, ImageTagMutability="IMMUTABLE", EmptyOnDelete=True, ImageScanningConfiguration=dict(ScanOnPush=True))
     resource("Cluster", "ECS::Cluster", ClusterName=experiment)
-    resource("Logs", "Logs::LogGroup", LogGroupName=f"/bankai/{experiment}", RetentionInDays=30)
+    resource("Logs", "Logs::LogGroup", LogGroupName=f"/bankai/{experiment}", RetentionInDays=1)
     role("InstanceRole", "ec2.amazonaws.com", managed=["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"])
     role("ExecutionRole", "ecs-tasks.amazonaws.com", managed=["arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"])
     prefixes = [experiment+"/", experiment+"-quality/", experiment+"-scaling/"]
@@ -37,14 +37,14 @@ def infrastructure(experiment, bucket, subnets, security_groups):
         MetadataOptions=dict(HttpTokens="required", HttpPutResponseHopLimit=2),
         BlockDeviceMappings=[dict(DeviceName="/dev/xvda", Ebs=dict(VolumeSize=100, VolumeType="gp3", Encrypted=True, DeleteOnTermination=True))],
         UserData={"Fn::Base64": sub("#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n")}))
-    resource("Fleet", "AutoScaling::AutoScalingGroup", MinSize="5", MaxSize="5", DesiredCapacity="5", VPCZoneIdentifier=subnets,
+    resource("Fleet", "AutoScaling::AutoScalingGroup", MinSize="0", MaxSize="1", DesiredCapacity="0", NewInstancesProtectedFromScaleIn=False, VPCZoneIdentifier=subnets,
         LaunchTemplate=dict(LaunchTemplateId=ref("LaunchTemplate"), Version=attr("LaunchTemplate", "LatestVersionNumber")),
         Tags=[dict(Key="Name", Value=experiment, PropagateAtLaunch=True)])
-    resource("CapacityProvider", "ECS::CapacityProvider", Name=experiment, AutoScalingGroupProvider=dict(AutoScalingGroupArn=ref("Fleet"), ManagedScaling=dict(Status="DISABLED"), ManagedTerminationProtection="DISABLED"))
+    resource("CapacityProvider", "ECS::CapacityProvider", Name=experiment, AutoScalingGroupProvider=dict(AutoScalingGroupArn=ref("Fleet"), ManagedScaling=dict(Status="DISABLED"), ManagedTerminationProtection="DISABLED", ManagedDraining="DISABLED"))
     resource("Association", "ECS::ClusterCapacityProviderAssociations", Cluster=ref("Cluster"), CapacityProviders=[ref("CapacityProvider")], DefaultCapacityProviderStrategy=[dict(CapacityProvider=ref("CapacityProvider"), Weight=1)])
-    return dict(AWSTemplateFormatVersion="2010-09-09", Parameters=dict(EcsAmi=dict(Type="AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>", Default=AMI_PARAMETER)),
+    return dict(AWSTemplateFormatVersion="2010-09-09", Description="Budget-limited benchmark pilot; capacity remains zero until AWS shutdown is verified.", Metadata={"AWSToolsMetrics": {"AWSAgentToolkit": "aws-cloudformation@3"}, "com.aws.cloudformation.Context": {"ref": ["README.md", "BUDGET.md"]}}, Parameters=dict(EcsAmi=dict(Type="AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>", Default=AMI_PARAMETER)),
         Resources=resources, Outputs={name: {"Value": value} for name, value in dict(Cluster=ref("Cluster"), CapacityProvider=ref("CapacityProvider"),
-            Repository=attr("Repository", "RepositoryUri"), ExecutionRole=attr("ExecutionRole", "Arn"), TaskRole=attr("TaskRole", "Arn"), Logs=ref("Logs")).items()})
+            Fleet=ref("Fleet"), Repository=attr("Repository", "RepositoryUri"), ExecutionRole=attr("ExecutionRole", "Arn"), TaskRole=attr("TaskRole", "Arn"), Logs=ref("Logs")).items()})
 
 
 def task_definition(experiment, image, region, outputs):
@@ -64,11 +64,11 @@ def commands(experiment, bucket, region):
 
 
 def verify_hosts(tasks):
-    if len(tasks) != 5 or any(task.get("lastStatus") != "RUNNING" for task in tasks):
-        raise RuntimeError("Five tasks must be running before releasing the barrier")
+    if len(tasks) != 1 or any(task.get("lastStatus") != "RUNNING" for task in tasks):
+        raise RuntimeError("One pilot task must be running before releasing the barrier")
     hosts = [task.get("containerInstanceArn") for task in tasks]
-    if None in hosts or len(set(hosts)) != 5:
-        raise RuntimeError("Tasks must occupy five distinct hosts")
+    if None in hosts or len(set(hosts)) != 1:
+        raise RuntimeError("Pilot must occupy one host")
     return hosts
 
 
@@ -76,29 +76,44 @@ def outputs_for(cf, name):
     return {item["OutputKey"]: item["OutputValue"] for item in cf.describe_stacks(StackName=name)["Stacks"][0]["Outputs"]}
 
 
-def launch(ecs, s3, outputs, state, experiment, bucket, region):
+def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial"):
+    from .budget import reserve, arm, stop, validate_policy
+    validate_policy()
+    if region != "us-east-1":
+        raise ValueError("Budget policy permits us-east-1 only")
+    if dataset not in PROFILES:
+        raise ValueError("Unknown pilot dataset")
     if state.get("tasks"):
         raise RuntimeError("Tasks already recorded; use a new experiment/state")
+    reserve(s3, bucket, outputs["Fleet"])
+    shutdown = arm(autoscaling, outputs["Fleet"])
+    state["budget"] = dict(reserved_brl="20", shutdown_at=shutdown.isoformat(), ledger_bucket=bucket)
     barrier = f"{experiment}/control/{time.time_ns()}.json"
     tasks = []
     try:
-        for command in commands(experiment, bucket, region):
-            response = ecs.run_task(cluster=outputs["Cluster"], taskDefinition=state["task_definition"], count=1,
-                capacityProviderStrategy=[dict(capacityProvider=outputs["CapacityProvider"], weight=1)],
-                placementConstraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == c7i.4xlarge")],
-                overrides=dict(containerOverrides=[dict(name="benchmark", command=command, environment=[dict(name="BENCHMARK_BARRIER_BUCKET", value=bucket), dict(name="BENCHMARK_BARRIER_KEY", value=barrier)])]))
-            if response.get("failures"):
-                raise RuntimeError(response["failures"])
-            tasks.extend(task["taskArn"] for task in response["tasks"])
+        autoscaling.update_auto_scaling_group(AutoScalingGroupName=outputs["Fleet"], MinSize=0, MaxSize=1, DesiredCapacity=1)
+        readiness = time.monotonic() + 600
+        while not ecs.list_container_instances(cluster=outputs["Cluster"], status="ACTIVE")["containerInstanceArns"]:
+            if time.monotonic() >= readiness:
+                raise TimeoutError("Budget pilot instance registration timeout")
+            time.sleep(5)
+        command = next(command for command in commands(experiment, bucket, region) if command[2] == "quality" and command[4] == dataset)
+        response = ecs.run_task(cluster=outputs["Cluster"], taskDefinition=state["task_definition"], count=1,
+            capacityProviderStrategy=[dict(capacityProvider=outputs["CapacityProvider"], weight=1)],
+            placementConstraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == c7i.4xlarge")],
+            overrides=dict(containerOverrides=[dict(name="benchmark", command=command, environment=[dict(name="BENCHMARK_BARRIER_BUCKET", value=bucket), dict(name="BENCHMARK_BARRIER_KEY", value=barrier)])]))
+        if response.get("failures"):
+            raise RuntimeError(response["failures"])
+        tasks.extend(task["taskArn"] for task in response["tasks"])
         deadline = time.monotonic()+900
         while True:
             described = ecs.describe_tasks(cluster=outputs["Cluster"], tasks=tasks)["tasks"]
             if any(task["lastStatus"] == "STOPPED" for task in described):
                 raise RuntimeError("Task stopped before launch barrier")
-            if len(described) == 5 and all(task["lastStatus"] == "RUNNING" for task in described):
+            if len(described) == 1 and all(task["lastStatus"] == "RUNNING" for task in described):
                 hosts = verify_hosts(described); break
             if time.monotonic() > deadline:
-                raise TimeoutError("Five-host launch timeout")
+                raise TimeoutError("Pilot launch timeout")
             time.sleep(5)
         instances = ecs.describe_container_instances(cluster=outputs["Cluster"], containerInstances=hosts)["containerInstances"]
         identities = {item["containerInstanceArn"]: item["ec2InstanceId"] for item in instances}
@@ -106,8 +121,11 @@ def launch(ecs, s3, outputs, state, experiment, bucket, region):
         s3.put_object(Bucket=bucket, Key=barrier, Body=json.dumps(state).encode())
         return state
     except Exception:
-        for task in tasks:
-            ecs.stop_task(cluster=outputs["Cluster"], task=task, reason="Failed benchmark launch barrier")
+        try:
+            stop(autoscaling, outputs["Fleet"])
+        finally:
+            for task in tasks:
+                ecs.stop_task(cluster=outputs["Cluster"], task=task, reason="Failed benchmark launch barrier")
         raise
 
 
@@ -118,12 +136,15 @@ def main():
     parser.add_argument("--experiment", required=True); parser.add_argument("--subnets", nargs="+", required=True)
     parser.add_argument("--security-groups", nargs="+", required=True); parser.add_argument("--image")
     parser.add_argument("--state", default="aws-state.json")
+    parser.add_argument("--dataset", choices=list(PROFILES), default="industrial")
     args = parser.parse_args()
+    if args.action in ("provision", "launch") and args.region != "us-east-1":
+        raise ValueError("Budget policy permits us-east-1 only")
     template = infrastructure(args.experiment, args.bucket, args.subnets, args.security_groups)
     if args.action == "plan":
         fake_outputs = dict(ExecutionRole="${ExecutionRole}", TaskRole="${TaskRole}", Logs=f"/bankai/{args.experiment}")
         definition = task_definition(args.experiment, args.image, args.region, fake_outputs) if args.image else None
-        print(json.dumps(dict(template=template, task_definition=definition, commands=commands(args.experiment, args.bucket, args.region), reservations=dict(cpu=16384, memory_mib=28672),
+        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=200, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
             constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == c7i.4xlarge")]), indent=2)); return
     import boto3
     session = boto3.Session(region_name=args.region); cf, ecs = session.client("cloudformation"), session.client("ecs")
@@ -146,9 +167,11 @@ def main():
         response = ecs.register_task_definition(**definition)
         state.update(task_definition=response["taskDefinition"]["taskDefinitionArn"], image=args.image)
     elif args.action == "launch":
+        from .orchestrator import require_public_release
+        require_public_release()
         if not state.get("task_definition"):
             raise ValueError("Register the immutable image first")
-        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region)
+        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset)
     else:
         tasks = ecs.describe_tasks(cluster=outputs["Cluster"], tasks=state["tasks"])["tasks"] if state.get("tasks") else []
         # AWS response dates are not JSON-native.

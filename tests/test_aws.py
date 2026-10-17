@@ -6,7 +6,7 @@ from bankai_benchmark.aws_ecs import infrastructure,task_definition,commands,ver
 def test_resource_geometry_and_scoped_policies():
     template=infrastructure('example','results-bucket',['subnet-a'],['sg-a']);resources=template['Resources']
     fleet=resources['Fleet']['Properties']
-    assert [fleet[k] for k in ['MinSize','MaxSize','DesiredCapacity']] == ['5']*3
+    assert [fleet[k] for k in ['MinSize','MaxSize','DesiredCapacity']] == ['0','1','0']
     assert resources['LaunchTemplate']['Properties']['LaunchTemplateData']['InstanceType'] == 'c7i.4xlarge'
     assert template['Parameters']['EcsAmi']['Default'] == AMI_PARAMETER
     statements=resources['TaskRole']['Properties']['Policies'][0]['PolicyDocument']['Statement']
@@ -25,9 +25,16 @@ def test_digest_and_cpu_reservations():
     assert len(commands('example','bucket','us-east-1')) == 5
 
 
-def test_mocked_five_host_launch():
+def test_mocked_single_host_launch(monkeypatch):
+    from bankai_benchmark import budget
+    from datetime import datetime, timezone
+    monkeypatch.setattr(budget, "reserve", lambda *args: None)
+    monkeypatch.setattr(budget, "arm", lambda *args: datetime.now(timezone.utc))
+    class ASG:
+        def update_auto_scaling_group(self, **kwargs): self.request = kwargs
     class ECS:
         requests=[]
+        def list_container_instances(self, **kwargs): return dict(containerInstanceArns=["host"])
         def run_task(self,**kwargs):
             self.requests.append(kwargs)
             return dict(tasks=[dict(taskArn=f'task{len(self.requests)}')])
@@ -37,9 +44,9 @@ def test_mocked_five_host_launch():
             return dict(containerInstances=[dict(containerInstanceArn=h,ec2InstanceId='ec2-'+h) for h in kwargs['containerInstances']])
     class S3:
         def put_object(self,**kwargs):self.request=kwargs
-    ecs,s3=ECS(),S3();outputs=dict(Cluster='cluster',CapacityProvider='capacity',Logs='logs')
-    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1')
-    assert len(set(result['instances'])) == 5 and len(result['tasks']) == 5
+    ecs,s3=ECS(),S3();outputs=dict(Cluster='cluster',CapacityProvider='capacity',Logs='logs',Fleet='fleet')
+    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG())
+    assert len(set(result['instances'])) == 1 and len(result['tasks']) == 1
     for request in ecs.requests:
         assert request['placementConstraints'] == [dict(type='distinctInstance'),dict(type='memberOf',expression='attribute:ecs.instance-type == c7i.4xlarge')]
     assert json.loads(s3.request['Body'])['tasks'] == result['tasks']
