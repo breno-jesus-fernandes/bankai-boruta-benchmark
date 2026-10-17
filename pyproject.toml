@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Reproducible, process-isolated Bankai Boruta benchmark suite"
 requires-python = ">=3.11"
 license = "MIT"
-dependencies = ["numpy>=2.1", "scipy>=1.13", "scikit-learn>=1.6", "psutil>=6", "Boruta==0.4.3", "lightgbm>=4.6,<5", "bankai-random-forest==0.1.0a15", "bankai-boruta==0.1.0a3+benchmark.1", "boto3>=1.35"]
+dependencies = ["numpy>=2.1", "scipy>=1.13", "scikit-learn>=1.6", "psutil>=6", "Boruta==0.4.3", "lightgbm>=4.6,<5", "bankai-random-forest==0.1.0a15", "bankai-boruta==0.1.0a4", "boto3>=1.35"]
 
 [project.scripts]
 bankai-benchmark = "bankai_benchmark.orchestrator:main"
@@ -17,12 +17,6 @@ bankai-aws = "bankai_benchmark.aws_ecs:main"
 
 [dependency-groups]
 dev = ["pytest>=8"]
-
-[tool.uv.sources]
-bankai-boruta = [
-  { path = "artifacts/bankai_boruta-0.1.0a3+benchmark.1-cp311-abi3-macosx_11_0_arm64.whl", marker = "sys_platform == 'darwin' and platform_machine == 'arm64'" },
-  { path = "artifacts/bankai_boruta-0.1.0a3+benchmark.1.tar.gz", marker = "sys_platform != 'darwin' or platform_machine != 'arm64'" },
-]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/bankai_benchmark"]

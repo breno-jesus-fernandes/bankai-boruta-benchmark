@@ -20,27 +20,17 @@ and limitations are in [VERIFICATION.md](VERIFICATION.md).
 
 ## Release gate
 
-Public `bankai-boruta==0.1.0a3` cannot honor positive `n_jobs` and fractional
-`max_features` on its native path. This repository preserves the requested forest
-profiles with an isolated development correction rather than silently changing
-paths. [upstream/native-controls.patch](upstream/native-controls.patch) extends
-native eligibility and threads the forest's resolved feature count and thread
-count through the Rust boundary, preparation, and training. Per-round sampling
-resolves against the current real-plus-shadow width using a15's validation.
+The suite pins public `bankai-boruta==0.1.0a4` from PyPI. This release includes
+native support for positive `n_jobs` and fractional `max_features`, resolving
+feature counts against each round's real-plus-shadow width. `uv.lock` records
+public distribution hashes; `release-verification.json` records the verified
+version and artifacts. The native/adapter parity tests cover thread counts,
+feature sampling and width reduction after Classic rejections.
 
-The source baseline is recorded in [upstream/base-revision.txt](upstream/base-revision.txt).
-Immutable local wheel/source archives and SHA-256 checksums are committed under
-`artifacts/`; the archive includes `Cargo.lock` and the upstream GPL text. The
-Rust forest dependency is pinned to source revision
-`caa46c22ef93434cd87319490513e877d4378564`. These are development artifacts,
-not a claimed public release. Rebuild instructions are in [upstream/README.md](upstream/README.md).
-
-**`full` runs are intentionally gated.** Before paper execution, publish the
-upstream correction, replace the development dependency/source override with its
-verified public release, regenerate `uv.lock` with wheel hashes, run the native
-parity tests and Linux smoke, and update
-`src/bankai_benchmark/release-verification.json` with that verified version and
-wheel hashes. No future version is assumed or manufactured by this repository.
+Full runs require the installed version to match the verified release and a
+passing native-control attestation. Smoke results never populate final paper
+values. The historical upstream patch remains under `upstream/` for provenance;
+installation and container builds use the public release.
 
 ## Experiment profiles
 
@@ -238,8 +228,8 @@ make docker-smoke
 
 The amd64 Docker image pins Python 3.11 slim-bookworm by digest, includes
 libgomp1, installs locked dependencies, runs as a non-root user, and records a
-revision label. Building the development Rust extension needs network access
-and a Rust toolchain; the runtime image excludes that toolchain.
+revision label. Installation downloads locked public wheels; no Rust toolchain
+is needed for the supported Linux amd64 image.
 
 AWS commands use the caller's ordinary credential chain. Supply an existing
 result bucket, region, subnet IDs, and security group IDs. Instances need
