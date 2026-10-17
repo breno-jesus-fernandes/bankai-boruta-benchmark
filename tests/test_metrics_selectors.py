@@ -37,6 +37,7 @@ def test_lightgbm_width_and_cloning():
     model=clone(estimator(trial('borutapy_lightgbm_rf'),'lightgbm'))
     X=np.random.default_rng(4).normal(size=(40,80));y=np.arange(40)%2
     model.fit(X,y);assert model.colsample_bytree == 8/80
+    model=clone(model)
     model.fit(X[:,:20],y);assert model.colsample_bytree == 4/20
     model=estimator(replace(trial(),dataset='bioinformatica'),'lightgbm')
     model.fit(X,y);assert model.colsample_bytree == .15

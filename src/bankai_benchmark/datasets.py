@@ -2,6 +2,7 @@
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import json
+import hashlib
 import numpy as np
 from scipy.special import expit
 from .config import GENERATOR_VERSION, profile, digest, atomic_json
@@ -16,6 +17,10 @@ class DatasetBundle:
     relevant_features: np.ndarray
     feature_subtypes: dict
     metadata: dict
+
+
+def generator_hash():
+    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def standardize(x):
@@ -103,7 +108,7 @@ def generate_dataset(dataset_id, seed, mode):
         indices = split.permutation(np.flatnonzero(y == cls))
         train.extend(indices[:count]); test.extend(indices[count:])
     train = split.permutation(train); test = split.permutation(test)
-    metadata = dict(generator_version=GENERATOR_VERSION, configuration_hash=digest(asdict(cfg)), dataset=dataset_id,
+    metadata = dict(generator_version=GENERATOR_VERSION, generator_hash=generator_hash(), configuration_hash=digest(asdict(cfg)), dataset=dataset_id,
         seed=seed, mode=mode, dimensions=[cfg.n, cfg.p], class_counts_train=np.bincount(y[train], minlength=2).tolist(),
         class_counts_test=np.bincount(y[test], minlength=2).tolist(), column_permutation=permutation.tolist(),
         calibration=dict(scope="joint_train_test_synthetic", signal_variance=float(signal.var()), noise_variance=float(logistic_noise.var()),
@@ -114,7 +119,7 @@ def generate_dataset(dataset_id, seed, mode):
 
 
 def cache_dataset(root, dataset, seed, mode):
-    key = digest(dict(profile=asdict(profile(dataset, mode)), seed=seed, generator=GENERATOR_VERSION))
+    key = digest(dict(profile=asdict(profile(dataset, mode)), seed=seed, generator_version=GENERATOR_VERSION, generator_hash=generator_hash()))
     directory = Path(root)/key
     if not (directory/"metadata.json").exists():
         bundle = generate_dataset(dataset, seed, mode)

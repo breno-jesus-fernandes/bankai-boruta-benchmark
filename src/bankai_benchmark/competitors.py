@@ -12,6 +12,11 @@ from .config import COMPETITORS, profile, json_parameters
 
 class WidthAwareLGBM(LGBMClassifier):
     """Clonable LGBM estimator; update sampling against actual shadow width."""
+    def __sklearn_clone__(self):
+        params = self.get_params(deep=False)
+        params["colsample_bytree"] = getattr(self, "_sampling_policy", self.colsample_bytree)
+        return type(self)(**params)
+
     def fit(self, X, y, **kwargs):
         policy = getattr(self, "_sampling_policy", self.colsample_bytree)
         self._sampling_policy = policy
