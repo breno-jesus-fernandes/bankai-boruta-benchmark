@@ -36,10 +36,13 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_IMAGE_PUBLISH_ROLE }}
           aws-region: us-east-1
-          allowed-account-ids: '642504869083'
           role-session-name: bankai-image-${{ github.run_id }}
           role-duration-seconds: 900
           unset-current-credentials: true
+      - name: Verify assumed AWS identity
+        run: |
+          aws sts get-caller-identity > aws-caller.json
+          jq -e '.Account == "642504869083" and (.Arn | startswith("arn:aws:sts::642504869083:assumed-role/bankai-image-publisher-Publisher-"))' aws-caller.json
       - uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2
         id: login
       - name: Publish and record immutable digest
@@ -53,7 +56,7 @@ jobs:
           docker push "$image_uri"
           image_digest=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$image_tag" --query 'imageDetails[0].imageDigest' --output text)
           [[ "$image_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
-          jq -n --arg revision "$GITHUB_SHA" --arg image "${ECR_REGISTRY}/${ECR_REPOSITORY}@${image_digest}" --arg tag "$image_tag" --arg run "$GITHUB_RUN_ID" '{source_revision:$revision,image:$image,tag:$tag,workflow_run:$run}' > published-image.json
+          jq -n --arg revision "$GITHUB_SHA" --arg image "${ECR_REGISTRY}/${ECR_REPOSITORY}@${image_digest}" --arg tag "$image_tag" --arg run "$GITHUB_RUN_ID" --slurpfile caller aws-caller.json '{source_revision:$revision,image:$image,tag:$tag,workflow_run:$run,aws_caller:$caller[0]}' > published-image.json
           cat published-image.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
