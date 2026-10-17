@@ -34,7 +34,9 @@ appear in the chat. AWS requests, storage, and compute can still be billed.
 
 The local machine must stay on and connected. `caffeinate -i` prevents idle sleep
 while this process runs; it does not prevent manual sleep or power loss. The
-LaunchAgent has no keepalive/retry and credentials are never written into it.
+controller runs as a detached local process with no automatic restart. It
+survives the chat turn ending; it does not survive a computer restart/logout.
+Credentials remain in the configured AWS profile and are not embedded in code.
 
 Runtime state, downloaded results, aggregate reports, and process logs are under
 `reports/quality-monitor/` (gitignored). Original Industrial artifacts are also
@@ -43,7 +45,7 @@ committed under `verification/pilot-20261017/`. All raw results remain in S3.
 ```sh
 cat reports/quality-monitor/status.txt
 tail reports/quality-monitor/updates.txt
-launchctl print gui/$(id -u)/com.bankai.quality-continuation
+ps -p $(cat reports/quality-monitor/process.pid) -o pid,state,etime,command
 ```
 
 Stopping the local agent alone does not terminate EC2 immediately. The AWS
