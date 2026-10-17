@@ -7,7 +7,7 @@ The prepared CREATE change set is `publisher-review-20261017` in stack
 `REVIEW_IN_PROGRESS`; do not call create-stack again against that name.
 
 The role accepts only GitHub subject
-`repo:breno-jesus-fernandes/bankai-boruta-benchmark:ref:refs/heads/main`, with
+`repo:breno-jesus-fernandes@32203685/bankai-boruta-benchmark@1423557673:ref:refs/heads/main`, with
 `sts.amazonaws.com` audience. No AWS access keys or user passwords are created.
 This is a dedicated **image publisher**, not a deployment administrator. It has
 no EC2, ECS, Auto Scaling, S3, IAM or budget-management permission. The local
@@ -58,3 +58,11 @@ used for measured results. Keep total ancillary charges within the reserve.
 This template creates the first GitHub OIDC provider in this account (read-only
 inventory returned none). Do not deploy a duplicate if another provider is
 created concurrently; review the change set again instead.
+
+The repository OIDC API returned `use_immutable_subject=true` and the prefix
+above. The first publication exposed a mismatch with the legacy name-only
+subject. The corrected trust uses `GitHubSubjectPrefix` discovered from
+`gh api repos/breno-jesus-fernandes/bankai-boruta-benchmark/actions/oidc/customization/sub`.
+It does not opt out of immutable subjects or add a wildcard. New/renamed GitHub
+repositories after July 15, 2026 can use this format:
+https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-GitHub-actions-oidc-tokens/

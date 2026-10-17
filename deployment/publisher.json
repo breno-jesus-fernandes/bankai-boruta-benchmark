@@ -7,10 +7,10 @@
     }
   },
   "Parameters": {
-    "GitHubRepository": {
+    "GitHubSubjectPrefix": {
       "Type": "String",
-      "Default": "breno-jesus-fernandes/bankai-boruta-benchmark",
-      "AllowedPattern": "[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+      "Default": "repo:breno-jesus-fernandes@32203685/bankai-boruta-benchmark@1423557673",
+      "AllowedPattern": "repo:[A-Za-z0-9_.-]+@[0-9]+/[A-Za-z0-9_.-]+@[0-9]+"
     }
   },
   "Resources": {
@@ -60,7 +60,7 @@
         "com.aws.cloudformation.Context": {
           "why": "Docker push permissions follow the ECR documented operation list, not the benchmark runtime SDK baseline.",
           "must": [
-            "Trust only this GitHub repository main branch and STS audience.",
+            "Trust only the discovered immutable GitHub subject prefix, main branch and STS audience.",
             "No EC2, ECS, IAM, S3 or Auto Scaling permissions."
           ]
         }
@@ -82,7 +82,7 @@
                 "StringEquals": {
                   "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
                   "token.actions.githubusercontent.com:sub": {
-                    "Fn::Sub": "repo:${GitHubRepository}:ref:refs/heads/main"
+                    "Fn::Sub": "${GitHubSubjectPrefix}:ref:refs/heads/main"
                   }
                 }
               }

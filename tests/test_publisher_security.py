@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_publisher_trust_and_permissions_are_scoped():
     template = json.loads((ROOT/'deployment/publisher.json').read_text())
+    assert template['Parameters']['GitHubSubjectPrefix']['Default'] == 'repo:breno-jesus-fernandes@32203685/bankai-boruta-benchmark@1423557673'
     role = template['Resources']['Publisher']['Properties']
     trust = role['AssumeRolePolicyDocument']['Statement']
     assert len(trust) == 1
@@ -14,7 +15,7 @@ def test_publisher_trust_and_permissions_are_scoped():
     assert trust[0]['Principal'] == {'Federated': {'Ref': 'GitHubProvider'}}
     assert trust[0]['Condition'] == {'StringEquals': {
         'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-        'token.actions.githubusercontent.com:sub': {'Fn::Sub': 'repo:${GitHubRepository}:ref:refs/heads/main'},
+        'token.actions.githubusercontent.com:sub': {'Fn::Sub': '${GitHubSubjectPrefix}:ref:refs/heads/main'},
     }}
     statements = role['Policies'][0]['PolicyDocument']['Statement']
     for statement in statements:
