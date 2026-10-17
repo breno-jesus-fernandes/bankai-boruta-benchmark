@@ -1,0 +1,103 @@
+{
+  "workflow_url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39052816852",
+  "source_commit": "cc343c75ab2b9a16ddd35ecb3f1df6a7234dae64",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "container",
+      "conclusion": "success",
+      "url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39052816852/job/117454675076"
+    },
+    {
+      "name": "test",
+      "conclusion": "success",
+      "url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39052816852/job/117454675263"
+    }
+  ],
+  "trials": [
+    {
+      "competitor": "bankai_classic_adapter",
+      "status": "success",
+      "vmhwm_bytes": 168697856,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "bankai_greedy_native",
+      "status": "success",
+      "vmhwm_bytes": 168960000,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "rust",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "borutapy_lightgbm_rf",
+      "status": "success",
+      "vmhwm_bytes": 173203456,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "greedy_borutapy_lightgbm",
+      "status": "success",
+      "vmhwm_bytes": 173199360,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "borutapy_sklearn_et",
+      "status": "success",
+      "vmhwm_bytes": 168706048,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "bankai_classic_native",
+      "status": "success",
+      "vmhwm_bytes": 169050112,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "rust",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    {
+      "competitor": "greedy_borutapy_bankai",
+      "status": "success",
+      "vmhwm_bytes": 168312832,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    }
+  ]
+}
