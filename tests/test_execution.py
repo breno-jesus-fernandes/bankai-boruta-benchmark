@@ -78,5 +78,21 @@ def test_upload_retry_restore(tmp_path,monkeypatch):
     with pytest.raises(ClientError):upload(Fail(),p,'bucket','key')
     assert p.exists()
 
-def test_paper_runs_are_gated():
-    with pytest.raises(RuntimeError,match='public Bankai release'):require_public_release()
+def test_paper_runs_are_gated(monkeypatch):
+    import bankai_benchmark.orchestrator as orchestrator
+    for version in ('0.1.0a3+benchmark.1', '0.1.0a3'):
+        monkeypatch.setattr(orchestrator.importlib.metadata, 'version', lambda name: version)
+        with pytest.raises(RuntimeError, match='public Bankai release'):
+            require_public_release()
+
+
+def test_unverified_public_release_is_gated(tmp_path, monkeypatch):
+    import bankai_benchmark.orchestrator as orchestrator
+    monkeypatch.setattr(orchestrator, '__file__', str(tmp_path/'orchestrator.py'))
+    monkeypatch.setattr(orchestrator.importlib.metadata, 'version', lambda name: '0.1.0a4')
+    attestation = tmp_path/'release-verification.json'
+    attestation.write_text(json.dumps(dict(verified_version='0.1.0a4', native_control_tests_passed=False)))
+    with pytest.raises(RuntimeError, match='public Bankai release'):
+        require_public_release()
+    attestation.write_text(json.dumps(dict(verified_version='0.1.0a4', native_control_tests_passed=True)))
+    require_public_release()

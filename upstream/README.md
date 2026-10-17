@@ -1,4 +1,7 @@
-# Native-control development artifact
+# Historical native-control development artifact
+
+The correction is now published in `bankai-boruta==0.1.0a4`. Normal installs
+use PyPI; the following records the original development workflow.
 
 The standalone patch applies to the exact revision in `base-revision.txt`.
 It keeps the public constructors unchanged. `n_jobs` resolves with the pinned
@@ -19,11 +22,7 @@ uvx --from 'maturin==1.15.0' maturin sdist --out /path/to/benchmark/artifacts
 ```
 
 The patch assigns `0.1.0a3+benchmark.1` only to the isolated development artifact.
-The wheel/source checksum list is `artifacts/SHA256SUMS`. `test_native_controls.py`
-is the portable upstream test contribution: positive 1/4 thread counts,
-sqrt/fraction/integer/None/log2 feature sampling, Classic/Greedy paths,
-zero native shadow-copy bytes, positive adapter copy bytes, and deterministic
-importance-history/selection parity. The benchmark's tests also exercise path
-assertions on all configurations. Public upstream publication and release are
-still required before full paper campaigns. This patch has not been pushed to
-or released from the upstream repository by the benchmark task.
+The original artifact hashes remain in `artifacts/build-provenance.json` and
+Git history; development binaries were removed after migrating to PyPI.
+`test_native_controls.py` records the original upstream parity tests. The suite
+also checks native/adapter parity and path diagnostics in `tests/test_native.py`.

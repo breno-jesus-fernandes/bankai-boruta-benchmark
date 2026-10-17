@@ -1,0 +1,7 @@
+{
+  "version": "0.1.0a4",
+  "smoke_wall_seconds": 11.571743541979231,
+  "successful_trials": 7,
+  "reference_machine": "Apple M1, 8 logical CPUs, 8 GiB RAM, macOS, Python 3.11",
+  "resume_verified": true
+}
