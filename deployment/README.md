@@ -26,9 +26,12 @@ Evidence: `verification/aws-bootstrap-deployed.json`.
 - The stack intentionally retains the bucket on future deletion.
 
 `deployment/pilot-plan.json` is the next benchmark stack's unexecuted plan,
-using these outputs and the existing public subnet. It proposes IAM service
-roles, ECR, ECS and a zero-capacity Auto Scaling group. It has **not** been
-applied; no EC2 host, ECS workload or ECR image has been created.
+using these outputs, the published immutable image digest and the existing
+public subnet. The reviewed CloudFormation change set proposes IAM service
+roles, ECS and a zero-capacity Auto Scaling group. It has **not** been
+executed; no pilot EC2 host or ECS workload has been created. The image is in
+the separate publisher repository; the pilot stack does not create a duplicate
+ECR repository.
 
 The generated `bankai-aws plan` uses subnet `subnet-017ce335d1359cd45`. That subnet has public
 IPv4 assignment and an active internet-gateway route. The benchmark stack stays
@@ -72,5 +75,6 @@ The locked SDK dependency includes `boto3[crt]`: the CLI login credential
 provider requires AWS CRT. Actual SDK access using profile `bankai` was tested
 against the deployed bootstrap resources without exporting credentials.
 
-See [PUBLISHING.md](PUBLISHING.md) for the reviewed dedicated GitHub OIDC image
-publisher and its unexecuted change set.
+See [PUBLISHING.md](PUBLISHING.md) for the deployed dedicated GitHub OIDC image
+publisher. See [PILOT.md](PILOT.md) for the prepared pilot change set and its
+validation results.
