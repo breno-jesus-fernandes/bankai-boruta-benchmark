@@ -1,0 +1,62 @@
+name: publish benchmark image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-benchmark-image
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY: bankai-image-publisher-images
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          version: '0.5.20'
+      - name: Verify suite and public release gate
+        run: |
+          sudo apt-get update && sudo apt-get install -y libgomp1
+          uv sync --locked
+          uv run pytest -q
+          uv run python -c 'from bankai_benchmark.orchestrator import require_public_release; require_public_release()'
+      - name: Build and validate the exact image to publish
+        run: |
+          docker build --platform linux/amd64 --build-arg VCS_REF="$GITHUB_SHA" -t bankai-benchmark:publish .
+          docker run --rm --platform linux/amd64 --entrypoint /app/.venv/bin/python bankai-benchmark:publish scripts/verify_linux.py
+      - uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: ${{ vars.AWS_IMAGE_PUBLISH_ROLE }}
+          aws-region: us-east-1
+          allowed-account-ids: '642504869083'
+          role-session-name: bankai-image-${{ github.run_id }}
+          role-duration-seconds: 900
+          unset-current-credentials: true
+      - uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2
+        id: login
+      - name: Publish and record immutable digest
+        env:
+          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
+        run: |
+          set -euo pipefail
+          image_tag="${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          image_uri="${ECR_REGISTRY}/${ECR_REPOSITORY}:${image_tag}"
+          docker tag bankai-benchmark:publish "$image_uri"
+          docker push "$image_uri"
+          image_digest=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$image_tag" --query 'imageDetails[0].imageDigest' --output text)
+          [[ "$image_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          jq -n --arg revision "$GITHUB_SHA" --arg image "${ECR_REGISTRY}/${ECR_REPOSITORY}@${image_digest}" --arg tag "$image_tag" --arg run "$GITHUB_RUN_ID" '{source_revision:$revision,image:$image,tag:$tag,workflow_run:$run}' > published-image.json
+          cat published-image.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: published-image
+          path: published-image.json
+          retention-days: 30

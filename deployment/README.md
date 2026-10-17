@@ -71,3 +71,6 @@ register its digest, and review the final BRL20/one-hour pilot configuration.
 The locked SDK dependency includes `boto3[crt]`: the CLI login credential
 provider requires AWS CRT. Actual SDK access using profile `bankai` was tested
 against the deployed bootstrap resources without exporting credentials.
+
+See [PUBLISHING.md](PUBLISHING.md) for the reviewed dedicated GitHub OIDC image
+publisher and its unexecuted change set.

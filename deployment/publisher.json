@@ -1,0 +1,153 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "GitHub main-branch OIDC image publisher with ECR-only permissions; no benchmark compute.",
+  "Metadata": {
+    "AWSToolsMetrics": {
+      "AWSAgentToolkit": "aws-cloudformation@3"
+    }
+  },
+  "Parameters": {
+    "GitHubRepository": {
+      "Type": "String",
+      "Default": "breno-jesus-fernandes/bankai-boruta-benchmark",
+      "AllowedPattern": "[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+    }
+  },
+  "Resources": {
+    "GitHubProvider": {
+      "Type": "AWS::IAM::OIDCProvider",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Short-lived GitHub identities replace AWS access keys in CI.",
+          "must": [
+            "Only sts.amazonaws.com audience; do not replace a shared provider without review."
+          ]
+        }
+      },
+      "Properties": {
+        "Url": "https://token.actions.githubusercontent.com",
+        "ClientIdList": [
+          "sts.amazonaws.com"
+        ]
+      }
+    },
+    "Repository": {
+      "Type": "AWS::ECR::Repository",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Immutable commit-tagged images retain the exact tested amd64 artifact.",
+          "must": [
+            "Keep immutable tags and basic scanning; no enhanced Inspector subscription."
+          ]
+        }
+      },
+      "Properties": {
+        "RepositoryName": {
+          "Fn::Sub": "${AWS::StackName}-images"
+        },
+        "ImageTagMutability": "IMMUTABLE",
+        "ImageScanningConfiguration": {
+          "ScanOnPush": true
+        },
+        "EncryptionConfiguration": {
+          "EncryptionType": "AES256"
+        }
+      }
+    },
+    "Publisher": {
+      "Type": "AWS::IAM::Role",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Docker push permissions follow the ECR documented operation list, not the benchmark runtime SDK baseline.",
+          "must": [
+            "Trust only this GitHub repository main branch and STS audience.",
+            "No EC2, ECS, IAM, S3 or Auto Scaling permissions."
+          ]
+        }
+      },
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "GitHubProvider"
+                }
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                  "token.actions.githubusercontent.com:sub": {
+                    "Fn::Sub": "repo:${GitHubRepository}:ref:refs/heads/main"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "PublishBenchmarkImage",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "Authenticate",
+                  "Effect": "Allow",
+                  "Action": "ecr:GetAuthorizationToken",
+                  "Resource": "*"
+                },
+                {
+                  "Sid": "PublishOneRepository",
+                  "Effect": "Allow",
+                  "Action": [
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:CompleteLayerUpload",
+                    "ecr:InitiateLayerUpload",
+                    "ecr:UploadLayerPart",
+                    "ecr:PutImage",
+                    "ecr:BatchGetImage",
+                    "ecr:DescribeImages"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Repository",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "RoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Publisher",
+          "Arn"
+        ]
+      }
+    },
+    "RepositoryName": {
+      "Value": {
+        "Ref": "Repository"
+      }
+    },
+    "RepositoryUri": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Repository",
+          "RepositoryUri"
+        ]
+      }
+    }
+  }
+}
