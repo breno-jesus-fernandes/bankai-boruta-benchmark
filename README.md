@@ -261,16 +261,22 @@ uv run bankai-aws destroy $AWS_ARGS
 ```
 
 Shell variable expansion in the example assumes a POSIX shell such as bash;
-pass flags directly or use an array in zsh. `provision` starts five paid
-on-demand instances, with desired/min/max all five. The CloudFormation stack
-contains a dedicated ECS cluster/capacity provider, launch template/ASG,
-execution/task/instance roles, ECR and CloudWatch logs. The current ECS-optimized
-x86_64 AMI is resolved via the official [SSM parameter](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/retrieve-ecs-optimized_AMI.html).
-Each task reserves 16,384 CPU units and 28 GiB. Four dataset tasks and one
-Industrial scaling task run sequential trials. The controller verifies five
-distinct hosts before releasing a unique S3 barrier; tasks check CPU affinity
-before measuring. [ECS placement constraints](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
-include `distinctInstance` and the required instance type. Task ARNs, EC2 IDs,
-image digest and log locations are retained. Teardown stops standalone tasks
-and deletes the stack; the result bucket is retained. No AWS resources are
-provisioned by local tests or CI.
+pass flags directly or use an array in zsh. `provision` creates an idle fleet
+(minimum/desired zero, maximum one); it does not start EC2 instances. Only
+`us-east-1` is permitted for provisioning and launch. The stack contains ECS,
+a capacity provider, roles, ECR, and logs. The current ECS-optimized x86_64 AMI
+is resolved via the official SSM parameter.
+
+`launch` now runs a single quality pilot on Industrial (use `--dataset` to
+choose another dataset). Each task reserves 16,384 CPU units and 28 GiB, and
+checks CPU affinity before measurement. The five-host paper launch is disabled
+under the R$200 policy. The controller first reserves R$20 in a persistent S3
+campaign ledger, then schedules and verifies an AWS-side shutdown one hour
+from arming, before starting capacity. At shutdown, minimum, maximum and desired
+capacity all become zero, terminating the instance without replacement even
+when the controller computer is disconnected. See [BUDGET.md](BUDGET.md) for
+limits, permissions, cost assumptions and recovery behavior.
+
+The single-host barrier retains task ARN, EC2 ID, image digest and log location.
+Teardown stops standalone tasks and deletes the stack; the result bucket is
+retained. No AWS resources are provisioned by local tests or CI.

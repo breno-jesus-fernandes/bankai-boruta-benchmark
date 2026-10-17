@@ -1,4 +1,4 @@
-"""Check CPU availability and wait for the controller's five-host barrier."""
+"""Check CPU availability and wait for the controller's budget-limited pilot barrier."""
 import json
 import os
 import time
