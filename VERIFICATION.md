@@ -42,10 +42,26 @@ was used only for verification, not measurements for the paper.
 
 The benchmark now pins public `bankai-boruta==0.1.0a4`. The release's native
 controls passed all 21 local parity cases; Linux acceptance for this pin is
-recorded below when the migration CI completes.
+recorded below.
 
 Review the documented frozen generator/default choices against the intended
 paper protocol before paper execution: the handoff omitted some numerical
 signal/noise/prevalence and downstream parameters. The README identifies every
 such choice. Full AWS results must come from a real provisioned workload;
 smoke outputs do not populate final paper values.
+
+## Public 0.1.0a4 migration
+
+Local regression: **66 passed**. Fresh seven-selector smoke: **11.572 seconds**
+on the Apple M1 reference machine, recorded in
+`verification/public-a4-smoke.json`. All seven trials succeeded; aggregation
+reported no missing/failed trials and withheld final paper placeholders.
+Repeating the campaign preserved every raw result hash and modification time.
+No AWS compute was started. Historical results above refer to the earlier
+development pin, not the public release.
+
+Public-wheel Linux amd64 acceptance passed in
+[Actions run 39057940483](https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39057940483)
+on commit `b2faedd`: tests, smoke, aggregation, resume and container assertions
+for VmHWM, CPU affinity and native paths. The public-release attestation is now
+enabled. The budget guard still limits AWS launches to the one-host pilot.

@@ -1,0 +1,71 @@
+{
+  "linux_acceptance": "passed",
+  "trials": [
+    {
+      "competitor": "bankai_classic_adapter",
+      "peak_rss_gib": 0.15712738037109375,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python"
+    },
+    {
+      "competitor": "borutapy_lightgbm_rf",
+      "peak_rss_gib": 0.1612701416015625,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python"
+    },
+    {
+      "competitor": "greedy_borutapy_lightgbm",
+      "peak_rss_gib": 0.16104507446289062,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python"
+    },
+    {
+      "competitor": "borutapy_sklearn_et",
+      "peak_rss_gib": 0.15686416625976562,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python"
+    },
+    {
+      "competitor": "greedy_borutapy_bankai",
+      "peak_rss_gib": 0.15703964233398438,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "python"
+    },
+    {
+      "competitor": "bankai_classic_native",
+      "peak_rss_gib": 0.17182540893554688,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "rust"
+    },
+    {
+      "competitor": "bankai_greedy_native",
+      "peak_rss_gib": 0.15708541870117188,
+      "highwater_reset": true,
+      "affinity": [
+        0
+      ],
+      "path": "rust"
+    }
+  ],
+  "workflow_run": "39057940483",
+  "source_commit": "b2faedd",
+  "package_version": "0.1.0a4"
+}
