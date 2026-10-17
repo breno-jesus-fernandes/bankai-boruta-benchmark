@@ -1,0 +1,133 @@
+"""Deterministic joint synthetic calibration; no model fits on test rows."""
+from dataclasses import dataclass, asdict
+from pathlib import Path
+import json
+import numpy as np
+from scipy.special import expit
+from .config import GENERATOR_VERSION, profile, digest, atomic_json
+
+
+@dataclass
+class DatasetBundle:
+    X_train: np.ndarray
+    X_test: np.ndarray
+    y_train: np.ndarray
+    y_test: np.ndarray
+    relevant_features: np.ndarray
+    feature_subtypes: dict
+    metadata: dict
+
+
+def standardize(x):
+    x = np.asarray(x, dtype=np.float64)
+    return (x-x.mean(axis=0)) / np.maximum(x.std(axis=0), 1e-12)
+
+
+def allocate(total, weights):
+    raw = np.asarray(weights, float) / sum(weights) * total
+    counts = np.floor(raw).astype(int)
+    counts[np.argsort(-(raw-counts), kind="stable")[:total-counts.sum()]] += 1
+    return counts
+
+
+def generate_dataset(dataset_id, seed, mode):
+    cfg = profile(dataset_id, mode)
+    n = cfg.n + round(cfg.n/4)
+    rng, weights, noise, perm_rng, split = [np.random.default_rng(s) for s in np.random.SeedSequence(seed).spawn(5)]
+    columns, subtypes, relevant, effects, effect_weights = [], {}, [], [], []
+
+    def add(name, values, causal=False):
+        values = np.asarray(values)
+        if values.ndim == 1:
+            values = values[:, None]
+        start = len(columns)
+        columns.extend(values.T)
+        subtypes.setdefault(name, []).extend(range(start, len(columns)))
+        if causal:
+            relevant.extend(range(start, len(columns)))
+
+    if dataset_id == "industrial":
+        roots = rng.normal(size=(n, 6)); add("signal", roots, True)
+        add("redundant", .95*roots + np.sqrt(1-.95**2)*rng.normal(size=roots.shape), True)
+        effects = [roots[:, i] for i in range(3)] + [roots[:, i]**2 for i in (3, 4)] + [roots[:, 5]*roots[:, 0]]
+        counts = allocate(cfg.p-12, [1, 1, 1])
+        latent = rng.normal(size=(n, max(1, int(np.ceil(counts[0]/10)))))
+        block = np.empty((n, counts[0]))
+        for j in range(counts[0]):
+            block[:, j] = .8*latent[:, j//10] + .6*rng.normal(size=n)
+        add("correlated_noise", block)
+        add("trap_noise", rng.uniform(size=(n, counts[1])))
+        add("gaussian_noise", rng.normal(size=(n, counts[2])))
+    elif dataset_id == "credito":
+        roots = rng.lognormal(size=(n, 6)); add("signal", roots, True)
+        effects = [np.log1p(roots[:, i]) for i in range(6)]
+        cards = [2, 3, 4, 5, 8, 10, 20, 50]
+        for card in cards:
+            x = rng.integers(card, size=n); add("categorical_signal", x, True)
+            effects.append(weights.normal(size=card)[x])
+        add("redundant", roots+.1*rng.normal(size=roots.shape), True)
+        counts = allocate(cfg.p-20, [40, 240])
+        for j in range(counts[0]):
+            add("trap_noise", rng.integers(cards[j % 8], size=n))
+        add("gaussian_noise", rng.normal(size=(n, counts[1])))
+    elif dataset_id == "bioinformatica":
+        correlation = .8**np.abs(np.arange(10)[:, None]-np.arange(10))
+        block = rng.normal(size=(n, 10)) @ np.linalg.cholesky(correlation).T
+        add("correlated_signal", block, True)
+        uv = rng.normal(size=(n, 20)); add("interaction_signal", uv, True)
+        effects = [block[:, i] for i in range(10)] + [np.tanh(2*uv[:, 2*i]*uv[:, 2*i+1]) for i in range(10)]
+        effect_weights = [.35]*10 + [1.]*10
+        counts = allocate(cfg.p-30, [1, 1])
+        add("trap_noise", rng.uniform(size=(n, counts[0])))
+        add("gaussian_noise", rng.normal(size=(n, counts[1])))
+    else:
+        step = rng.normal(size=(n, 20)); periodic = rng.uniform(-np.pi, np.pi, size=(n, 20))
+        sparse = rng.binomial(1, .05, size=(n, 20))*rng.exponential(size=(n, 20))
+        add("step_signal", step, True); add("periodic_signal", periodic, True); add("sparse_signal", sparse, True)
+        effects = [*(step > 0).T, *np.sin(periodic).T, *sparse.T]
+        counts = allocate(cfg.p-60, [1, 1])
+        add("trap_noise", rng.uniform(size=(n, counts[0])))
+        add("gaussian_noise", rng.normal(size=(n, counts[1])))
+    terms = np.column_stack([standardize(term) for term in effects])
+    signal = standardize(terms @ np.asarray(effect_weights or [1.]*len(effects)))
+    logistic_noise = standardize(noise.logistic(size=n))
+    logit = np.sqrt(cfg.snr)*signal + logistic_noise
+    positives = round(n*cfg.prevalence)
+    y = np.zeros(n, dtype=np.int32)
+    y[np.argsort(expit(logit), kind="stable")[-positives:]] = 1
+    permutation = perm_rng.permutation(cfg.p); inverse = np.argsort(permutation)
+    X = np.ascontiguousarray(np.asarray(columns, dtype=np.float32).T[:, permutation])
+    train_positive = round(cfg.n*cfg.prevalence)
+    train, test = [], []
+    for cls, count in ((0, cfg.n-train_positive), (1, train_positive)):
+        indices = split.permutation(np.flatnonzero(y == cls))
+        train.extend(indices[:count]); test.extend(indices[count:])
+    train = split.permutation(train); test = split.permutation(test)
+    metadata = dict(generator_version=GENERATOR_VERSION, configuration_hash=digest(asdict(cfg)), dataset=dataset_id,
+        seed=seed, mode=mode, dimensions=[cfg.n, cfg.p], class_counts_train=np.bincount(y[train], minlength=2).tolist(),
+        class_counts_test=np.bincount(y[test], minlength=2).tolist(), column_permutation=permutation.tolist(),
+        calibration=dict(scope="joint_train_test_synthetic", signal_variance=float(signal.var()), noise_variance=float(logistic_noise.var()),
+                         realized_snr=float((np.sqrt(cfg.snr)*signal).var()/logistic_noise.var()), snr=cfg.snr,
+                         term_means=terms.mean(axis=0).tolist(), term_variances=terms.var(axis=0).tolist()))
+    return DatasetBundle(np.ascontiguousarray(X[train]), np.ascontiguousarray(X[test]), y[train], y[test],
+                         np.sort(inverse[relevant]), {k: sorted(inverse[v].tolist()) for k, v in subtypes.items()}, metadata)
+
+
+def cache_dataset(root, dataset, seed, mode):
+    key = digest(dict(profile=asdict(profile(dataset, mode)), seed=seed, generator=GENERATOR_VERSION))
+    directory = Path(root)/key
+    if not (directory/"metadata.json").exists():
+        bundle = generate_dataset(dataset, seed, mode)
+        directory.mkdir(parents=True, exist_ok=True)
+        for name in ("X_train", "X_test", "y_train", "y_test", "relevant_features"):
+            np.save(directory/f"{name}.npy", getattr(bundle, name), allow_pickle=False)
+        atomic_json(directory/"metadata.json", dict(metadata=bundle.metadata, feature_subtypes=bundle.feature_subtypes))
+    return directory
+
+
+def load_dataset(directory):
+    directory = Path(directory)
+    info = json.loads((directory/"metadata.json").read_text())
+    arrays = {name: np.load(directory/f"{name}.npy", mmap_mode="r", allow_pickle=False)
+              for name in ("X_train", "X_test", "y_train", "y_test", "relevant_features")}
+    return DatasetBundle(**arrays, **info)
