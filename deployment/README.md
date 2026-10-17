@@ -16,30 +16,21 @@ and property validity. cfn-guard 3.2.1 passed five selected AWS registry rules:
 S3 encryption, public-access blocking, versioning, TLS-only policy and no
 world-accessible ingress. Evidence and registry revision are recorded in
 `verification/aws-bootstrap-guard.json`; this is not an exhaustive security audit.
-A CREATE change set `bootstrap-review-20261017` now exists for stack
-`bankai-benchmark-bootstrap` in `REVIEW_IN_PROGRESS`. It completed without
-validation errors and proposes three additions: bucket, TLS bucket policy and
-security group. No resource has been provisioned. Review with:
+The approved change set was executed on 2026-10-17. Stack
+`bankai-benchmark-bootstrap` is `CREATE_COMPLETE`. SDK readback confirmed the
+public-access block, AES256 encryption, versioning, empty bucket and no ingress.
+Evidence: `verification/aws-bootstrap-deployed.json`.
 
-```sh
-AWS_PROFILE=bankai aws cloudformation describe-change-set --region us-east-1 \
-  --stack-name bankai-benchmark-bootstrap \
-  --change-set-name bootstrap-review-20261017
-```
+- Shared result/ledger bucket: `bankai-benchmark-bootstrap-results-ku2wdx1kzzqb`
+- Dedicated security group: `sg-09b271e76df18d9b9`
+- The stack intentionally retains the bucket on future deletion.
 
-After explicit approval, apply this existing change set (do not call create-stack
-again against the review placeholder):
+`deployment/pilot-plan.json` is the next benchmark stack's unexecuted plan,
+using these outputs and the existing public subnet. It proposes IAM service
+roles, ECR, ECS and a zero-capacity Auto Scaling group. It has **not** been
+applied; no EC2 host, ECS workload or ECR image has been created.
 
-```sh
-AWS_PROFILE=bankai aws cloudformation execute-change-set --region us-east-1 \
-  --stack-name bankai-benchmark-bootstrap \
-  --change-set-name bootstrap-review-20261017
-AWS_PROFILE=bankai aws cloudformation describe-stacks --region us-east-1 \
-  --stack-name bankai-benchmark-bootstrap --query 'Stacks[0].Outputs'
-```
-
-After bootstrap, substitute its bucket and security-group outputs into
-`bankai-aws plan`, using subnet `subnet-017ce335d1359cd45`. That subnet has public
+The generated `bankai-aws plan` uses subnet `subnet-017ce335d1359cd45`. That subnet has public
 IPv4 assignment and an active internet-gateway route. The benchmark stack stays
 at zero capacity until launch verifies the one-hour AWS shutdown schedule.
 
@@ -76,3 +67,7 @@ not replace the campaign-wide BRL160 reservation ledger and BRL40 reserve.
 No compute was started. Before launch: complete dedicated access and compliance
 checks, provision the zero-capacity stack, publish the CI-verified amd64 image,
 register its digest, and review the final BRL20/one-hour pilot configuration.
+
+The locked SDK dependency includes `boto3[crt]`: the CLI login credential
+provider requires AWS CRT. Actual SDK access using profile `bankai` was tested
+against the deployed bootstrap resources without exporting credentials.
