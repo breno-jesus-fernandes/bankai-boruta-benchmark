@@ -25,13 +25,14 @@ Evidence: `verification/aws-bootstrap-deployed.json`.
 - Dedicated security group: `sg-09b271e76df18d9b9`
 - The stack intentionally retains the bucket on future deletion.
 
-`deployment/pilot-plan.json` is the next benchmark stack's unexecuted plan,
-using these outputs, the published immutable image digest and the existing
-public subnet. The reviewed CloudFormation change set proposes IAM service
-roles, ECS and a zero-capacity Auto Scaling group. It has **not** been
-executed; no pilot EC2 host or ECS workload has been created. The image is in
-the separate publisher repository; the pilot stack does not create a duplicate
-ECR repository.
+`deployment/pilot-plan.json` records the pilot configuration, published
+immutable image digest and existing public subnet. The approved stack
+`bankai-pilot-20261017` is deployed (`CREATE_COMPLETE`) with IAM service roles,
+ECS and a zero-capacity Auto Scaling group. AWS readback confirmed min=0,
+desired=0, max=1, no EC2 instances and no registered ECS container instances.
+The image is in the separate publisher repository; the pilot stack does not
+create a duplicate ECR repository. Evidence:
+`verification/aws-pilot-deployed.json`.
 
 The generated `bankai-aws plan` uses subnet `subnet-017ce335d1359cd45`. That subnet has public
 IPv4 assignment and an active internet-gateway route. The benchmark stack stays
