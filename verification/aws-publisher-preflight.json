@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-17",
+  "guard_version": "3.2.1",
+  "registry_revision": "7f7340c26ae5d5e8874651dbffeb12e0e9f505b6",
+  "template_sha256": "89104e93de508ba460d8e02561d6f02759635100d5a6ef53476161d04e294c7d",
+  "guard_results": [
+    {
+      "name": "deployment/publisher.json",
+      "metadata": {},
+      "status": "PASS",
+      "not_compliant": [],
+      "not_applicable": [],
+      "compliant": [
+        "ECR_REPO_SCAN_ON_PUSH",
+        "IAM_ROLE_NO_ALLOW_PLUS_NOT_ACTION_ON_TRUST_POLICY",
+        "IAM_ROLE_NO_ALLOW_PLUS_NOT_PRINCIPAL",
+        "IAM_ROLE_NO_FULL_ACCESS_ON_TRUST_POLICY",
+        "IAM_ROLE_NO_WILDCARD_ACTIONS_ON_PERMISSIONS"
+      ]
+    }
+  ],
+  "access_analyzer_findings": [],
+  "iam_simulation": [
+    {
+      "Action": "ecr:PutImage",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "allowed"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    },
+    {
+      "Action": "ecr:GetAuthorizationToken",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "implicitDeny"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    },
+    {
+      "Action": "ec2:RunInstances",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "implicitDeny"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    },
+    {
+      "Action": "iam:CreateRole",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "implicitDeny"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    },
+    {
+      "Action": "s3:PutObject",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "implicitDeny"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    },
+    {
+      "Action": "autoscaling:UpdateAutoScalingGroup",
+      "Resources": [
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/bankai-image-publisher-images",
+          "Decision": "implicitDeny"
+        },
+        {
+          "Arn": "arn:aws:ecr:us-east-1:642504869083:repository/other",
+          "Decision": "implicitDeny"
+        }
+      ]
+    }
+  ],
+  "auth_token_simulation": [
+    {
+      "Action": "ecr:GetAuthorizationToken",
+      "Decision": "allowed"
+    }
+  ],
+  "validation_errors": [],
+  "change_set": "publisher-review-20261017",
+  "executed": false
+}
