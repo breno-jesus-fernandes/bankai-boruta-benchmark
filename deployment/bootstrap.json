@@ -1,0 +1,145 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private retained benchmark results and isolated outbound-only network group; no compute.",
+  "Metadata": {
+    "AWSToolsMetrics": {
+      "AWSAgentToolkit": "aws-cloudformation@3"
+    }
+  },
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    }
+  },
+  "Resources": {
+    "Results": {
+      "Type": "AWS::S3::Bucket",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "One shared campaign bucket keeps the cumulative budget ledger across pilot stacks. Preserve raw results for reproducibility.",
+          "must": [
+            "Private access only; retain results and ledger on stack deletion."
+          ]
+        }
+      },
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "AbortIncompleteUploads",
+              "Status": "Enabled",
+              "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 1
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "ResultsPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Require TLS for raw results and budget reservations.",
+          "must": [
+            "Deny insecure transport for bucket and object requests."
+          ]
+        }
+      },
+      "Properties": {
+        "Bucket": {
+          "Ref": "Results"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Results",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": "${Results.Arn}/*"
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BenchmarkNetwork": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Dedicated group avoids modifying shared default or SageMaker groups. ECS pulls and uploads through existing public subnet routes.",
+          "must": [
+            "No inbound rules; no NAT gateway or paid network endpoints."
+          ]
+        }
+      },
+      "Properties": {
+        "GroupDescription": "Bankai benchmark outbound-only",
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "SecurityGroupIngress": [],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "Bucket": {
+      "Value": {
+        "Ref": "Results"
+      }
+    },
+    "SecurityGroup": {
+      "Value": {
+        "Ref": "BenchmarkNetwork"
+      }
+    }
+  }
+}

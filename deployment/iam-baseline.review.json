@@ -1,0 +1,279 @@
+{
+  "Policies": [
+    {
+      "Policy": {
+        "Id": "IamPolicyAutopilot",
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "autoscaling:DescribeAutoScalingGroups",
+              "autoscaling:DescribeScheduledActions"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "autoscaling:PutScheduledUpdateGroupAction",
+              "autoscaling:UpdateAutoScalingGroup"
+            ],
+            "Resource": [
+              "arn:aws:autoscaling:us-east-1:642504869083:autoScalingGroup:*:autoScalingGroupName/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudformation:CreateStack",
+              "cloudformation:DeleteStack",
+              "cloudformation:DescribeStacks",
+              "cloudformation:TagResource"
+            ],
+            "Resource": [
+              "arn:aws:cloudformation:us-east-1:642504869083:changeSet/*/*",
+              "arn:aws:cloudformation:us-east-1:642504869083:stack/*/*",
+              "arn:aws:cloudformation:us-east-1:642504869083:stackset/*:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudformation:ListStacks"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecr:DescribeImages"
+            ],
+            "Resource": [
+              "arn:aws:ecr:us-east-1:642504869083:repository/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecs:DescribeContainerInstances",
+              "ecs:DescribeTasks",
+              "ecs:ListContainerInstances",
+              "ecs:ListTasks",
+              "ecs:RegisterTaskDefinition",
+              "ecs:RunTask",
+              "ecs:StopTask"
+            ],
+            "Resource": [
+              "arn:aws:ecs:us-east-1:642504869083:cluster/*",
+              "arn:aws:ecs:us-east-1:642504869083:container-instance/*/*",
+              "arn:aws:ecs:us-east-1:642504869083:task-definition/*:*",
+              "arn:aws:ecs:us-east-1:642504869083:task/*/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecs:TagResource"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "autoscaling.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "ecs-tasks.amazonaws.com",
+                  "ecs.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "cloudformation.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "ecs-tasks.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kms:Decrypt",
+              "kms:GenerateDataKey"
+            ],
+            "Resource": [
+              "arn:aws:kms:us-east-1:642504869083:key/*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "kms:ViaService": [
+                  "s3.us-east-1.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject",
+              "s3:GetObjectLegalHold",
+              "s3:GetObjectRetention",
+              "s3:GetObjectTagging",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutObjectLegalHold",
+              "s3:PutObjectRetention",
+              "s3:PutObjectTagging"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*/*",
+              "arn:aws:s3:us-east-1:642504869083:accesspoint/*/object/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListAllMyBuckets"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3-object-lambda:GetObject",
+              "s3-object-lambda:PutObject"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*/*",
+              "arn:aws:s3:us-east-1:642504869083:accesspoint/*/object/*"
+            ]
+          }
+        ]
+      },
+      "PolicyType": "Identity"
+    }
+  ],
+  "Warnings": [
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 0
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 3
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 6
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 7
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 8
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 9
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 10
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 13
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    }
+  ]
+}

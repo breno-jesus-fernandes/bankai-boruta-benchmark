@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-17",
+  "region": "us-east-1",
+  "change_set": "bootstrap-review-20261017",
+  "stack": "bankai-benchmark-bootstrap",
+  "change_set_status": "CREATE_COMPLETE",
+  "validation_errors": [],
+  "provisioned": false,
+  "cloudtrail_management_events": true
+}

@@ -11,7 +11,7 @@ licenses and notices; the lockfile records the resolved distributions.
 | NumPy, SciPy, scikit-learn, pandas, joblib | BSD family |
 | LightGBM | MIT |
 | psutil | BSD-3-Clause |
-| boto3, botocore | Apache-2.0 |
+| boto3, botocore, AWS CRT | Apache-2.0 |
 | pytest | MIT |
 
 Bankai packages are installed from their public distributions. Historical
