@@ -1,0 +1,31 @@
+name: benchmark
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.5.20'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.97.1'
+      - run: sudo apt-get update && sudo apt-get install -y libgomp1
+      - run: sha256sum -c artifacts/SHA256SUMS
+      - run: uv sync --locked
+      - run: uv run pytest
+      - run: make smoke
+      - run: make aggregate
+      - run: make smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke-results
+          path: |
+            results/
+            reports/
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make docker-smoke
