@@ -1,0 +1,374 @@
+{
+  "template": {
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+      "EcsAmi": {
+        "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+        "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+      }
+    },
+    "Resources": {
+      "Repository": {
+        "Type": "AWS::ECR::Repository",
+        "Properties": {
+          "RepositoryName": "benchmark-test",
+          "ImageTagMutability": "IMMUTABLE",
+          "EmptyOnDelete": true,
+          "ImageScanningConfiguration": {
+            "ScanOnPush": true
+          }
+        }
+      },
+      "Cluster": {
+        "Type": "AWS::ECS::Cluster",
+        "Properties": {
+          "ClusterName": "benchmark-test"
+        }
+      },
+      "Logs": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+          "LogGroupName": "/bankai/benchmark-test",
+          "RetentionInDays": 30
+        }
+      },
+      "InstanceRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ec2.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+          ],
+          "Policies": []
+        }
+      },
+      "ExecutionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ecs-tasks.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+          ],
+          "Policies": []
+        }
+      },
+      "TaskRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ecs-tasks.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [],
+          "Policies": [
+            {
+              "PolicyName": "ExperimentResults",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "s3:GetObject",
+                      "s3:PutObject"
+                    ],
+                    "Resource": [
+                      "arn:aws:s3:::benchmark-results/benchmark-test/*",
+                      "arn:aws:s3:::benchmark-results/benchmark-test-quality/*",
+                      "arn:aws:s3:::benchmark-results/benchmark-test-scaling/*"
+                    ]
+                  },
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "s3:ListBucket"
+                    ],
+                    "Resource": "arn:aws:s3:::benchmark-results",
+                    "Condition": {
+                      "StringLike": {
+                        "s3:prefix": [
+                          "benchmark-test/*",
+                          "benchmark-test-quality/*",
+                          "benchmark-test-scaling/*"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "InstanceProfile": {
+        "Type": "AWS::IAM::InstanceProfile",
+        "Properties": {
+          "Roles": [
+            {
+              "Ref": "InstanceRole"
+            }
+          ]
+        }
+      },
+      "LaunchTemplate": {
+        "Type": "AWS::EC2::LaunchTemplate",
+        "Properties": {
+          "LaunchTemplateData": {
+            "ImageId": {
+              "Ref": "EcsAmi"
+            },
+            "InstanceType": "c7i.4xlarge",
+            "IamInstanceProfile": {
+              "Arn": {
+                "Fn::GetAtt": [
+                  "InstanceProfile",
+                  "Arn"
+                ]
+              }
+            },
+            "SecurityGroupIds": [
+              "sg-test"
+            ],
+            "MetadataOptions": {
+              "HttpTokens": "required",
+              "HttpPutResponseHopLimit": 2
+            },
+            "BlockDeviceMappings": [
+              {
+                "DeviceName": "/dev/xvda",
+                "Ebs": {
+                  "VolumeSize": 100,
+                  "VolumeType": "gp3",
+                  "Encrypted": true,
+                  "DeleteOnTermination": true
+                }
+              }
+            ],
+            "UserData": {
+              "Fn::Base64": {
+                "Fn::Sub": "#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n"
+              }
+            }
+          }
+        }
+      },
+      "Fleet": {
+        "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "Properties": {
+          "MinSize": "5",
+          "MaxSize": "5",
+          "DesiredCapacity": "5",
+          "VPCZoneIdentifier": [
+            "subnet-test"
+          ],
+          "LaunchTemplate": {
+            "LaunchTemplateId": {
+              "Ref": "LaunchTemplate"
+            },
+            "Version": {
+              "Fn::GetAtt": [
+                "LaunchTemplate",
+                "LatestVersionNumber"
+              ]
+            }
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "benchmark-test",
+              "PropagateAtLaunch": true
+            }
+          ]
+        }
+      },
+      "CapacityProvider": {
+        "Type": "AWS::ECS::CapacityProvider",
+        "Properties": {
+          "Name": "benchmark-test",
+          "AutoScalingGroupProvider": {
+            "AutoScalingGroupArn": {
+              "Ref": "Fleet"
+            },
+            "ManagedScaling": {
+              "Status": "DISABLED"
+            },
+            "ManagedTerminationProtection": "DISABLED"
+          }
+        }
+      },
+      "Association": {
+        "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+        "Properties": {
+          "Cluster": {
+            "Ref": "Cluster"
+          },
+          "CapacityProviders": [
+            {
+              "Ref": "CapacityProvider"
+            }
+          ],
+          "DefaultCapacityProviderStrategy": [
+            {
+              "CapacityProvider": {
+                "Ref": "CapacityProvider"
+              },
+              "Weight": 1
+            }
+          ]
+        }
+      }
+    },
+    "Outputs": {
+      "Cluster": {
+        "Value": {
+          "Ref": "Cluster"
+        }
+      },
+      "CapacityProvider": {
+        "Value": {
+          "Ref": "CapacityProvider"
+        }
+      },
+      "Repository": {
+        "Value": {
+          "Fn::GetAtt": [
+            "Repository",
+            "RepositoryUri"
+          ]
+        }
+      },
+      "ExecutionRole": {
+        "Value": {
+          "Fn::GetAtt": [
+            "ExecutionRole",
+            "Arn"
+          ]
+        }
+      },
+      "TaskRole": {
+        "Value": {
+          "Fn::GetAtt": [
+            "TaskRole",
+            "Arn"
+          ]
+        }
+      },
+      "Logs": {
+        "Value": {
+          "Ref": "Logs"
+        }
+      }
+    }
+  },
+  "task_definition": null,
+  "commands": [
+    [
+      "full",
+      "--suite",
+      "quality",
+      "--dataset",
+      "industrial",
+      "--experiment",
+      "benchmark-test",
+      "--bucket",
+      "benchmark-results",
+      "--region",
+      "us-east-1"
+    ],
+    [
+      "full",
+      "--suite",
+      "quality",
+      "--dataset",
+      "credito",
+      "--experiment",
+      "benchmark-test",
+      "--bucket",
+      "benchmark-results",
+      "--region",
+      "us-east-1"
+    ],
+    [
+      "full",
+      "--suite",
+      "quality",
+      "--dataset",
+      "bioinformatica",
+      "--experiment",
+      "benchmark-test",
+      "--bucket",
+      "benchmark-results",
+      "--region",
+      "us-east-1"
+    ],
+    [
+      "full",
+      "--suite",
+      "quality",
+      "--dataset",
+      "ciberseguranca",
+      "--experiment",
+      "benchmark-test",
+      "--bucket",
+      "benchmark-results",
+      "--region",
+      "us-east-1"
+    ],
+    [
+      "full",
+      "--suite",
+      "scaling",
+      "--dataset",
+      "industrial",
+      "--experiment",
+      "benchmark-test",
+      "--bucket",
+      "benchmark-results",
+      "--region",
+      "us-east-1"
+    ]
+  ],
+  "reservations": {
+    "cpu": 16384,
+    "memory_mib": 28672
+  },
+  "constraints": [
+    {
+      "type": "distinctInstance"
+    },
+    {
+      "type": "memberOf",
+      "expression": "attribute:ecs.instance-type == c7i.4xlarge"
+    }
+  ]
+}

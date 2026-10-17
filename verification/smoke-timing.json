@@ -1,5 +1,12 @@
 {
-  "wall_seconds": 14.701092333009,
-  "exit_code": 0,
-  "platform": "macOS-26.6.2-arm64-arm-64bit"
+  "source_commit": "ce7a598f5248ec2c2272b0ea264b35604ba1456a",
+  "wall_seconds": 11.606169416976627,
+  "successful_trials": 7,
+  "resume_unchanged": true,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "cpu": "Apple M1",
+  "logical_cpus": 8,
+  "ram_gib": 8,
+  "threads": 1,
+  "source_hash": "ec26493f3ae73c1d5c4c461791349c519ba49a11e540d968ddd5d41bd4211f76"
 }
