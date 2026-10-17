@@ -1,7 +1,7 @@
 # Pilot preparation
 
 Account audit on 2026-10-17: `bankai` still authenticates as root. The account
-has no IAM users or IAM Identity Center instances. Use a dedicated federated
+has no IAM users; no IAM Identity Center instance was returned in us-east-1. Use a dedicated federated
 identity before routine deployment; do not create or commit root access keys.
 
 `bootstrap.json` prepares a new, private AES256-encrypted, versioned S3 bucket
