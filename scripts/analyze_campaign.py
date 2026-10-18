@@ -51,6 +51,9 @@ def export(fig,root,name):
         metadata={'Date':None,'Creator':'Bankai benchmark'} if extension=='svg' else (
             {'CreationDate':None,'ModDate':None,'Creator':'Bankai benchmark'} if extension=='pdf' else {'Software':'Bankai benchmark'})
         fig.savefig(root/f'{name}.{extension}',bbox_inches='tight',dpi=220,metadata=metadata)
+        if extension=='svg':
+            path=root/f'{name}.{extension}'
+            path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
     plt.close(fig)
 
 
@@ -148,6 +151,8 @@ def main():
         return parsed
     quality=numbers(out/'quality/summary_by_dataset.csv');scaling=numbers(out/'scaling/thread_scaling.csv')
     figures(quality,scaling,out/'figures')
+    for path in out.rglob('*.csv'):
+        path.write_text(path.read_text())  # Normalize generated CSVs to LF for source control.
     checks=dict(unique_measured_trials=210,quality=140,new_scaling=70,reused_scaling=35,
         quality_seeds_per_cell=5,scaling_seeds_per_cell=5,scaling_baseline_threads=4,
         observed_distinct_task_pid_pairs=pid_count,affinity_contract_passed=True,bankai_execution_paths_passed=True,
