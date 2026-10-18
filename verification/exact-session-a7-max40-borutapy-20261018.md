@@ -7,6 +7,7 @@ trees, depth 6, `max_features="sqrt"`, bootstrap, float32, and 16 physical AMD
 cores on `c7a.4xlarge`. Jobs ran sequentially on isolated processes and hosts.
 The three processes reported the same Linux kernel, architecture, and 16 logical
 CPUs. Fit time and external process RSS were measured over three repetitions.
+All selectors used `alpha=0.05`, `two_step=True`, and shadow percentile 100.
 
 | Method | Fixed-40 median time | Fixed-40 median RSS | Capped-40 median time | Capped-40 median RSS | Actual rounds |
 |---|---:|---:|---:|---:|---:|
@@ -26,6 +27,11 @@ was **0.667** for all three methods: each confirmed 8 true features and no
 irrelevant features. If tentative features are counted as selected, precision
 is **0.889** for either Bankai variant (the extra tentative feature 64 is
 irrelevant) and **1.000** for BorutaPy; recall remains **0.667** for all.
+These are point metrics on one fixed synthetic dataset, whose relevant-feature
+set is known exactly; no confidence interval is estimated for them. The three
+repetitions measure runtime/RSS variability on the same seed and are not
+independent dataset samples. The selectors' `alpha=0.05` controls their
+internal feature tests and is not a precision/recall confidence interval.
 
 BorutaPy's median run was about 20–21% shorter than the Bankai medians, while
 using about 199 MiB more RSS than the materialized reference and about 547 MiB
