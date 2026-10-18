@@ -145,7 +145,7 @@ def main():
     if args.action == "plan":
         fake_outputs = dict(ExecutionRole="${ExecutionRole}", TaskRole="${TaskRole}", Logs=f"/bankai/{args.experiment}")
         definition = task_definition(args.experiment, args.image, args.region, fake_outputs) if args.image else None
-        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=200, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
+        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=220, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
             constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])]), indent=2)); return
     import boto3
     session = boto3.Session(region_name=args.region); cf, ecs = session.client("cloudformation"), session.client("ecs")

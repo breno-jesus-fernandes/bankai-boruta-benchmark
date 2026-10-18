@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 import json
 import pytest
-from bankai_benchmark.budget import reserve, arm, PILOT_SECONDS
+from bankai_benchmark.budget import reserve, arm, PILOT_SECONDS, TOTAL_BRL
 
 
 class S3:
@@ -21,10 +21,11 @@ class S3:
 
 def test_cumulative_campaign_limit_and_no_refunds():
     s3 = S3()
-    for index in range(8): reserve(s3, 'bucket', f'fleet{index}')
-    assert len(json.loads(s3.data)['launches']) == 8
+    assert TOTAL_BRL == 220
+    for index in range(9): reserve(s3, 'bucket', f'fleet{index}')
+    assert len(json.loads(s3.data)['launches']) == 9
     with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet9')
-    assert s3.version == 8
+    assert s3.version == 9
     with pytest.raises(RuntimeError, match='already reserved'): reserve(s3, 'bucket', 'fleet0')
 
 

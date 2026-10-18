@@ -1,9 +1,7 @@
-# Orçamento v2 — planejamento offline
+# Orçamento do smoke ECS v2
 
-Nenhum recurso AWS foi iniciado nesta etapa. Os valores da campanha a4 são evidência histórica em [BUDGET a4](docs/history/a4-20261017/BUDGET.md), não uma estimativa para a AMD.
+O teto aprovado para o piloto ECS foi elevado para R$220. R$40 permanecem reservados, cada execução piloto consome irrevogavelmente R$20 e a política permite até nove reservas no total. O smoke autorizado é limitado a uma instância por até uma hora; uma ação agendada no Auto Scaling Group força min/max/desejado a zero como proteção adicional.
 
-A campanha v2 tem 80 fits de qualidade e 100 de escala, além de warmups e referências downstream. As novas dimensões dobram N; o smoke local não permite estimar duração ou custo real. Não transportar tempos, preço de c7i ou alocações consumidas para uma campanha c7a.
+A imagem v2 foi publicada no ECR e a stack `bankai-paper-v2-a5-ecs-smoke` foi criada sem capacidade ativa. Antes de ligar a instância, a política local e o ledger S3 serão alinhados ao limite aprovado, uma reserva única será registrada e o desligamento automático será armado e verificado. O ledger conserva as reservas anteriores; falhas não devolvem valores automaticamente.
 
-Antes da campanha, obter cotação vigente c7a.4xlarge na região escolhida, câmbio, impostos, EBS, logs, tráfego e armazenamento; calcular limite por duração e manter reserva. Os limites existentes de `budget.py` são travas conservadoras, não orçamento calibrado do v2. Usar novo experiment ID e ledger aprovado, garantir encerramento automático e uma tarefa por host. Planos offline deixam DesiredCapacity=0.
-
-A revisão de orçamento e a campanha paga ficam para uma etapa posterior. Nenhuma publicação de resultados ou imagens foi feita aqui.
+Este limite cobre somente o smoke ECS, não a campanha de qualidade ou escalabilidade. A c7a.4xlarge deve ser usada em `us-east-1`; planos offline mantêm capacidade desejada zero. O piloto não estima duração ou custo de campanha, nem valida recall em escala.

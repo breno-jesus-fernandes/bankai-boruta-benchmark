@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import json
 
-TOTAL_BRL = Decimal('200')
+TOTAL_BRL = Decimal('220')
 RESERVE_BRL = Decimal('40')
 PILOT_BRL = Decimal('20')
 PILOT_SECONDS = 3600
