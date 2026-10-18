@@ -21,11 +21,11 @@ class S3:
 
 def test_cumulative_campaign_limit_and_no_refunds():
     s3 = S3()
-    assert TOTAL_BRL == 220
-    for index in range(9): reserve(s3, 'bucket', f'fleet{index}')
-    assert len(json.loads(s3.data)['launches']) == 9
-    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet9')
-    assert s3.version == 9
+    assert TOTAL_BRL == 240
+    for index in range(10): reserve(s3, 'bucket', f'fleet{index}')
+    assert len(json.loads(s3.data)['launches']) == 10
+    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet10')
+    assert s3.version == 10
     with pytest.raises(RuntimeError, match='already reserved'): reserve(s3, 'bucket', 'fleet0')
 
 
