@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Reproducible, process-isolated Bankai Boruta benchmark suite"
 requires-python = ">=3.11"
 license = "MIT"
-dependencies = ["numpy>=2.1", "scipy>=1.13", "scikit-learn>=1.6", "psutil>=6", "Boruta==0.4.3", "lightgbm>=4.6,<5", "bankai-random-forest==0.1.0a15", "bankai-boruta==0.1.0a4", "boto3[crt]>=1.35"]
+dependencies = ["numpy>=2.1", "scipy>=1.13", "scikit-learn>=1.6", "psutil>=6", "Boruta==0.4.3", "lightgbm>=4.6,<5", "bankai-random-forest==0.1.0a15", "bankai-boruta==0.1.0a5", "boto3[crt]>=1.35"]
 
 [project.scripts]
 bankai-benchmark = "bankai_benchmark.orchestrator:main"

@@ -1,0 +1,39 @@
+warning: `VIRTUAL_ENV=/Users/jesus/Documents/Code/bankai-boruta/.venv` does not match the project environment path `.venv` and will be ignored
+run industrial/bankai_classic_native_s42_t1
+run industrial/bankai_classic_adapter_s42_t1
+run industrial/borutapy_lightgbm_rf_s42_t1
+run industrial/borutapy_sklearn_et_s42_t1
+run credito/bankai_classic_native_s42_t1
+run credito/bankai_classic_adapter_s42_t1
+run credito/borutapy_lightgbm_rf_s42_t1
+run credito/borutapy_sklearn_et_s42_t1
+run bioinformatica/bankai_classic_native_s42_t1
+run bioinformatica/bankai_classic_adapter_s42_t1
+run bioinformatica/borutapy_lightgbm_rf_s42_t1
+run bioinformatica/borutapy_sklearn_et_s42_t1
+run ciberseguranca/bankai_classic_native_s42_t1
+run ciberseguranca/bankai_classic_adapter_s42_t1
+run ciberseguranca/borutapy_lightgbm_rf_s42_t1
+run ciberseguranca/borutapy_sklearn_et_s42_t1
+skip industrial/bankai_classic_native_s42_t1
+skip industrial/bankai_classic_adapter_s42_t1
+skip industrial/borutapy_lightgbm_rf_s42_t1
+skip industrial/borutapy_sklearn_et_s42_t1
+skip credito/bankai_classic_native_s42_t1
+skip credito/bankai_classic_adapter_s42_t1
+skip credito/borutapy_lightgbm_rf_s42_t1
+skip credito/borutapy_sklearn_et_s42_t1
+skip bioinformatica/bankai_classic_native_s42_t1
+skip bioinformatica/bankai_classic_adapter_s42_t1
+skip bioinformatica/borutapy_lightgbm_rf_s42_t1
+skip bioinformatica/borutapy_sklearn_et_s42_t1
+skip ciberseguranca/bankai_classic_native_s42_t1
+skip ciberseguranca/bankai_classic_adapter_s42_t1
+skip ciberseguranca/borutapy_lightgbm_rf_s42_t1
+skip ciberseguranca/borutapy_sklearn_et_s42_t1
+{
+  "protocol": "paper-v2-a5-amd16",
+  "smoke_wall_seconds": 25.413203082978725,
+  "successful_trials": 16,
+  "resume_unchanged": true
+}

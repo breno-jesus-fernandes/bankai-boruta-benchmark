@@ -47,9 +47,10 @@ def test_busy_cluster_prevents_even_creating_another_fleet(tmp_path):
     controller.asg.create_auto_scaling_group.assert_not_called()
 
 
-def test_full_seed_grid_required_before_advancing():
+@pytest.mark.parametrize("methods", [4,7])
+def test_full_seed_grid_required_before_advancing(methods):
     expected = [{"dataset": "credito", "competitor": str(m), "seed": s, "threads": 16}
-                for m in range(7) for s in range(42, 47)]
+                for m in range(methods) for s in range(42, 47)]
     results = [dict(row, status="success") for row in expected]
     assert controller_module.dataset_complete(results, expected, "credito")
     assert not controller_module.dataset_complete(results[:-1], expected, "credito")

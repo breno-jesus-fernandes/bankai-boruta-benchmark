@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pytest
 from sklearn.base import clone
-from bankai_benchmark.competitors import estimator,fit_select,PythonGreedy
+from bankai_benchmark.competitors import estimator,fit_select
 from bankai_benchmark.config import COMPETITORS,Trial
 from bankai_benchmark.datasets import generate_dataset
 from bankai_benchmark.metrics import downstream,selection_metrics
@@ -41,14 +41,3 @@ def test_lightgbm_width_and_cloning():
     model.fit(X[:,:20],y);assert model.colsample_bytree == 4/20
     model=estimator(replace(trial(),dataset='bioinformatica'),'lightgbm')
     model.fit(X,y);assert model.colsample_bytree == .15
-
-def test_greedy_strict_hit_once_full_set():
-    class Controlled:
-        calls=0
-        def set_params(self,**kwargs):return self
-        def fit(self,X,y):
-            self.calls+=1;assert X.shape[1] == 6
-            self.feature_importances_=np.array([2 if self.calls == 1 else 0,1,0,1,1,1])
-    model=Controlled();result=PythonGreedy(model,.05,42).fit(np.zeros((10,3)),np.arange(10)%2)
-    assert model.calls == result.n_iter_ == ceil(log2(3/.05))
-    assert result.support_.tolist() == [True,False,False]

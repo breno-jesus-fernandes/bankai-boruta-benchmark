@@ -30,6 +30,7 @@ def paired_comparisons(rows):
            ('bankai_greedy_native','greedy_borutapy_bankai')]
     for dataset in DATASETS:
         for a,b in pairs:
+            if not all((dataset,method,seed) in lookup for method in (a,b) for seed in SEEDS): continue
             paired=[(lookup[(dataset,a,s)],lookup[(dataset,b,s)]) for s in SEEDS]
             row=dict(dataset=dataset,method_a=a,method_b=b,paired_seeds=len(paired),
                 identical_confirmed_sets=sum(x['selected_indices']==y['selected_indices'] for x,y in paired),
@@ -109,6 +110,13 @@ def main():
     parser.add_argument('--quality',required=True);parser.add_argument('--scaling',required=True)
     parser.add_argument('--output',required=True)
     args=parser.parse_args();out=Path(args.output);out.mkdir(parents=True,exist_ok=True)
+    if any(json.loads(p.read_text()).get("protocol") == "paper-v2-a5-amd16" for p in Path(args.quality).rglob("manifest.json")):
+        from bankai_benchmark.reporting_v2 import report
+        report(args.quality, args.scaling, out)
+        return
+    global COMPETITORS
+    from bankai_benchmark.config import HISTORICAL_COMPETITORS
+    COMPETITORS = HISTORICAL_COMPETITORS
     rows,expected,issues=validated_results(args.quality)
     if len(rows)!=140 or issues or any(r['status']!='success' for r in rows):
         raise ValueError('Complete successful 140-trial quality suite required')

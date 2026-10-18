@@ -4,10 +4,20 @@ import json
 from pathlib import Path
 
 SCHEMA_VERSION = 1
-GENERATOR_VERSION = "1.0.0"
+GENERATOR_VERSION = "2.0.0"
+PROTOCOL = "paper-v2-a5-amd16"
+MACHINE = dict(instance_type="c7a.4xlarge", physical_cores=16, threads_per_core=1, memory_gib=32)
 SEEDS = (42, 43, 44, 45, 46)
-COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "bankai_greedy_native",
+HISTORICAL_COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "bankai_greedy_native",
                "borutapy_lightgbm_rf", "borutapy_sklearn_et", "greedy_borutapy_bankai", "greedy_borutapy_lightgbm")
+COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "borutapy_lightgbm_rf", "borutapy_sklearn_et")
+EFFECT_WEIGHTS = {
+    "industrial": [1, 1, .25, .25, .02, .02],
+    "credito": [1.]*7 + [.25]*4 + [.02]*3,
+    "bioinformatica": [.35]*10 + [1.]*10,
+    "ciberseguranca": ([1.]*10 + [.25]*6 + [.02]*4)*3,
+}
+MARGINAL_COEFFICIENT = .35
 DOWNSTREAM = dict(n_estimators=200, max_features="sqrt", class_weight="balanced")
 
 
@@ -41,10 +51,10 @@ class Profile:
 
 
 PROFILES = {
-    "industrial": Profile("industrial", 100000, 500, 100, 6, 63, "sqrt", 50, .5, 2.),
-    "credito": Profile("credito", 150000, 300, 100, 6, 63, "sqrt", 50, .2, 2.),
-    "bioinformatica": Profile("bioinformatica", 25000, 2000, 150, 8, 63, .15, 60, .5, 1.),
-    "ciberseguranca": Profile("ciberseguranca", 200000, 150, 100, 6, 63, "sqrt", 40, .1, 2.),
+    "industrial": Profile("industrial", 200000, 500, 100, 6, 63, "sqrt", 50, .5, 1.),
+    "credito": Profile("credito", 300000, 300, 100, 6, 63, "sqrt", 50, .2, 1.),
+    "bioinformatica": Profile("bioinformatica", 50000, 2000, 150, 8, 63, .15, 60, .5, 1.),
+    "ciberseguranca": Profile("ciberseguranca", 400000, 150, 100, 6, 63, "sqrt", 40, .1, 1.),
 }
 RELEVANT_COUNTS = dict(industrial=12, credito=20, bioinformatica=30, ciberseguranca=60)
 
@@ -73,7 +83,7 @@ class Trial:
 
     @property
     def configuration_hash(self):
-        return digest(dict(profile=asdict(profile(self.dataset, self.mode)), generator=GENERATOR_VERSION,
+        return digest(dict(profile=asdict(profile(self.dataset, self.mode)), generator=GENERATOR_VERSION, protocol=PROTOCOL, machine=MACHINE,
                            source_hash=source_hash(), dependencies=dependency_hash(), downstream=DOWNSTREAM, competitor=self.competitor, threads=self.threads))
 
     @property
@@ -86,7 +96,7 @@ class Trial:
 
 
 def trial_grid(experiment_id, mode, suite, dataset=None):
-    datasets = [dataset] if dataset else (["industrial"] if mode == "smoke" or suite == "scaling" else list(PROFILES))
+    datasets = [dataset] if dataset else (["industrial"] if suite == "scaling" else list(PROFILES))
     seeds = (42,) if mode == "smoke" else ((42, 43) if mode == "smoke-matrix" else SEEDS)
     threads = (1,) if mode == "smoke" else ((1, 4) if mode == "smoke-matrix" else ((1, 2, 4, 8, 16) if suite == "scaling" else (16,)))
     return tuple(Trial(experiment_id, suite, mode, d, c, s, t) for d in datasets for c in COMPETITORS for t in threads for s in seeds)

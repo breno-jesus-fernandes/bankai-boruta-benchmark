@@ -1,0 +1,15 @@
+{
+  "verified_version": "0.1.0a4",
+  "native_control_tests_passed": true,
+  "wheel_hashes": {
+    "bankai_boruta-0.1.0a4-cp311-abi3-macosx_10_12_x86_64.whl": "f5a90e063e5e52e94a5a42e846bf9588c3804c8204894ea5ab4195cc56108455",
+    "bankai_boruta-0.1.0a4-cp311-abi3-macosx_11_0_arm64.whl": "41e43dab5c8abe77eb05a06da9043adc0c61661a86f9d7965bc5d07f2c63468e",
+    "bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_aarch64.whl": "25576481437499029b03effb2e3cd8bec69641e100bc6fe3d41cdd18b082967a",
+    "bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_x86_64.whl": "cfc4abab425cd53e5b736c001ee8907a4b20ea5cbd6f2ca3ae8af3d0c7fc4bc9",
+    "bankai_boruta-0.1.0a4-cp311-abi3-win_amd64.whl": "2ceb171a5184a69526554460f4d66e3ecc9ea6d06c70b3fa12aa0388c16f3155",
+    "bankai_boruta-0.1.0a4.tar.gz": "203a33302b8fa920f150a7d10b77d4fabfec5543eaab654ff23767d3307bf585"
+  },
+  "source_revision": "6ce4c434b0087fe7d569266846aa8642266b2bbf",
+  "reason": "21 native/adapter parity cases passed locally and on Linux; seven-selector Linux amd64 container smoke passed with VmHWM and affinity assertions.",
+  "linux_acceptance_url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39057940483"
+}

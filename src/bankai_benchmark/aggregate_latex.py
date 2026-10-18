@@ -32,7 +32,9 @@ def validated_results(root):
         manifest = json.loads(path.read_text())
         if digest({k: v for k, v in manifest.items() if k != "configuration_hash"}) != manifest["configuration_hash"]:
             raise ValueError(f"Manifest checksum mismatch: {path}")
-        fingerprints.add(digest(dict(source=manifest["source_hash"], packages=manifest["package_versions"])))
+        if manifest.get("protocol") not in (None, "paper-v2-a5-amd16"):
+            raise ValueError("Unsupported benchmark protocol")
+        fingerprints.add(digest(dict(source=manifest["source_hash"], packages=manifest["package_versions"], protocol=manifest.get("protocol", "paper-v1-a4"))))
         for spec in manifest["trials"]:
             expected.append(spec)
             result_path = path.parent.parent/spec["key"]
@@ -42,6 +44,8 @@ def validated_results(root):
             for field in ("configuration_hash", "dataset", "competitor", "seed", "threads", "experiment_id", "suite", "mode"):
                 if result[field] != spec[field]:
                     raise ValueError(f"Manifest mismatch {field}: {result_path}")
+            if manifest.get("protocol") and result.get("protocol") != manifest["protocol"]:
+                raise ValueError(f"Result protocol mismatch: {result_path}")
             if result["status"] != "success":
                 issues.append(dict(key=spec["key"], status=result["status"]))
             results.append(result)
@@ -76,6 +80,7 @@ def placeholder_values(results, mapping):
         tokens["m"+alias] = median(alias, "execution_metrics", "peak_rss_gib")
         tokens["r"+alias] = median(alias, "selection_metrics", "recall")
     for suffix, alias in (("C", "CR"), ("G", "GR")):
+        if alias not in groups: continue
         tokens["info"+suffix] = median(alias, "selection_metrics", "tp")
         tokens["ruido"+suffix] = median(alias, "selection_metrics", "fp")
     opts = dict(threads=mapping["threads"], dataset=mapping["dataset"])
@@ -111,6 +116,13 @@ def aggregate(root, output, provisional=False, mapping_path=None):
         subtypes = {name for r in successes for name in r["selection_metrics"].get("subtype_recall", {})}
         for name in sorted(subtypes):
             row.update({f"recall_{name}_{stat}": value for stat, value in distribution([r["selection_metrics"]["subtype_recall"][name] for r in successes if r["selection_metrics"]["subtype_recall"].get(name) is not None]).items()})
+        for category in ("intensity_recall",):
+            for name in sorted({name for r in successes for name in r["selection_metrics"].get(category, {})}):
+                row.update({f"{category}_{name}_{stat}": value for stat, value in distribution([r["selection_metrics"][category][name] for r in successes if r["selection_metrics"].get(category, {}).get(name) is not None]).items()})
+        # Explicit buffers are diagnostics, never interchangeable with process RSS.
+        numeric_diagnostics = {key for r in successes for key, value in (r.get("diagnostics") or {}).items() if isinstance(value, (int, float)) and not isinstance(value, bool)}
+        for name in sorted(numeric_diagnostics):
+            row.update({f"diagnostic_{name}_{stat}": value for stat, value in distribution([r["diagnostics"][name] for r in successes if isinstance((r.get("diagnostics") or {}).get(name), (int, float))]).items()})
         for reference in ("oracle", "all_features"):
             values = []
             for spec in specs:
@@ -132,7 +144,9 @@ def aggregate(root, output, provisional=False, mapping_path=None):
             **{f"speedup_{k}": v for k, v in distribution(values).items()},
             **{f"efficiency_{k}": v for k, v in distribution([v/row["threads"] for v in values]).items()}))
     write_csv(output/"thread_scaling.csv", scaling)
-    mapping = json.loads(Path(mapping_path or Path(__file__).with_name("config-paper.json")).read_text())
+    manifests = [json.loads(p.read_text()) for p in Path(root).rglob("manifest.json")]
+    current = all(m.get("protocol") == "paper-v2-a5-amd16" for m in manifests)
+    mapping = json.loads(Path(mapping_path or Path(__file__).with_name("config-paper.json" if current else "config-paper-v1.json")).read_text())
     tokens, placeholder_complete = placeholder_values(results, mapping)
     complete = placeholder_complete and not issues
     if not complete and not provisional:
@@ -153,7 +167,9 @@ def aggregate(root, output, provisional=False, mapping_path=None):
         return "\n".join(lines+["\\end{tabular}"])+"\n"
     quality = [r for r in summary if r["suite"] == "quality"]
     (output/"wmecai_table1.tex").write_text(table([r for r in quality if r["competitor"] != "greedy_borutapy_lightgbm"]))
-    (output/"wmecai_lightgbm_greedy.tex").write_text(table([r for r in quality if r["competitor"] == "greedy_borutapy_lightgbm"]))
+    if current:
+        (output/"wmecai_lightgbm_greedy.tex").unlink(missing_ok=True)
+    if not current: (output/"wmecai_lightgbm_greedy.tex").write_text(table([r for r in quality if r["competitor"] == "greedy_borutapy_lightgbm"]))
     atomic_json(output/"completeness.json", dict(final_paper_ready=complete, expected=len(expected),
         successful=sum(r["status"] == "success" for r in results), issues=issues, quantile_method=QUANTILE_METHOD))
     markdown = ["# "+label, "", f"Expected: {len(expected)}. Successful: {sum(r['status']=='success' for r in results)}. Missing/failed: {len(issues)}.", "",

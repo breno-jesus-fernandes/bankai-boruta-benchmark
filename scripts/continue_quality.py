@@ -20,7 +20,7 @@ from botocore.config import Config
 
 from bankai_benchmark.aggregate_latex import aggregate, validated_results
 from bankai_benchmark.budget import arm, reserve, stop, validate_policy
-from bankai_benchmark.config import atomic_json
+from bankai_benchmark.config import atomic_json, MACHINE
 
 
 DATASETS = ("credito", "bioinformatica", "ciberseguranca")
@@ -37,7 +37,7 @@ def dataset_complete(results, expected, dataset):
     found = {(r["competitor"], r["seed"], r["threads"]) for r in results
              if r["dataset"] == dataset and r["status"] == "success"}
     wanted = {(s["competitor"], s["seed"], s["threads"]) for s in specs}
-    return len(specs) == 35 and found == wanted
+    return len(specs) in (20, 35) and len(wanted) == len(specs) and found == wanted
 
 
 class Controller:
@@ -170,7 +170,7 @@ class Controller:
         response = self.ecs.run_task(cluster=self.args.cluster,
             taskDefinition=self.args.task_definition, count=1, launchType="EC2",
             placementConstraints=[{"type": "distinctInstance"}, {"type": "memberOf",
-                "expression": "attribute:ecs.instance-type == c7i.4xlarge"}],
+                "expression": "attribute:ecs.instance-type == "+MACHINE["instance_type"]}],
             overrides={"containerOverrides": [{"name": "benchmark", "command": [
                 "full", "--suite", suite, "--dataset", target_dataset or dataset,
                 "--experiment", self.args.experiment, "--bucket", self.args.bucket,
@@ -207,7 +207,7 @@ class Controller:
         while True:
             results, expected, issues = self.sync()
             counts = Counter(r["status"] for r in results if r["dataset"] == dataset)
-            self.summary(f"{dataset}: {counts['success']}/35; falhas {sum(v for k,v in counts.items() if k != 'success')}")
+            self.summary(f"{dataset}: {counts['success']}/{len([s for s in expected if s['dataset'] == dataset])}; falhas {sum(v for k,v in counts.items() if k != 'success')}")
             response = self.ecs.describe_tasks(cluster=self.args.cluster, tasks=stage["tasks"])
             if response.get("failures") or len(response["tasks"]) != 1:
                 raise RuntimeError("ECS task status unavailable")
@@ -217,7 +217,7 @@ class Controller:
                     raise RuntimeError(f"{dataset} stopped/incomplete: {task.get('stoppedReason')}; {dict(counts)}")
                 stage.update(status="complete", completed_at=datetime.now(timezone.utc).isoformat())
                 self.save()
-                self.summary(f"{dataset}: 35/35 OK; desligando host", notify=True)
+                self.summary(f"{dataset}: todos os fits OK; desligando host", notify=True)
                 return
             if any(k != "success" and v for k, v in counts.items()):
                 raise RuntimeError(f"Trial failure; campaign halted: {dict(counts)}")
@@ -311,7 +311,7 @@ class Controller:
                     time.sleep(30)
         self.sync()
         aggregate(self.results, self.report, provisional=True)
-        self.summary("Qualidade: 140/140 OK; todos os hosts desligados. Relatorios locais prontos.", notify=True)
+        self.summary("Qualidade: todos os fits OK; todos os hosts desligados. Relatorios locais prontos.", notify=True)
 
 
 def main():

@@ -1,7 +1,18 @@
 {
-  "version": 1,
+  "version": 2,
   "dataset": "industrial",
   "threads": 16,
-  "methods": {"CR": "bankai_classic_native", "CA": "bankai_classic_adapter", "BP": "borutapy_lightgbm_rf", "GR": "bankai_greedy_native", "GB": "greedy_borutapy_bankai"},
-  "time_tokens": {"CR": "CR", "CA": "CA", "BP": "BP", "GR": "GR", "tGB": "GB"}
+  "methods": {
+    "CR": "bankai_classic_native",
+    "CA": "bankai_classic_adapter",
+    "BP": "borutapy_lightgbm_rf",
+    "ET": "borutapy_sklearn_et"
+  },
+  "time_tokens": {
+    "CR": "CR",
+    "CA": "CA",
+    "BP": "BP",
+    "ET": "ET"
+  },
+  "protocol": "paper-v2-a5-amd16"
 }

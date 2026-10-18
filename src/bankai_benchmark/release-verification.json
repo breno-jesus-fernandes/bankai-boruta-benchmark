@@ -1,15 +1,15 @@
 {
-  "verified_version": "0.1.0a4",
+  "verified_version": "0.1.0a5",
   "native_control_tests_passed": true,
-  "wheel_hashes": {
-    "bankai_boruta-0.1.0a4-cp311-abi3-macosx_10_12_x86_64.whl": "f5a90e063e5e52e94a5a42e846bf9588c3804c8204894ea5ab4195cc56108455",
-    "bankai_boruta-0.1.0a4-cp311-abi3-macosx_11_0_arm64.whl": "41e43dab5c8abe77eb05a06da9043adc0c61661a86f9d7965bc5d07f2c63468e",
-    "bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_aarch64.whl": "25576481437499029b03effb2e3cd8bec69641e100bc6fe3d41cdd18b082967a",
-    "bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_x86_64.whl": "cfc4abab425cd53e5b736c001ee8907a4b20ea5cbd6f2ca3ae8af3d0c7fc4bc9",
-    "bankai_boruta-0.1.0a4-cp311-abi3-win_amd64.whl": "2ceb171a5184a69526554460f4d66e3ecc9ea6d06c70b3fa12aa0388c16f3155",
-    "bankai_boruta-0.1.0a4.tar.gz": "203a33302b8fa920f150a7d10b77d4fabfec5543eaab654ff23767d3307bf585"
+  "artifact_sha256_verified": {
+    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_10_12_x86_64.whl": "9ffcad64d682c956505553aebb4491397cbc9eac76a84876c5975c8de6bf0221",
+    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_11_0_arm64.whl": "ce4f795f8818b921a5818685d519bd5f65ddc03a00ec1be97cfd136252db1b67",
+    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_aarch64.whl": "84e28d3d8b9036a572449610bf7f086c94b0928f37d2c1cb4244c76fdc40f914",
+    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_x86_64.whl": "4be1601509f1424c8b49eac9b33b50ca57a67b4254012cc5321429ff5a9f8d09",
+    "bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl": "00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259",
+    "bankai_boruta-0.1.0a5.tar.gz": "318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a"
   },
-  "source_revision": "6ce4c434b0087fe7d569266846aa8642266b2bbf",
-  "reason": "21 native/adapter parity cases passed locally and on Linux; seven-selector Linux amd64 container smoke passed with VmHWM and affinity assertions.",
-  "linux_acceptance_url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39057940483"
+  "reason": "Six public a5 distributions downloaded and SHA256 verified. Eleven classic native/adapter parity cases passed locally on macOS. Linux/container acceptance pending.",
+  "linux_acceptance": "pending",
+  "local_control_cases": 11
 }

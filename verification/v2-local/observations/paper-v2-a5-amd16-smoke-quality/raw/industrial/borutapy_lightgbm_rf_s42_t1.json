@@ -1,0 +1,276 @@
+{
+  "competitor": "borutapy_lightgbm_rf",
+  "configuration_hash": "f524793c56a49845e743349ec5c5ceb45740c3cd6a9e0b79f34d81b3b92deb0a",
+  "dataset": "industrial",
+  "diagnostics": {
+    "path": "python"
+  },
+  "downstream_metrics": {
+    "accuracy": 0.5,
+    "balanced_accuracy": 0.5,
+    "f1": 0.6666666666666666,
+    "roc_auc": 0.5,
+    "seconds": 0.0033682920038700104,
+    "selected_count": 0
+  },
+  "error": null,
+  "execution_metrics": {
+    "baseline_rss_bytes": 168558592,
+    "completed_rounds": 3,
+    "delta_peak_gib": 0.00396728515625,
+    "fit_polling_peak_bytes": 172818432,
+    "fit_seconds": 0.018519499979447573,
+    "highwater_reset": false,
+    "highwater_scope": "process_lifetime",
+    "memory_method": "polling",
+    "peak_rss_gib": 0.16094970703125,
+    "seconds_per_round": 0.006173166659815858,
+    "vmhwm_bytes": null
+  },
+  "experiment_id": "paper-v2-a5-amd16-smoke-quality",
+  "generator_version": "2.0.0",
+  "mode": "smoke",
+  "protocol": "paper-v2-a5-amd16",
+  "provenance": {
+    "affinity": null,
+    "cpu": "Apple M1",
+    "cpu_vendor": "unavailable",
+    "dataset_metadata": {
+      "calibration": {
+        "noise_variance": 1.0,
+        "realized_snr": 1.0,
+        "scope": "joint_train_test_synthetic",
+        "signal_variance": 1.0,
+        "snr": 1.0,
+        "term_means": [
+          -3.9968028886505634e-17,
+          1.5987211554602253e-17,
+          4.440892098500626e-19,
+          -2.042810365310288e-17,
+          -6.616929226765933e-17,
+          -1.634803403760543e-17
+        ],
+        "term_variances": [
+          1.0000000000000004,
+          0.9999999999999996,
+          0.9999999999999998,
+          0.9999999999999998,
+          1.0000000000000002,
+          0.9999999999999998
+        ]
+      },
+      "class_counts_test": [
+        50,
+        50
+      ],
+      "class_counts_train": [
+        200,
+        200
+      ],
+      "column_permutation": [
+        26,
+        7,
+        9,
+        3,
+        13,
+        33,
+        2,
+        22,
+        4,
+        25,
+        23,
+        19,
+        0,
+        14,
+        24,
+        15,
+        11,
+        39,
+        31,
+        8,
+        20,
+        10,
+        34,
+        36,
+        12,
+        18,
+        29,
+        5,
+        38,
+        35,
+        6,
+        27,
+        30,
+        37,
+        1,
+        28,
+        16,
+        17,
+        21,
+        32
+      ],
+      "configuration_hash": "95e57bbc3553a5bc801a1597ef1f014953cbf35da6c98079fef9fccaf10282fd",
+      "dataset": "industrial",
+      "dimensions": [
+        400,
+        40
+      ],
+      "effect_weights": [
+        1,
+        1,
+        0.25,
+        0.25,
+        0.02,
+        0.02
+      ],
+      "generator_hash": "e01284b558175b7cfae90507958af80d21b46f9339448e9682843586b44b222d",
+      "generator_version": "2.0.0",
+      "intensity_groups": {
+        "medium": [
+          2,
+          3,
+          6,
+          19
+        ],
+        "strong": [
+          1,
+          12,
+          30,
+          34
+        ],
+        "weak": [
+          8,
+          12,
+          16,
+          21,
+          27,
+          30
+        ]
+      },
+      "interaction_type": null,
+      "mode": "smoke",
+      "protocol": "paper-v2-a5-amd16",
+      "seed": 42,
+      "term_features": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5,
+          0
+        ]
+      ]
+    },
+    "effective_parameters": {
+      "boosting_type": "rf",
+      "class_weight": null,
+      "colsample_bytree": 0.1,
+      "deterministic": true,
+      "force_col_wise": true,
+      "importance_type": "gain",
+      "learning_rate": 0.1,
+      "max_bin": 63,
+      "max_depth": 3,
+      "min_child_samples": 2,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 8,
+      "n_jobs": 1,
+      "num_leaves": 8,
+      "objective": null,
+      "random_state": {
+        "state_hash": "c873338e3b8058b1840b93b59a48baa92fa250087c78089dc92d4f6ad4df9f83",
+        "type": "RandomState"
+      },
+      "reg_alpha": 0.0,
+      "reg_lambda": 0.0,
+      "subsample": 0.8,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 1,
+      "verbosity": -1
+    },
+    "image_digest": null,
+    "instance_identity": null,
+    "log_location": null,
+    "logical_cpus": 8,
+    "packages": {
+      "Boruta": "0.4.3",
+      "bankai-boruta": "0.1.0a5",
+      "bankai-random-forest": "0.1.0a15",
+      "lightgbm": "4.7.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.17.1"
+    },
+    "physical_cpus": 8,
+    "pid": 79144,
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_hash": "bf861762f1e9436f9e322d253f5f6c9babc3be25c6a8e49c43704fec816d0c20",
+    "task_arn": null,
+    "thread_environment": {
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "RAYON_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "topology": {
+      "allowed_cpus": null,
+      "effective_affinity": null,
+      "physical_core_ids": null,
+      "selected_cpus": null,
+      "status": "unavailable_macos_smoke"
+    }
+  },
+  "schema_version": 1,
+  "seed": 42,
+  "selected_indices": [],
+  "selection_metrics": {
+    "f1": 0.0,
+    "fdr": 0.0,
+    "fn": 12,
+    "fp": 0,
+    "fp_trap_noise": 0,
+    "fp_trap_noise_rate": 0.0,
+    "intensity_recall": {
+      "medium": 0.0,
+      "strong": 0.0,
+      "weak": 0.0
+    },
+    "precision": 0.0,
+    "recall": 0.0,
+    "selected_count": 0,
+    "subtype_recall": {
+      "correlated_noise": null,
+      "gaussian_noise": null,
+      "redundant": 0.0,
+      "signal": 0.0,
+      "trap_noise": null
+    },
+    "tentative_count": 3,
+    "tn": 28,
+    "tp": 0
+  },
+  "status": "success",
+  "suite": "quality",
+  "tentative_indices": [
+    19,
+    34,
+    39
+  ],
+  "threads": 1,
+  "trial_id": "borutapy_lightgbm_rf_s42_t1"
+}

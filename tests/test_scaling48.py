@@ -9,7 +9,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parents[1]/'scripts'))
 scaling=importlib.import_module('scaling48')
 
-from bankai_benchmark.config import COMPETITORS, SEEDS, Trial, atomic_json
+from bankai_benchmark.config import HISTORICAL_COMPETITORS as COMPETITORS, SEEDS, Trial, atomic_json
 from bankai_benchmark.orchestrator import manifest_for
 from test_aggregation import fake_result
 
@@ -21,15 +21,15 @@ def test_container_wrapper_only_restricts_grid_and_keeps_original_worker(monkeyp
     monkeypatch.setattr(orchestrator,'trial_grid',original)
     seen=[]
     monkeypatch.setattr(entry,'main',lambda:seen.extend(orchestrator.trial_grid('test-scaling','full','scaling')))
-    exec(scaling.RUNNER,{})
-    assert len(seen)==70
-    assert {t.threads for t in seen}=={4,8}
-    assert {t.seed for t in seen}==set(SEEDS)
-    assert seen[0].threads==8 and seen[-1].threads==4
-    expected={t.key:t.configuration_hash for t in original('test-scaling','full','scaling') if t.threads in (4,8)}
-    assert {t.key:t.configuration_hash for t in seen}==expected
-    with pytest.raises(ValueError):
-        orchestrator.trial_grid('test-quality','full','quality')
+    with pytest.raises(ValueError, match='Historical scaling48'):
+        exec(scaling.RUNNER,{})
+
+
+def historical_manifest(trials):
+    m=manifest_for(trials)
+    m.pop('protocol',None)
+    m['configuration_hash']=__import__('bankai_benchmark.config',fromlist=['digest']).digest({k:v for k,v in m.items() if k!='configuration_hash'})
+    return m
 
 
 def campaign(tmp_path):
@@ -37,7 +37,7 @@ def campaign(tmp_path):
     def make(root, suite, threads):
         trials=[Trial('test-'+suite,suite,'full','industrial',c,s,t)
                 for c in COMPETITORS for s in SEEDS for t in threads]
-        atomic_json(root/('test-'+suite)/'manifest.json',manifest_for(trials))
+        atomic_json(root/('test-'+suite)/'manifest.json',historical_manifest(trials))
         for t in trials:
             four=[2,100,3,100,4][t.seed-42]
             eight=[1,100,1,100,1][t.seed-42]

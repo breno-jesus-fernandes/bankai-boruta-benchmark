@@ -7,7 +7,8 @@ def test_resource_geometry_and_scoped_policies():
     template=infrastructure('example','results-bucket',['subnet-a'],['sg-a']);resources=template['Resources']
     fleet=resources['Fleet']['Properties']
     assert [fleet[k] for k in ['MinSize','MaxSize','DesiredCapacity']] == ['0','1','0']
-    assert resources['LaunchTemplate']['Properties']['LaunchTemplateData']['InstanceType'] == 'c7i.4xlarge'
+    assert resources['LaunchTemplate']['Properties']['LaunchTemplateData']['InstanceType'] == 'c7a.4xlarge'
+    assert resources['LaunchTemplate']['Properties']['LaunchTemplateData']['CpuOptions'] == {'CoreCount':16,'ThreadsPerCore':1}
     assert template['Parameters']['EcsAmi']['Default'] == AMI_PARAMETER
     statements=resources['TaskRole']['Properties']['Policies'][0]['PolicyDocument']['Statement']
     assert statements[0]['Resource'] == ['arn:aws:s3:::results-bucket/example/*','arn:aws:s3:::results-bucket/example-quality/*','arn:aws:s3:::results-bucket/example-scaling/*']
@@ -48,6 +49,6 @@ def test_mocked_single_host_launch(monkeypatch):
     result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG())
     assert len(set(result['instances'])) == 1 and len(result['tasks']) == 1
     for request in ecs.requests:
-        assert request['placementConstraints'] == [dict(type='distinctInstance'),dict(type='memberOf',expression='attribute:ecs.instance-type == c7i.4xlarge')]
+        assert request['placementConstraints'] == [dict(type='distinctInstance'),dict(type='memberOf',expression='attribute:ecs.instance-type == c7a.4xlarge')]
     assert json.loads(s3.request['Body'])['tasks'] == result['tasks']
     with pytest.raises(RuntimeError):verify_hosts([dict(lastStatus='RUNNING',containerInstanceArn='same')]*5)

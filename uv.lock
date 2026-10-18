@@ -49,7 +49,7 @@ wheels = [
 
 [[package]]
 name = "bankai-boruta"
-version = "0.1.0a4"
+version = "0.1.0a5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bankai-random-forest" },
@@ -59,13 +59,13 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3e/39/26a10bd8a3b51fd4d839ef31a7e4d612e3441c0ac11a1101cf86bcb6a4fc/bankai_boruta-0.1.0a4.tar.gz", hash = "sha256:203a33302b8fa920f150a7d10b77d4fabfec5543eaab654ff23767d3307bf585", size = 35817 }
+sdist = { url = "https://files.pythonhosted.org/packages/45/8d/e36afacc8c7d7fe2e0895970926bb1926b2d009a17f795afea5e58f8addf/bankai_boruta-0.1.0a5.tar.gz", hash = "sha256:318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a", size = 194006 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/95/8cdc5a3b40d90a24f2f3b629777bf888d8f1b58eb09913b898514f2a4963/bankai_boruta-0.1.0a4-cp311-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f5a90e063e5e52e94a5a42e846bf9588c3804c8204894ea5ab4195cc56108455", size = 441191 },
-    { url = "https://files.pythonhosted.org/packages/fc/78/65805691e1e95b1112150e77444e9ab6d787b629eb275dba0a6716461a86/bankai_boruta-0.1.0a4-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:41e43dab5c8abe77eb05a06da9043adc0c61661a86f9d7965bc5d07f2c63468e", size = 408147 },
-    { url = "https://files.pythonhosted.org/packages/6e/fa/2156b727070971be911ffe063b2eb6c12b6e3df39bdf24ac4374fca12ae6/bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:25576481437499029b03effb2e3cd8bec69641e100bc6fe3d41cdd18b082967a", size = 435025 },
-    { url = "https://files.pythonhosted.org/packages/bf/76/5e88ccc065713309b7da0bd9b58af219d77ef4d576f7ca05ab5cf79d397b/bankai_boruta-0.1.0a4-cp311-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:cfc4abab425cd53e5b736c001ee8907a4b20ea5cbd6f2ca3ae8af3d0c7fc4bc9", size = 463410 },
-    { url = "https://files.pythonhosted.org/packages/02/b6/f513e3931960e1c72eb4f2753dbe20a71aa1bc9d758462616ea803c91435/bankai_boruta-0.1.0a4-cp311-abi3-win_amd64.whl", hash = "sha256:2ceb171a5184a69526554460f4d66e3ecc9ea6d06c70b3fa12aa0388c16f3155", size = 365821 },
+    { url = "https://files.pythonhosted.org/packages/d8/40/83bbcacafb53ea747aed161b1d4079dc53e37086da60f0fe1ccb4100867b/bankai_boruta-0.1.0a5-cp311-abi3-macosx_10_12_x86_64.whl", hash = "sha256:9ffcad64d682c956505553aebb4491397cbc9eac76a84876c5975c8de6bf0221", size = 452571 },
+    { url = "https://files.pythonhosted.org/packages/32/85/b9b8db4912e40cedf5a2c5bcbc67ae7edb1e329db34c4ceb53c95dfd575d/bankai_boruta-0.1.0a5-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:ce4f795f8818b921a5818685d519bd5f65ddc03a00ec1be97cfd136252db1b67", size = 420279 },
+    { url = "https://files.pythonhosted.org/packages/a4/60/2bdfd77e8c500bf4f7893b8f349bd77e4c090bfd1e19281b87b7249890a8/bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:84e28d3d8b9036a572449610bf7f086c94b0928f37d2c1cb4244c76fdc40f914", size = 447007 },
+    { url = "https://files.pythonhosted.org/packages/b1/ee/d608695beee44fd537929d01c031f3e15851d9127cd9e3452cca60311a10/bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:4be1601509f1424c8b49eac9b33b50ca57a67b4254012cc5321429ff5a9f8d09", size = 477623 },
+    { url = "https://files.pythonhosted.org/packages/97/22/2a0e511db3f70a7bb0076d634d10856982d726e83cd114f90b3888c0dc28/bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl", hash = "sha256:00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259", size = 380325 },
 ]
 
 [[package]]
@@ -94,7 +94,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bankai-boruta", specifier = "==0.1.0a4" },
+    { name = "bankai-boruta", specifier = "==0.1.0a5" },
     { name = "bankai-random-forest", specifier = "==0.1.0a15" },
     { name = "boruta", specifier = "==0.4.3" },
     { name = "boto3", extras = ["crt"], specifier = ">=1.35" },

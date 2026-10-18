@@ -8,7 +8,7 @@ import signal
 import subprocess
 import sys
 import time
-from .config import atomic_json, digest, trial_grid, PROFILES, source_hash
+from .config import atomic_json, digest, trial_grid, PROFILES, PROTOCOL, GENERATOR_VERSION, MACHINE, COMPETITORS, source_hash
 
 
 def execute(command, timeout):
@@ -40,7 +40,7 @@ def upload(client, path, bucket, key, attempts=4):
 
 
 def manifest_for(trials):
-    data = dict(schema_version=1, experiment_id=trials[0].experiment_id, mode=trials[0].mode, suite=trials[0].suite,
+    data = dict(protocol=PROTOCOL, generator_version=GENERATOR_VERSION, machine=MACHINE, competitors=list(COMPETITORS), schema_version=1, experiment_id=trials[0].experiment_id, mode=trials[0].mode, suite=trials[0].suite,
         source_hash=source_hash(), package_versions={name: importlib.metadata.version(name) for name in
             ("bankai-boruta", "bankai-random-forest", "Boruta", "lightgbm", "numpy", "scipy", "scikit-learn")},
         trials=[dict(**asdict(t), configuration_hash=t.configuration_hash, key=t.key) for t in trials])

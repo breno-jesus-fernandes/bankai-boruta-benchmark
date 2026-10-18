@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import re
 import time
-from .config import atomic_json, PROFILES
+from .config import atomic_json, PROFILES, MACHINE
 
 AMI_PARAMETER = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
 
@@ -31,14 +31,16 @@ def infrastructure(experiment, bucket, subnets, security_groups):
         dict(Effect="Allow", Action=["s3:ListBucket"], Resource=f"arn:aws:s3:::{bucket}", Condition={"StringLike": {"s3:prefix": [prefix+"*" for prefix in prefixes]}})]
     role("TaskRole", "ecs-tasks.amazonaws.com", policies=[dict(PolicyName="ExperimentResults", PolicyDocument=dict(Version="2012-10-17", Statement=statements))])
     resource("InstanceProfile", "IAM::InstanceProfile", Roles=[ref("InstanceRole")])
-    resource("LaunchTemplate", "EC2::LaunchTemplate", LaunchTemplateData=dict(ImageId=ref("EcsAmi"), InstanceType="c7i.4xlarge",
+    resource("LaunchTemplate", "EC2::LaunchTemplate", LaunchTemplateData=dict(ImageId=ref("EcsAmi"), InstanceType=MACHINE["instance_type"], CpuOptions=dict(CoreCount=MACHINE["physical_cores"], ThreadsPerCore=MACHINE["threads_per_core"]),
         IamInstanceProfile={"Arn": attr("InstanceProfile", "Arn")}, SecurityGroupIds=security_groups,
         MetadataOptions=dict(HttpTokens="required", HttpPutResponseHopLimit=2),
         BlockDeviceMappings=[dict(DeviceName="/dev/xvda", Ebs=dict(VolumeSize=100, VolumeType="gp3", Encrypted=True, DeleteOnTermination=True))],
         UserData={"Fn::Base64": sub("#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n")}))
+    resources["LaunchTemplate"]["Metadata"] = {"com.aws.cloudformation.Context": dict(why="AMD physical-core benchmark", must=["16 physical cores, one thread per core", "one task per host"])}
     resource("Fleet", "AutoScaling::AutoScalingGroup", MinSize="0", MaxSize="1", DesiredCapacity="0", NewInstancesProtectedFromScaleIn=False, VPCZoneIdentifier=subnets,
         LaunchTemplate=dict(LaunchTemplateId=ref("LaunchTemplate"), Version=attr("LaunchTemplate", "LatestVersionNumber")),
         Tags=[dict(Key="Name", Value=experiment, PropagateAtLaunch=True)])
+    resources["Fleet"]["Metadata"] = {"com.aws.cloudformation.Context": dict(why="Offline plan must create no paid capacity", must=["DesiredCapacity=0 until a separately authorized campaign"])}
     resource("CapacityProvider", "ECS::CapacityProvider", Name=experiment, AutoScalingGroupProvider=dict(AutoScalingGroupArn=ref("Fleet"), ManagedScaling=dict(Status="DISABLED"), ManagedTerminationProtection="DISABLED", ManagedDraining="DISABLED"))
     resource("Association", "ECS::ClusterCapacityProviderAssociations", Cluster=ref("Cluster"), CapacityProviders=[ref("CapacityProvider")], DefaultCapacityProviderStrategy=[dict(CapacityProvider=ref("CapacityProvider"), Weight=1)])
     return dict(AWSTemplateFormatVersion="2010-09-09", Description="Budget-limited benchmark pilot; capacity remains zero until AWS shutdown is verified.", Metadata={"AWSToolsMetrics": {"AWSAgentToolkit": "aws-cloudformation@3"}, "com.aws.cloudformation.Context": {"ref": ["README.md", "BUDGET.md"]}}, Parameters=dict(EcsAmi=dict(Type="AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>", Default=AMI_PARAMETER)),
@@ -99,7 +101,7 @@ def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, 
         command = next(command for command in commands(experiment, bucket, region) if command[2] == "quality" and command[4] == dataset)
         response = ecs.run_task(cluster=outputs["Cluster"], taskDefinition=state["task_definition"], count=1,
             capacityProviderStrategy=[dict(capacityProvider=outputs["CapacityProvider"], weight=1)],
-            placementConstraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == c7i.4xlarge")],
+            placementConstraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])],
             overrides=dict(containerOverrides=[dict(name="benchmark", command=command, environment=[dict(name="BENCHMARK_BARRIER_BUCKET", value=bucket), dict(name="BENCHMARK_BARRIER_KEY", value=barrier)])]))
         if response.get("failures"):
             raise RuntimeError(response["failures"])
@@ -144,7 +146,7 @@ def main():
         fake_outputs = dict(ExecutionRole="${ExecutionRole}", TaskRole="${TaskRole}", Logs=f"/bankai/{args.experiment}")
         definition = task_definition(args.experiment, args.image, args.region, fake_outputs) if args.image else None
         print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=200, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
-            constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == c7i.4xlarge")]), indent=2)); return
+            constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])]), indent=2)); return
     import boto3
     session = boto3.Session(region_name=args.region); cf, ecs = session.client("cloudformation"), session.client("ecs")
     name = "bankai-"+args.experiment

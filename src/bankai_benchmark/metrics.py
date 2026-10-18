@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, r
 from .config import DOWNSTREAM
 
 
-def selection_metrics(selected, relevant, subtypes, tentative=None):
+def selection_metrics(selected, relevant, subtypes, tentative=None, intensity_groups=None):
     chosen = set(np.flatnonzero(selected).tolist()); truth = set(np.asarray(relevant).tolist())
     tp, fp, fn = len(chosen & truth), len(chosen-truth), len(truth-chosen)
     precision = tp/len(chosen) if chosen else 0.
@@ -16,6 +16,7 @@ def selection_metrics(selected, relevant, subtypes, tentative=None):
         precision=precision, recall=recall, f1=2*precision*recall/(precision+recall) if precision+recall else 0.,
         fdr=fp/len(chosen) if chosen else 0., fp_trap_noise=len(chosen & traps),
         fp_trap_noise_rate=len(chosen & traps)/len(traps) if traps else None,
+        intensity_recall={name: len(chosen & set(indices))/len(indices) if indices else None for name, indices in (intensity_groups or {}).items()},
         subtype_recall={name: len(chosen & set(indices) & truth)/len(set(indices) & truth)
                         if set(indices) & truth else None for name, indices in subtypes.items()})
 

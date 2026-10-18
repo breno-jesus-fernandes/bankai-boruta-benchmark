@@ -33,12 +33,11 @@ def test_every_placeholder_and_paired_ratios():
             rows.append(fake_result(t,time=(i+1)*(2 if c == 'bankai_classic_adapter' else 1),recall=.8 if c == 'bankai_classic_native' else .7))
     tokens,complete=placeholder_values(rows,mapping)
     assert complete
-    assert set(tokens) == {'CR','CA','BP','GR','tGB','mCR','mCA','mBP','mGR','mGB','rCR','rCA','rBP','rGR','rGB','infoC','ruidoC','infoG','ruidoG','razao','delta'}
+    assert set(tokens) == {'CR','CA','BP','ET','mCR','mCA','mBP','mET','rCR','rCA','rBP','rET','infoC','ruidoC','razao','delta'}
     assert tokens['razao'] == 2 and tokens['delta'] == pytest.approx(10)
-    assert tokens['CR'] == 3 and tokens['CA'] == 6 and tokens['tGB'] == 3
-    assert all(tokens[k] == 2 for k in ('mCR','mCA','mBP','mGR','mGB'))
-    assert tokens['rCR'] == .8 and tokens['rCA'] == .7
-    assert tokens['infoC'] == tokens['infoG'] == 10 and tokens['ruidoC'] == tokens['ruidoG'] == 5
+    assert tokens['CR'] == 3 and tokens['CA'] == 6 and tokens['ET'] == 3
+    assert all(tokens[k] == 2 for k in ('mCR','mCA','mBP','mET'))
+    assert tokens['infoC'] == 10 and tokens['ruidoC'] == 5
     assert not placeholder_values(rows[1:],mapping)[1]
 
 

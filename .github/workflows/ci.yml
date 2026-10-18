@@ -18,8 +18,7 @@ jobs:
         with:
           name: smoke-results
           path: |
-            results/
-            reports/
+            verification/v2-local/
   container:
     runs-on: ubuntu-latest
     steps:

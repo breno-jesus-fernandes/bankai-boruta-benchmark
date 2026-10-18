@@ -15,7 +15,7 @@ import time
 
 from bankai_benchmark.aggregate_latex import distribution, validated_results
 from bankai_benchmark.aws_ecs import task_definition
-from bankai_benchmark.config import COMPETITORS, SEEDS, atomic_json, digest
+from bankai_benchmark.config import HISTORICAL_COMPETITORS as COMPETITORS, SEEDS, atomic_json, digest
 from bankai_benchmark.budget import LEDGER_KEY, TOTAL_BRL, RESERVE_BRL
 from continue_quality import Controller, successful_exit
 
@@ -25,6 +25,9 @@ original_grid = orchestrator.trial_grid
 def reduced_grid(experiment_id, mode, suite, dataset=None):
     if mode != "full" or suite != "scaling" or dataset not in (None, "industrial"):
         raise ValueError("This entry point permits Industrial full scaling only")
+    from bankai_benchmark.config import PROTOCOL
+    if PROTOCOL == "paper-v2-a5-amd16":
+        raise ValueError("Historical scaling48 runner cannot execute protocol v2; use full --suite scaling")
     return tuple(sorted((t for t in original_grid(experiment_id, mode, suite, dataset)
                          if t.threads in (4, 8)),
                         key=lambda t: (-t.threads, t.competitor, t.seed)))
@@ -57,6 +60,9 @@ def compatibility(row):
 
 
 def compare(baseline_root, scaling_root, output):
+    for root in (baseline_root, scaling_root):
+        if any(json.loads(p.read_text()).get("protocol") == "paper-v2-a5-amd16" for p in Path(root).rglob("manifest.json")):
+            raise ValueError("Historical scaling48 cannot reuse protocol v2 observations")
     baseline, _, _ = validated_results(baseline_root)
     baseline = [r for r in baseline if r['dataset'] == 'industrial'
                 and r['suite'] == 'quality' and r['mode'] == 'full' and r['threads'] == 16]

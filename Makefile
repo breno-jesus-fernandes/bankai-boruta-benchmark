@@ -7,13 +7,13 @@ test:
 	uv run pytest
 
 smoke:
-	uv run bankai-benchmark smoke --experiment smoke
+	uv run python scripts/verify_smoke.py
 
 smoke-matrix:
 	uv run bankai-benchmark smoke-matrix --experiment smoke-matrix
 
 aggregate:
-	uv run bankai-aggregate --results results --output reports --provisional
+	uv run bankai-aggregate --results verification/v2-local/results --output verification/v2-local/reports --provisional
 
 docker-build:
 	$(CONTAINER_ENGINE) build --platform linux/amd64 --build-arg VCS_REF=$$(git rev-parse HEAD) -t bankai-benchmark:dev .

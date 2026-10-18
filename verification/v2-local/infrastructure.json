@@ -1,0 +1,312 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Budget-limited benchmark pilot; capacity remains zero until AWS shutdown is verified.",
+  "Metadata": {
+    "AWSToolsMetrics": {
+      "AWSAgentToolkit": "aws-cloudformation@3"
+    },
+    "com.aws.cloudformation.Context": {
+      "ref": [
+        "README.md",
+        "BUDGET.md"
+      ]
+    }
+  },
+  "Parameters": {
+    "EcsAmi": {
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+      "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+    }
+  },
+  "Resources": {
+    "Cluster": {
+      "Type": "AWS::ECS::Cluster",
+      "Properties": {
+        "ClusterName": "paper-v2-amd"
+      }
+    },
+    "Logs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/bankai/paper-v2-amd",
+        "RetentionInDays": 1
+      }
+    },
+    "InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+        ],
+        "Policies": []
+      }
+    },
+    "ExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        ],
+        "Policies": []
+      }
+    },
+    "TaskRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "ExperimentResults",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::example-results-bucket/paper-v2-amd/*",
+                    "arn:aws:s3:::example-results-bucket/paper-v2-amd-quality/*",
+                    "arn:aws:s3:::example-results-bucket/paper-v2-amd-scaling/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:ListBucket"
+                  ],
+                  "Resource": "arn:aws:s3:::example-results-bucket",
+                  "Condition": {
+                    "StringLike": {
+                      "s3:prefix": [
+                        "paper-v2-amd/*",
+                        "paper-v2-amd-quality/*",
+                        "paper-v2-amd-scaling/*"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
+    "LaunchTemplate": {
+      "Type": "AWS::EC2::LaunchTemplate",
+      "Properties": {
+        "LaunchTemplateData": {
+          "ImageId": {
+            "Ref": "EcsAmi"
+          },
+          "InstanceType": "c7a.4xlarge",
+          "CpuOptions": {
+            "CoreCount": 16,
+            "ThreadsPerCore": 1
+          },
+          "IamInstanceProfile": {
+            "Arn": {
+              "Fn::GetAtt": [
+                "InstanceProfile",
+                "Arn"
+              ]
+            }
+          },
+          "SecurityGroupIds": [
+            "sg-example"
+          ],
+          "MetadataOptions": {
+            "HttpTokens": "required",
+            "HttpPutResponseHopLimit": 2
+          },
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/xvda",
+              "Ebs": {
+                "VolumeSize": 100,
+                "VolumeType": "gp3",
+                "Encrypted": true,
+                "DeleteOnTermination": true
+              }
+            }
+          ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Sub": "#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n"
+            }
+          }
+        }
+      },
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "AMD physical-core benchmark",
+          "must": [
+            "16 physical cores, one thread per core",
+            "one task per host"
+          ]
+        }
+      }
+    },
+    "Fleet": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "MinSize": "0",
+        "MaxSize": "1",
+        "DesiredCapacity": "0",
+        "NewInstancesProtectedFromScaleIn": false,
+        "VPCZoneIdentifier": [
+          "subnet-example"
+        ],
+        "LaunchTemplate": {
+          "LaunchTemplateId": {
+            "Ref": "LaunchTemplate"
+          },
+          "Version": {
+            "Fn::GetAtt": [
+              "LaunchTemplate",
+              "LatestVersionNumber"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "paper-v2-amd",
+            "PropagateAtLaunch": true
+          }
+        ]
+      },
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Offline plan must create no paid capacity",
+          "must": [
+            "DesiredCapacity=0 until a separately authorized campaign"
+          ]
+        }
+      }
+    },
+    "CapacityProvider": {
+      "Type": "AWS::ECS::CapacityProvider",
+      "Properties": {
+        "Name": "paper-v2-amd",
+        "AutoScalingGroupProvider": {
+          "AutoScalingGroupArn": {
+            "Ref": "Fleet"
+          },
+          "ManagedScaling": {
+            "Status": "DISABLED"
+          },
+          "ManagedTerminationProtection": "DISABLED",
+          "ManagedDraining": "DISABLED"
+        }
+      }
+    },
+    "Association": {
+      "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+      "Properties": {
+        "Cluster": {
+          "Ref": "Cluster"
+        },
+        "CapacityProviders": [
+          {
+            "Ref": "CapacityProvider"
+          }
+        ],
+        "DefaultCapacityProviderStrategy": [
+          {
+            "CapacityProvider": {
+              "Ref": "CapacityProvider"
+            },
+            "Weight": 1
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "Cluster": {
+      "Value": {
+        "Ref": "Cluster"
+      }
+    },
+    "CapacityProvider": {
+      "Value": {
+        "Ref": "CapacityProvider"
+      }
+    },
+    "Fleet": {
+      "Value": {
+        "Ref": "Fleet"
+      }
+    },
+    "ExecutionRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ExecutionRole",
+          "Arn"
+        ]
+      }
+    },
+    "TaskRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "TaskRole",
+          "Arn"
+        ]
+      }
+    },
+    "Logs": {
+      "Value": {
+        "Ref": "Logs"
+      }
+    }
+  }
+}

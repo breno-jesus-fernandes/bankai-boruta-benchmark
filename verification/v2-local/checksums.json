@@ -1,0 +1,189 @@
+{
+  "files": [
+    {
+      "path": "VALIDATION.md",
+      "sha256": "cf7190204ce777934e5de394115912ec0eae9f3fc696fd73415862b066372c2a",
+      "bytes": 3266
+    },
+    {
+      "path": "final/report/completeness.json",
+      "sha256": "5817ee2a4913e6c5473bd7f2f49cf57c6b4c41c25cef53ed29ad4d6ff80cc135",
+      "bytes": 118
+    },
+    {
+      "path": "final/report/placeholder_replacements.json",
+      "sha256": "2b7ceb06d3f1e863cfe6bd71340428a0341c73888d8203053d5f422ae15d9e0e",
+      "bytes": 312
+    },
+    {
+      "path": "final/report/summary.md",
+      "sha256": "fa0598c279db794edb8744e8817ca1581a48bb3ca42894db472db9244d41a760",
+      "bytes": 2082
+    },
+    {
+      "path": "final/report/summary_by_dataset.csv",
+      "sha256": "daee0273b806c16488d2da97e7f61e0807f597a2a3dca1ab02a65df600e4af6d",
+      "bytes": 21967
+    },
+    {
+      "path": "final/report/thread_scaling.csv",
+      "sha256": "3cd7205ad9bf3c42f564d6ffbeb5dd000ef1125b0206d4a3fd5dde963f8c1366",
+      "bytes": 28
+    },
+    {
+      "path": "final/report/wmecai_placeholders.tex",
+      "sha256": "b2fe16078e2f3c40e54544c8c949491cce339895f2191b60df418feafff3615e",
+      "bytes": 838
+    },
+    {
+      "path": "final/report/wmecai_table1.tex",
+      "sha256": "64acc99c17175a4cc2379d3e198e67d135d3bf79dfc78532bb62aeeb9be0462a",
+      "bytes": 1989
+    },
+    {
+      "path": "guard.json",
+      "sha256": "8618a5bab3595a70fb7e6dca9cb6fb011ce936cacc36addb00a96db933fe06b3",
+      "bytes": 284
+    },
+    {
+      "path": "infrastructure.json",
+      "sha256": "8d1a4086c02d4dd4610903157b5e529a2b78583706aea89b9bec48865a23da17",
+      "bytes": 7799
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/manifest.json",
+      "sha256": "059108fe056b3f5f8836559817933139b826eaec10cd464a606f3941e5356a1c",
+      "bytes": 8080
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/bioinformatica/bankai_classic_adapter_s42_t1.json",
+      "sha256": "89b3b534ef9473354cea6f37fda1e95c20562c4dc05fdd32f13201e296e66296",
+      "bytes": 8493
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/bioinformatica/bankai_classic_native_s42_t1.json",
+      "sha256": "c07b423b701360592778e0d42b1eaed5ab8602789d215e6a19292209e5d3bba0",
+      "bytes": 8459
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/bioinformatica/borutapy_lightgbm_rf_s42_t1.json",
+      "sha256": "526bd116c845b9580fe3bb5c54ef830fe855b82c022db9044c4ea4f3c13b0bd4",
+      "bytes": 7883
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/bioinformatica/borutapy_sklearn_et_s42_t1.json",
+      "sha256": "bfd280c9ce205042c86ecc1c1d5099acedb2a884a86dc53adb6d1fdb80e9fe3f",
+      "bytes": 7785
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/ciberseguranca/bankai_classic_adapter_s42_t1.json",
+      "sha256": "03c2d98bfa01d1a9bed93ec544a397eea08e8c21a91273ffb1526f11e1635a8a",
+      "bytes": 13354
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/ciberseguranca/bankai_classic_native_s42_t1.json",
+      "sha256": "57ba5ecbdf23485ab9e4e58d555a8d8450cd1d0d52edd395e31513430bc06e40",
+      "bytes": 13322
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s42_t1.json",
+      "sha256": "7c14af756d89e14ec7e867f8bc5b4d1f2a3f4383ff3cfb89ae4ba61b4fd4a335",
+      "bytes": 12745
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/ciberseguranca/borutapy_sklearn_et_s42_t1.json",
+      "sha256": "b44a9a1b0ca1cbc3c1cc7155a3cb1fd3f851557912521f070535bd6c9508bb18",
+      "bytes": 12657
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/credito/bankai_classic_adapter_s42_t1.json",
+      "sha256": "16dc98f2ce6c3925721fe9232115255fc77ce17dc39f89633db650e911c08ec5",
+      "bytes": 7535
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/credito/bankai_classic_native_s42_t1.json",
+      "sha256": "1664bf64dab0c9bfbefe24099e49058b4409ad6154c427528f1bf331c1390cdc",
+      "bytes": 7491
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/credito/borutapy_lightgbm_rf_s42_t1.json",
+      "sha256": "93b49659ac5b07ee7ea26196a6a5dafdf306b6d6216222862906e0ea0a9a3e29",
+      "bytes": 6914
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/credito/borutapy_sklearn_et_s42_t1.json",
+      "sha256": "87abe1d9e55902cd8da50016fc5779954e254825a4f7ea87ef89339c9569922a",
+      "bytes": 6833
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/industrial/bankai_classic_adapter_s42_t1.json",
+      "sha256": "db9707bf587e4446283295656fa4e97e552289aaa3a09d3c718e7770e65a9c30",
+      "bytes": 6608
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/industrial/bankai_classic_native_s42_t1.json",
+      "sha256": "4250778cccf78891947e68fab7139c96507ca5da7967f91cd10ca4ae6ac6fce5",
+      "bytes": 6570
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/industrial/borutapy_lightgbm_rf_s42_t1.json",
+      "sha256": "1c7351c819762c82a930225e67aafae7ef579cf4c2c95e956c63193699dfe1f9",
+      "bytes": 5973
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/raw/industrial/borutapy_sklearn_et_s42_t1.json",
+      "sha256": "56735fe0f752324169e6b9f1c212a7b94730107f5a10cf9dd6278a9728722299",
+      "bytes": 5872
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/references/bioinformatica/seed42.json",
+      "sha256": "dd404f2e823d6abf6c5eb801c473e8e096bdf31deaf569b4096546b8efca80e2",
+      "bytes": 530
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/references/ciberseguranca/seed42.json",
+      "sha256": "bb1aa1d33adbd74c27112b173d286070c98a775df98942e58a0e4597c78adaf3",
+      "bytes": 494
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/references/credito/seed42.json",
+      "sha256": "0f503a59364ac4d133692a100660532d96a6c33772d40e88f2dff78b8341f7a1",
+      "bytes": 520
+    },
+    {
+      "path": "observations/paper-v2-a5-amd16-smoke-quality/references/industrial/seed42.json",
+      "sha256": "f62299364abfcab8b1d8f18b4a236a3496451dada6d7493609af02c033050e7b",
+      "bytes": 503
+    },
+    {
+      "path": "protocol.guard",
+      "sha256": "4ac19135c3e5ed4d1a9f3124dcf0dc57411fe6139a5e1c5c104e21a1896ba664",
+      "bytes": 698
+    },
+    {
+      "path": "release-verification-a4-historical.json",
+      "sha256": "54c1b913f64a7f8eb9b448a67ebde3c31ae45a4f32a664075747edecc33edc74",
+      "bytes": 1201
+    },
+    {
+      "path": "v2-archive.log",
+      "sha256": "78516099e44f2a745bf60a504f5b8537dc74104e5f038783829037c57610f4b7",
+      "bytes": 175
+    },
+    {
+      "path": "v2-pytest-final.log",
+      "sha256": "2500ba80d52ef441bd7f1c8eb2247aa90871b7b95240688d5d9abf70e92dfa76",
+      "bytes": 323
+    },
+    {
+      "path": "v2-smoke-final.log",
+      "sha256": "79e954a6c91b594ddfe981cb4c53c4be504c1bea99fca2b07bf2b97d61395c77",
+      "bytes": 1728
+    },
+    {
+      "path": "v2-smoke-selected.log",
+      "sha256": "8054e098ea01d6f21f4e107e2046fd52b3866fc658f8caefc4849c7de73053b2",
+      "bytes": 662
+    }
+  ]
+}

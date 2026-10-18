@@ -1,0 +1,11 @@
+{
+  "name": "/Users/jesus/Documents/Code/arima-from-scratch-in-python/bankai-boruta-benchmark/verification/v2-local/infrastructure.json",
+  "metadata": {},
+  "status": "PASS",
+  "not_compliant": [],
+  "not_applicable": [],
+  "compliant": [
+    "amd_host",
+    "offline_capacity"
+  ]
+}

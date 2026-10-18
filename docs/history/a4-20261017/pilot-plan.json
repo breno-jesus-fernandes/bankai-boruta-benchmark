@@ -1,0 +1,371 @@
+{
+  "template": {
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Budget-limited benchmark pilot; capacity remains zero until AWS shutdown is verified.",
+    "Metadata": {
+      "AWSToolsMetrics": {
+        "AWSAgentToolkit": "aws-cloudformation@3"
+      },
+      "com.aws.cloudformation.Context": {
+        "ref": [
+          "README.md",
+          "BUDGET.md"
+        ]
+      }
+    },
+    "Parameters": {
+      "EcsAmi": {
+        "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+        "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+      }
+    },
+    "Resources": {
+      "Cluster": {
+        "Type": "AWS::ECS::Cluster",
+        "Properties": {
+          "ClusterName": "pilot-20261017"
+        }
+      },
+      "Logs": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+          "LogGroupName": "/bankai/pilot-20261017",
+          "RetentionInDays": 1
+        }
+      },
+      "InstanceRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ec2.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+          ],
+          "Policies": []
+        }
+      },
+      "ExecutionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ecs-tasks.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+          ],
+          "Policies": []
+        }
+      },
+      "TaskRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ecs-tasks.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "ManagedPolicyArns": [],
+          "Policies": [
+            {
+              "PolicyName": "ExperimentResults",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "s3:GetObject",
+                      "s3:PutObject"
+                    ],
+                    "Resource": [
+                      "arn:aws:s3:::bankai-benchmark-bootstrap-results-ku2wdx1kzzqb/pilot-20261017/*",
+                      "arn:aws:s3:::bankai-benchmark-bootstrap-results-ku2wdx1kzzqb/pilot-20261017-quality/*",
+                      "arn:aws:s3:::bankai-benchmark-bootstrap-results-ku2wdx1kzzqb/pilot-20261017-scaling/*"
+                    ]
+                  },
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "s3:ListBucket"
+                    ],
+                    "Resource": "arn:aws:s3:::bankai-benchmark-bootstrap-results-ku2wdx1kzzqb",
+                    "Condition": {
+                      "StringLike": {
+                        "s3:prefix": [
+                          "pilot-20261017/*",
+                          "pilot-20261017-quality/*",
+                          "pilot-20261017-scaling/*"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "InstanceProfile": {
+        "Type": "AWS::IAM::InstanceProfile",
+        "Properties": {
+          "Roles": [
+            {
+              "Ref": "InstanceRole"
+            }
+          ]
+        }
+      },
+      "LaunchTemplate": {
+        "Type": "AWS::EC2::LaunchTemplate",
+        "Properties": {
+          "LaunchTemplateData": {
+            "ImageId": {
+              "Ref": "EcsAmi"
+            },
+            "InstanceType": "c7i.4xlarge",
+            "IamInstanceProfile": {
+              "Arn": {
+                "Fn::GetAtt": [
+                  "InstanceProfile",
+                  "Arn"
+                ]
+              }
+            },
+            "SecurityGroupIds": [
+              "sg-09b271e76df18d9b9"
+            ],
+            "MetadataOptions": {
+              "HttpTokens": "required",
+              "HttpPutResponseHopLimit": 2
+            },
+            "BlockDeviceMappings": [
+              {
+                "DeviceName": "/dev/xvda",
+                "Ebs": {
+                  "VolumeSize": 100,
+                  "VolumeType": "gp3",
+                  "Encrypted": true,
+                  "DeleteOnTermination": true
+                }
+              }
+            ],
+            "UserData": {
+              "Fn::Base64": {
+                "Fn::Sub": "#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n"
+              }
+            }
+          }
+        }
+      },
+      "Fleet": {
+        "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "Properties": {
+          "MinSize": "0",
+          "MaxSize": "1",
+          "DesiredCapacity": "0",
+          "NewInstancesProtectedFromScaleIn": false,
+          "VPCZoneIdentifier": [
+            "subnet-017ce335d1359cd45"
+          ],
+          "LaunchTemplate": {
+            "LaunchTemplateId": {
+              "Ref": "LaunchTemplate"
+            },
+            "Version": {
+              "Fn::GetAtt": [
+                "LaunchTemplate",
+                "LatestVersionNumber"
+              ]
+            }
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "pilot-20261017",
+              "PropagateAtLaunch": true
+            }
+          ]
+        }
+      },
+      "CapacityProvider": {
+        "Type": "AWS::ECS::CapacityProvider",
+        "Properties": {
+          "Name": "pilot-20261017",
+          "AutoScalingGroupProvider": {
+            "AutoScalingGroupArn": {
+              "Ref": "Fleet"
+            },
+            "ManagedScaling": {
+              "Status": "DISABLED"
+            },
+            "ManagedTerminationProtection": "DISABLED",
+            "ManagedDraining": "DISABLED"
+          }
+        }
+      },
+      "Association": {
+        "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+        "Properties": {
+          "Cluster": {
+            "Ref": "Cluster"
+          },
+          "CapacityProviders": [
+            {
+              "Ref": "CapacityProvider"
+            }
+          ],
+          "DefaultCapacityProviderStrategy": [
+            {
+              "CapacityProvider": {
+                "Ref": "CapacityProvider"
+              },
+              "Weight": 1
+            }
+          ]
+        }
+      }
+    },
+    "Outputs": {
+      "Cluster": {
+        "Value": {
+          "Ref": "Cluster"
+        }
+      },
+      "CapacityProvider": {
+        "Value": {
+          "Ref": "CapacityProvider"
+        }
+      },
+      "Fleet": {
+        "Value": {
+          "Ref": "Fleet"
+        }
+      },
+      "ExecutionRole": {
+        "Value": {
+          "Fn::GetAtt": [
+            "ExecutionRole",
+            "Arn"
+          ]
+        }
+      },
+      "TaskRole": {
+        "Value": {
+          "Fn::GetAtt": [
+            "TaskRole",
+            "Arn"
+          ]
+        }
+      },
+      "Logs": {
+        "Value": {
+          "Ref": "Logs"
+        }
+      }
+    }
+  },
+  "task_definition": {
+    "family": "pilot-20261017",
+    "requiresCompatibilities": [
+      "EC2"
+    ],
+    "networkMode": "bridge",
+    "cpu": "16384",
+    "memory": "28672",
+    "executionRoleArn": "${ExecutionRole}",
+    "taskRoleArn": "${TaskRole}",
+    "runtimePlatform": {
+      "cpuArchitecture": "X86_64",
+      "operatingSystemFamily": "LINUX"
+    },
+    "containerDefinitions": [
+      {
+        "name": "benchmark",
+        "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+        "essential": true,
+        "cpu": 16384,
+        "memory": 28672,
+        "entryPoint": [
+          "/app/.venv/bin/python",
+          "-m",
+          "bankai_benchmark.ecs_entrypoint"
+        ],
+        "environment": [
+          {
+            "name": "BENCHMARK_IMAGE_DIGEST",
+            "value": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/bankai/pilot-20261017",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "benchmark"
+          }
+        }
+      }
+    ]
+  },
+  "commands": [
+    [
+      "full",
+      "--suite",
+      "quality",
+      "--dataset",
+      "industrial",
+      "--experiment",
+      "pilot-20261017",
+      "--bucket",
+      "bankai-benchmark-bootstrap-results-ku2wdx1kzzqb",
+      "--region",
+      "us-east-1"
+    ]
+  ],
+  "budget": {
+    "total_brl": 200,
+    "reserve_brl": 40,
+    "pilot_reserved_brl": 20,
+    "max_instances": 1,
+    "shutdown_seconds": 3600
+  },
+  "reservations": {
+    "cpu": 16384,
+    "memory_mib": 28672
+  },
+  "constraints": [
+    {
+      "type": "distinctInstance"
+    },
+    {
+      "type": "memberOf",
+      "expression": "attribute:ecs.instance-type == c7i.4xlarge"
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "competitor": "bankai_classic_native",
+  "configuration_hash": "c53f7d17c5d5b9c7c07998e7a9afc79bda90ce3c39aec06c837533ecdca627e9",
+  "dataset": "credito",
+  "diagnostics": {
+    "copied_bytes": 0,
+    "copy_seconds": 0.0,
+    "fit_seconds": 0.013978750037495047,
+    "input_conversion_bytes": 0,
+    "input_conversion_seconds": 0.0011008330038748682,
+    "input_dtype": "float32",
+    "native_input_dtype": "float32",
+    "path": "rust",
+    "permutation_bytes": 65600,
+    "permutation_dtype": "uint32",
+    "preparation_seconds": 0.009689375025570391,
+    "reason": "a15 binned Extra Trees gain; virtual shadows",
+    "training_seconds": 0.00097646,
+    "training_storage_rebuilds": 3
+  },
+  "downstream_metrics": {
+    "accuracy": 0.8,
+    "balanced_accuracy": 0.5,
+    "f1": 0.0,
+    "roc_auc": 0.5,
+    "seconds": 0.0039185420027934015,
+    "selected_count": 0
+  },
+  "error": null,
+  "execution_metrics": {
+    "baseline_rss_bytes": 168607744,
+    "completed_rounds": 3,
+    "delta_peak_gib": 0.0009765625,
+    "fit_polling_peak_bytes": 169656320,
+    "fit_seconds": 0.013984791992697865,
+    "highwater_reset": false,
+    "highwater_scope": "process_lifetime",
+    "memory_method": "polling",
+    "peak_rss_gib": 0.1580047607421875,
+    "seconds_per_round": 0.004661597330899288,
+    "vmhwm_bytes": null
+  },
+  "experiment_id": "paper-v2-a5-amd16-smoke-quality",
+  "generator_version": "2.0.0",
+  "mode": "smoke",
+  "protocol": "paper-v2-a5-amd16",
+  "provenance": {
+    "affinity": null,
+    "cpu": "Apple M1",
+    "cpu_vendor": "unavailable",
+    "dataset_metadata": {
+      "calibration": {
+        "noise_variance": 1.0,
+        "realized_snr": 1.0,
+        "scope": "joint_train_test_synthetic",
+        "signal_variance": 1.0,
+        "snr": 1.0,
+        "term_means": [
+          4.418687638008123e-17,
+          1.2434497875801754e-17,
+          1.0746958878371515e-16,
+          -9.50350909079134e-17,
+          -9.392486788328824e-17,
+          1.5470957848151556e-16,
+          -4.451994328746877e-16,
+          -3.68594044175552e-17,
+          -1.2720380304642732e-16,
+          -1.2034817586936698e-16,
+          9.414691248821327e-17,
+          -5.3734794391857575e-17,
+          1.3322676295501878e-16,
+          2.1593837828959295e-17
+        ],
+        "term_variances": [
+          1.0000000000000004,
+          0.9999999999999997,
+          0.9999999999999998,
+          1.0000000000000002,
+          0.9999999999999997,
+          1.0000000000000007,
+          1.0000000000000082,
+          0.99999999999999,
+          1.000000000000004,
+          0.9999999999999953,
+          0.9999999999999973,
+          0.9999999999999951,
+          1.000000000000001,
+          0.9999999999999982
+        ]
+      },
+      "class_counts_test": [
+        80,
+        20
+      ],
+      "class_counts_train": [
+        320,
+        80
+      ],
+      "column_permutation": [
+        26,
+        7,
+        9,
+        3,
+        13,
+        33,
+        2,
+        22,
+        4,
+        25,
+        23,
+        19,
+        0,
+        14,
+        24,
+        15,
+        11,
+        39,
+        31,
+        8,
+        20,
+        10,
+        34,
+        36,
+        12,
+        18,
+        29,
+        5,
+        38,
+        35,
+        6,
+        27,
+        30,
+        37,
+        1,
+        28,
+        16,
+        17,
+        21,
+        32
+      ],
+      "configuration_hash": "8c5629437eb3d8e955b028ea6ae9b754cdfe7b8bd8171bc30b89bbd74fbd6875",
+      "dataset": "credito",
+      "dimensions": [
+        400,
+        40
+      ],
+      "effect_weights": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.02,
+        0.02,
+        0.02
+      ],
+      "generator_hash": "e01284b558175b7cfae90507958af80d21b46f9339448e9682843586b44b222d",
+      "generator_version": "2.0.0",
+      "intensity_groups": {
+        "medium": [
+          1,
+          2,
+          19,
+          21
+        ],
+        "strong": [
+          3,
+          6,
+          8,
+          11,
+          12,
+          13,
+          15,
+          25,
+          27,
+          30,
+          34,
+          36,
+          37
+        ],
+        "weak": [
+          4,
+          16,
+          24
+        ]
+      },
+      "interaction_type": null,
+      "mode": "smoke",
+      "protocol": "paper-v2-a5-amd16",
+      "seed": 42,
+      "term_features": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ]
+      ]
+    },
+    "effective_parameters": {
+      "bin_sample_size": 200000,
+      "binning_seed": 6,
+      "binning_strategy": "exact_sort",
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": null,
+      "criterion": "gini",
+      "extra_seed": 6,
+      "extra_trees": true,
+      "extra_trees_backend": "binned",
+      "importance_type": "gain",
+      "max_bins": 63,
+      "max_depth": 3,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 1,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 8,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": 1886571776,
+      "shap_mode": "sampled",
+      "shap_sample_size": 1000,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "image_digest": null,
+    "instance_identity": null,
+    "log_location": null,
+    "logical_cpus": 8,
+    "packages": {
+      "Boruta": "0.4.3",
+      "bankai-boruta": "0.1.0a5",
+      "bankai-random-forest": "0.1.0a15",
+      "lightgbm": "4.7.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.17.1"
+    },
+    "physical_cpus": 8,
+    "pid": 79152,
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_hash": "bf861762f1e9436f9e322d253f5f6c9babc3be25c6a8e49c43704fec816d0c20",
+    "task_arn": null,
+    "thread_environment": {
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "RAYON_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "topology": {
+      "allowed_cpus": null,
+      "effective_affinity": null,
+      "physical_core_ids": null,
+      "selected_cpus": null,
+      "status": "unavailable_macos_smoke"
+    }
+  },
+  "schema_version": 1,
+  "seed": 42,
+  "selected_indices": [],
+  "selection_metrics": {
+    "f1": 0.0,
+    "fdr": 0.0,
+    "fn": 20,
+    "fp": 0,
+    "fp_trap_noise": 0,
+    "fp_trap_noise_rate": 0.0,
+    "intensity_recall": {
+      "medium": 0.0,
+      "strong": 0.0,
+      "weak": 0.0
+    },
+    "precision": 0.0,
+    "recall": 0.0,
+    "selected_count": 0,
+    "subtype_recall": {
+      "categorical_signal": 0.0,
+      "gaussian_noise": null,
+      "redundant": 0.0,
+      "signal": 0.0,
+      "trap_noise": null
+    },
+    "tentative_count": 4,
+    "tn": 20,
+    "tp": 0
+  },
+  "status": "success",
+  "suite": "quality",
+  "tentative_indices": [
+    3,
+    6,
+    15,
+    37
+  ],
+  "threads": 1,
+  "trial_id": "bankai_classic_native_s42_t1"
+}

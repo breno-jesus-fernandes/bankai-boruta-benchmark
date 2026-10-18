@@ -1,6 +1,6 @@
 """Matched budgets with explicit backend-specific ensemble semantics."""
 from dataclasses import dataclass
-from math import ceil, log2, sqrt
+from math import sqrt
 import numpy as np
 from sklearn.ensemble import ExtraTreesClassifier
 from bankai_random_forest import BankaiRandomForestClassifier
@@ -40,28 +40,6 @@ def estimator(trial, backend):
                          min_child_samples=2, reg_alpha=0., reg_lambda=0.)
 
 
-class PythonGreedy:
-    """Suite implementation: independent shadows, full set, strict hits, fixed K."""
-    def __init__(self, estimator, alpha, seed):
-        self.estimator = estimator
-        self.alpha, self.seed = alpha, seed
-
-    def fit(self, X, y):
-        rng = np.random.RandomState(self.seed)
-        p = X.shape[1]
-        self.n_iter_ = ceil(log2(p/self.alpha))
-        self.support_ = np.zeros(p, bool)
-        self.support_weak_ = np.zeros(p, bool)
-        for _ in range(self.n_iter_):
-            shadows = np.column_stack([rng.permutation(X[:, i]) for i in range(p)])
-            augmented = np.column_stack((X, shadows))
-            self.estimator.set_params(random_state=int(rng.randint(2**31-1)))
-            self.estimator.fit(augmented, y)
-            scores = self.estimator.feature_importances_
-            self.support_ |= scores[:p] > np.max(scores[p:])
-        return self
-
-
 @dataclass
 class Selection:
     confirmed: np.ndarray
@@ -82,10 +60,8 @@ class PreparedSelector:
         model = estimator(trial, backend)
         common = dict(n_estimators=cfg.trees, perc=100, alpha=cfg.alpha, two_step=True,
                       max_iter=cfg.max_iter, random_state=trial.seed, early_stopping=False)
-        if name.startswith("greedy_borutapy"):
-            self.selector = PythonGreedy(model, cfg.alpha, trial.seed)
-        elif name.startswith("bankai"):
-            self.selector = BankaiBoruta(model, **common, greedy="greedy" in name,
+        if name.startswith("bankai"):
+            self.selector = BankaiBoruta(model, **common, greedy=False,
                                importance_getter="feature_importances_" if name.endswith("adapter") else "auto")
         else:
             self.selector = BorutaPy(model, **common)

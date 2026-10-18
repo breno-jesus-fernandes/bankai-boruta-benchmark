@@ -1,0 +1,14 @@
+let launches = Resources.*[ Type == 'AWS::EC2::LaunchTemplate' ]
+rule amd_host {
+    %launches.Properties.LaunchTemplateData.InstanceType == 'c7a.4xlarge'
+    %launches.Properties.LaunchTemplateData.CpuOptions.CoreCount == 16
+    %launches.Properties.LaunchTemplateData.CpuOptions.ThreadsPerCore == 1
+    %launches.Properties.LaunchTemplateData.MetadataOptions.HttpTokens == 'required'
+    %launches.Properties.LaunchTemplateData.BlockDeviceMappings[*].Ebs.Encrypted == true
+}
+let fleets = Resources.*[ Type == 'AWS::AutoScaling::AutoScalingGroup' ]
+rule offline_capacity {
+    %fleets.Properties.DesiredCapacity == '0'
+    %fleets.Properties.MinSize == '0'
+    %fleets.Properties.MaxSize == '1'
+}
