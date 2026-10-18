@@ -6,21 +6,23 @@ from pathlib import Path
 import subprocess
 import sys
 import time
-from bankai_benchmark.config import PROFILES, PROTOCOL
+from bankai_benchmark.config import PROFILES, PROTOCOL, source_hash
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', choices=list(PROFILES))
-    parser.add_argument('--results', default='verification/v2-a6-r5-local/results')
-    parser.add_argument('--output', default='verification/v2-a6-r5-local/reports')
+    version = source_hash()[:8]
+    parser.add_argument('--results', default=f'verification/v2-a6-r5-local/results-{version}')
+    parser.add_argument('--output', default=f'verification/v2-a6-r5-local/reports-{version}')
+    parser.add_argument('--experiment', default=f'{PROTOCOL}-smoke-{version}')
     args = parser.parse_args()
-    command = [sys.executable, '-m', 'bankai_benchmark.orchestrator', 'smoke', '--experiment', PROTOCOL+'-smoke', '--results', args.results]
+    command = [sys.executable, '-m', 'bankai_benchmark.orchestrator', 'smoke', '--experiment', args.experiment, '--results', args.results]
     if args.dataset: command += ['--dataset', args.dataset]
     started = time.perf_counter()
     subprocess.run(command, check=True)
     elapsed = time.perf_counter()-started
-    paths = sorted((Path(args.results)/(PROTOCOL+'-smoke-quality')).glob('raw/**/*.json'))
+    paths = sorted((Path(args.results)/(args.experiment+'-quality')).glob('raw/**/*.json'))
     assert len(paths) == (4 if args.dataset else 16)
     before = {str(p): (p.stat().st_mtime_ns, hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths}
     assert all(json.loads(p.read_text())['status'] == 'success' for p in paths)

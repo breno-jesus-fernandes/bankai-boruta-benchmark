@@ -45,6 +45,8 @@ Alvo: `c7a.4xlarge`, AMD EPYC, 16 núcleos físicos, uma thread por núcleo, 32 
 
 Qualidade: quatro perfis × quatro métodos × cinco seeds (42–46) × 16 núcleos = 80 fits. Escala: Industrial × quatro métodos × cinco seeds × 4/8/16 núcleos = 60 fits independentes. Dois warmups por célula usam seeds 900001/900002. Não reutilizar observações anteriores ou da a4.
 
+O teto aprovado é R$400, com R$80 protegidos. O ledger atual foi reconciliado e permite R$100 em novas reservas. A próxima etapa é uma calibração Industrial full limitada a três horas (R$60 reservados atomicamente); ela medirá duração e memória, sem concluir a campanha de qualidade. As campanhas de 80/60 fits continuam condicionadas à análise dessa calibração.
+
 ```sh
 # Executar somente depois da aceitação Linux/container e aprovação da campanha futura.
 uv run bankai-benchmark full --suite quality --experiment paper-v2-a6-amd16-r5 --results results-v2

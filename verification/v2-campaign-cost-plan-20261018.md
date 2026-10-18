@@ -1,5 +1,7 @@
 # Planejamento de custo v2 — 18/10/2026
 
+> Snapshot preparado antes da autorização do ledger BRL400. O estado atualizado do orçamento e a calibração aprovada estão em [BUDGET.md](../BUDGET.md); os cenários e tarifas abaixo continuam como referência datada, não como cobrança ou autorização vigente.
+
 Este é um cenário de custo, não uma autorização de execução nem uma previsão de duração. O smoke ECS terminou corretamente, mas usou apenas 400 linhas por perfil; seus 39 segundos não podem ser extrapolados para os dados completos.
 
 ## Escopo de trabalho

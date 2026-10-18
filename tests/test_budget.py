@@ -2,31 +2,50 @@ from datetime import datetime, timezone
 from io import BytesIO
 import json
 import pytest
-from bankai_benchmark.budget import reserve, arm, transfer_reservation, PILOT_SECONDS, TOTAL_BRL
+from bankai_benchmark.budget import reserve, reserve_many, arm, transfer_reservation, PILOT_SECONDS, TOTAL_BRL
 
 
 class S3:
     class exceptions:
         class NoSuchKey(Exception): pass
-    def __init__(self): self.data = None; self.version = 0
+    def __init__(self):
+        self.version = 0
+        self.data = json.dumps(dict(schema_version=2,total_brl='400',reserve_brl='80',launches={})).encode()
     def get_object(self, **kwargs):
-        if self.data is None: raise self.exceptions.NoSuchKey()
         return dict(Body=BytesIO(self.data), ETag=str(self.version))
     def put_object(self, **kwargs):
-        if self.data is None: assert kwargs['IfNoneMatch'] == '*'
-        else: assert kwargs['IfMatch'] == str(self.version)
+        assert kwargs['IfMatch'] == str(self.version)
         self.version += 1
         self.data = kwargs['Body']
 
 
 def test_cumulative_campaign_limit_and_no_refunds():
     s3 = S3()
-    assert TOTAL_BRL == 260
-    for index in range(11): reserve(s3, 'bucket', f'fleet{index}')
-    assert len(json.loads(s3.data)['launches']) == 11
-    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet11')
-    assert s3.version == 11
+    assert TOTAL_BRL == 400
+    for index in range(16): reserve(s3, 'bucket', f'fleet{index}')
+    assert len(json.loads(s3.data)['launches']) == 16
+    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet16')
+    assert s3.version == 16
     with pytest.raises(RuntimeError, match='already reserved'): reserve(s3, 'bucket', 'fleet0')
+
+
+def test_three_hour_reservation_is_atomic_when_budget_is_insufficient():
+    s3=S3()
+    for index in range(14): reserve(s3,'bucket',f'prior-{index}')
+    version=s3.version; snapshot=json.loads(s3.data)
+    with pytest.raises(RuntimeError,match='exhausted'):
+        reserve_many(s3,'bucket',['calibration','calibration-hour2','calibration-hour3'])
+    assert s3.version==version
+    assert json.loads(s3.data)==snapshot
+
+
+def test_three_hour_reservation_commits_all_slots_with_one_conditional_write():
+    s3=S3()
+    reserve_many(s3,'bucket',['calibration','calibration-hour2','calibration-hour3'])
+    ledger=json.loads(s3.data)
+    assert set(ledger['launches'])=={'calibration','calibration-hour2','calibration-hour3'}
+    assert {row['reserved_brl'] for row in ledger['launches'].values()}=={'20'}
+    assert s3.version==1
 
 
 class ASG:
@@ -48,6 +67,18 @@ def test_aws_shutdown_sets_all_capacity_limits_to_zero():
     assert (deadline-now).total_seconds() == PILOT_SECONDS
     assert [client.action[k] for k in ('MinSize','MaxSize','DesiredCapacity')] == [0,0,0]
     with pytest.raises(RuntimeError, match='already has scheduled'): arm(client, 'fleet')
+
+
+def test_three_hour_shutdown_is_armed_and_read_back():
+    client=ASG(); now=datetime.now(timezone.utc).replace(microsecond=0)
+    deadline=arm(client,'fleet',now,duration_seconds=3*PILOT_SECONDS)
+    assert (deadline-now).total_seconds()==3*PILOT_SECONDS
+    assert client.action['MaxSize']==0 and client.action['DesiredCapacity']==0
+
+
+def test_shutdown_duration_must_be_whole_budget_hours():
+    with pytest.raises(ValueError,match='whole budget hours'):
+        arm(ASG(),'fleet',duration_seconds=90)
 
 
 @pytest.mark.parametrize('field,value', [('NewInstancesProtectedFromScaleIn',True),('MinSize',1),('MaxSize',5),('DesiredCapacity',1),('SuspendedProcesses',[{'ProcessName':'ScheduledActions'}]),('Instances',[{}])])
@@ -77,7 +108,7 @@ def test_ledger_conflict_does_not_retry_or_activate():
 def test_launch_cannot_start_without_verified_shutdown(monkeypatch):
     from bankai_benchmark.aws_ecs import launch
     from bankai_benchmark import budget
-    monkeypatch.setattr(budget, 'reserve', lambda *args: None)
+    monkeypatch.setattr(budget, 'reserve_many', lambda *args: None)
     client = ASG(); client.corrupt = True
     # ASG has deliberately no update method; ECS/S3 have no launch methods.
     with pytest.raises(RuntimeError, match='verification failed'):
@@ -103,14 +134,19 @@ def test_corrupt_reservation_blocks_budget_reuse():
     with pytest.raises(RuntimeError, match='Corrupt'): reserve(s3, 'bucket', 'new-fleet')
 
 
-def test_approved_budget_increase_migrates_and_reserves_atomically():
+def test_legacy_ledger_is_not_used_after_successor_budget_approval():
     s3 = S3()
-    ledger = {'schema_version': 1, 'total_brl': '240', 'reserve_brl': '40',
-              'launches': {f'old-{i}': {'reserved_brl': '20', 'reserved_at': 'old'} for i in range(10)}}
-    s3.data = json.dumps(ledger).encode()
-    reserve(s3, 'bucket', 'r4-smoke-fleet')
-    updated = json.loads(s3.data)
-    assert updated['total_brl'] == '260' and len(updated['launches']) == 11
+    s3.data = json.dumps({'schema_version': 1, 'total_brl': '260', 'reserve_brl': '40',
+                          'launches': {'old': {'reserved_brl': '20'}}}).encode()
+    with pytest.raises(RuntimeError, match='Incompatible budget ledger'):
+        reserve(s3, 'bucket', 'new-fleet')
+
+
+def test_missing_approved_budget_ledger_requires_reconciliation():
+    class Missing(S3):
+        def get_object(self, **kwargs): raise self.exceptions.NoSuchKey()
+    with pytest.raises(RuntimeError, match='reconcile'):
+        reserve(Missing(), 'bucket', 'new-fleet')
 
 
 def test_reservation_transfer_preserves_budget_and_shutdown_deadline():

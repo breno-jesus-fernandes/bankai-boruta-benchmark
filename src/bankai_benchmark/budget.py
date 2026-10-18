@@ -7,12 +7,12 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import json
 
-TOTAL_BRL = Decimal('260')
-PREVIOUS_TOTAL_BRL = Decimal('240')
-RESERVE_BRL = Decimal('40')
+TOTAL_BRL = Decimal('400')
+RESERVE_BRL = Decimal('80')
 PILOT_BRL = Decimal('20')
 PILOT_SECONDS = 3600
-LEDGER_KEY = 'bankai-budget/campaign-200-brl.json'
+LEDGER_KEY = 'bankai-budget/campaign-400-brl.json'
+LEGACY_LEDGER_KEY = 'bankai-budget/campaign-200-brl.json'
 ACTION = 'bankai-budget-shutdown'
 POLICY_EXPIRES = datetime(2026, 10, 24, tzinfo=timezone.utc)
 
@@ -23,38 +23,37 @@ def validate_policy(now=None):
 
 
 def reserve(s3, bucket, launch_id):
-    """Conditional writes serialize reservations across controllers/experiments."""
-    condition = {'IfNoneMatch': '*'}
+    """Reserve one hour in the successor ledger."""
+    return reserve_many(s3, bucket, [launch_id])
+
+
+def reserve_many(s3, bucket, launch_ids):
+    """Atomically reserve all hour slots before any paid capacity is enabled."""
     try:
         response = s3.get_object(Bucket=bucket, Key=LEDGER_KEY)
     except s3.exceptions.NoSuchKey:
-        ledger = {'schema_version': 1, 'total_brl': str(TOTAL_BRL),
-                  'reserve_brl': str(RESERVE_BRL), 'launches': {}}
-    else:
-        with response['Body'] as body:
-            ledger = json.load(body)
-        condition = {'IfMatch': response['ETag']}
-    if ledger['schema_version'] != 1 or Decimal(ledger['reserve_brl']) != RESERVE_BRL:
+        raise RuntimeError('Approved BRL400 ledger is missing; reconcile it before launch')
+    with response['Body'] as body:
+        ledger = json.load(body)
+    if (ledger.get('schema_version') != 2 or Decimal(ledger.get('total_brl', '0')) != TOTAL_BRL
+            or Decimal(ledger.get('reserve_brl', '0')) != RESERVE_BRL):
         raise RuntimeError('Incompatible budget ledger')
-    launches = ledger['launches']
-    if any(Decimal(item['reserved_brl']) != PILOT_BRL for item in launches.values()):
+    launches = ledger.get('launches', {})
+    if any(Decimal(item.get('reserved_brl', '0')) != PILOT_BRL for item in launches.values()):
         raise RuntimeError('Corrupt budget reservation')
-    allocated = sum((Decimal(item['reserved_brl']) for item in launches.values()), Decimal(0))
-    total = Decimal(ledger['total_brl'])
-    if total == PREVIOUS_TOTAL_BRL:
-        if allocated != PREVIOUS_TOTAL_BRL - RESERVE_BRL:
-            raise RuntimeError('Previous budget ledger is not eligible for the approved increase')
-        ledger['total_brl'] = str(TOTAL_BRL)
-    elif total != TOTAL_BRL:
-        raise RuntimeError('Incompatible budget ledger')
-    if launch_id in launches:
+    launch_ids = list(launch_ids)
+    if not launch_ids or len(set(launch_ids)) != len(launch_ids):
+        raise ValueError('Reservation IDs must be a nonempty unique sequence')
+    if any(launch_id in launches for launch_id in launch_ids):
         raise RuntimeError('Launch already reserved; deadline cannot be extended')
-    if allocated + PILOT_BRL > TOTAL_BRL - RESERVE_BRL:
+    allocated = sum((Decimal(item['reserved_brl']) for item in launches.values()), Decimal(0))
+    if allocated + PILOT_BRL*len(launch_ids) > TOTAL_BRL - RESERVE_BRL:
         raise RuntimeError('Budget exhausted: launch blocked')
-    launches[launch_id] = {'reserved_brl': str(PILOT_BRL),
-                          'reserved_at': datetime.now(timezone.utc).isoformat()}
+    reserved_at = datetime.now(timezone.utc).isoformat()
+    launches.update({launch_id: {'reserved_brl': str(PILOT_BRL), 'reserved_at': reserved_at}
+                     for launch_id in launch_ids})
     s3.put_object(Bucket=bucket, Key=LEDGER_KEY, Body=json.dumps(ledger).encode(),
-                  ContentType='application/json', **condition)
+                  ContentType='application/json', IfMatch=response['ETag'])
     return ledger
 
 
@@ -65,7 +64,8 @@ def transfer_reservation(s3, autoscaling, bucket, old_fleet, new_fleet, now=None
     response = s3.get_object(Bucket=bucket, Key=LEDGER_KEY)
     with response['Body'] as body:
         ledger = json.load(body)
-    if ledger.get('schema_version') != 1 or Decimal(ledger.get('reserve_brl', '0')) != RESERVE_BRL:
+    if (ledger.get('schema_version') != 2 or Decimal(ledger.get('total_brl', '0')) != TOTAL_BRL
+            or Decimal(ledger.get('reserve_brl', '0')) != RESERVE_BRL):
         raise RuntimeError('Incompatible budget ledger')
     launches = ledger.get('launches', {})
     reservation = launches.get(old_fleet)
@@ -126,10 +126,12 @@ def transfer_reservation(s3, autoscaling, bucket, old_fleet, new_fleet, now=None
     return deadline
 
 
-def arm(autoscaling, fleet, now=None):
+def arm(autoscaling, fleet, now=None, *, duration_seconds=PILOT_SECONDS):
     """Arm and read back a shutdown BEFORE allowing any paid capacity."""
     now = now or datetime.now(timezone.utc)
-    deadline = (now + timedelta(seconds=PILOT_SECONDS)).replace(microsecond=0)
+    if duration_seconds < PILOT_SECONDS or duration_seconds % PILOT_SECONDS:
+        raise ValueError('Shutdown duration must be one or more whole budget hours')
+    deadline = (now + timedelta(seconds=duration_seconds)).replace(microsecond=0)
     groups = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[fleet])['AutoScalingGroups']
     if len(groups) != 1:
         raise RuntimeError('Budget fleet absent')

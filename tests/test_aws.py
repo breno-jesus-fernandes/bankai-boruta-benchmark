@@ -30,8 +30,9 @@ def test_digest_and_cpu_reservations():
 def test_mocked_single_host_launch(monkeypatch):
     from bankai_benchmark import budget
     from datetime import datetime, timezone
-    monkeypatch.setattr(budget, "reserve", lambda *args: None)
-    monkeypatch.setattr(budget, "arm", lambda *args: datetime.now(timezone.utc))
+    reservations=[]; deadlines=[]
+    monkeypatch.setattr(budget, "reserve_many", lambda *args: reservations.extend(args[2]))
+    monkeypatch.setattr(budget, "arm", lambda *args, **kwargs: deadlines.append(kwargs['duration_seconds']) or datetime.now(timezone.utc))
     class ASG:
         def update_auto_scaling_group(self, **kwargs): self.request = kwargs
     class ECS:
@@ -47,10 +48,18 @@ def test_mocked_single_host_launch(monkeypatch):
     class S3:
         def put_object(self,**kwargs):self.request=kwargs
     ecs,s3=ECS(),S3();outputs=dict(Cluster='cluster',CapacityProvider='capacity',Logs='logs',Fleet='fleet')
-    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG(),mode='smoke')
+    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG(),mode='smoke',reservation_hours=3)
     assert len(set(result['instances'])) == 1 and len(result['tasks']) == 1
+    assert reservations == ['fleet','fleet-hour2','fleet-hour3']
+    assert deadlines == [3*3600]
+    assert result['budget']['reserved_brl']=='60'
     assert ecs.requests[0]['overrides']['containerOverrides'][0]['command'][0] == 'smoke'
     for request in ecs.requests:
         assert request['placementConstraints'] == [dict(type='distinctInstance'),dict(type='memberOf',expression='attribute:ecs.instance-type == c7a.4xlarge')]
     assert json.loads(s3.request['Body'])['tasks'] == result['tasks']
     with pytest.raises(RuntimeError):verify_hosts([dict(lastStatus='RUNNING',containerInstanceArn='same')]*5)
+
+
+def test_launch_rejects_unsupported_reservation_duration_before_aws_calls():
+    with pytest.raises(ValueError, match='one or three hours'):
+        launch(object(),object(),{},dict(),'example','bucket','us-east-1',autoscaling=object(),reservation_hours=2)

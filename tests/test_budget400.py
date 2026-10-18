@@ -49,3 +49,33 @@ def test_exhaustion_or_duplicate_never_writes(monkeypatch):
     with pytest.raises(RuntimeError,match='Already reserved'):
         budget.reserve(s3,'bucket','new-0')
     s3.put_object.assert_not_called()
+
+
+def test_reconcile_merges_current_v2_reservations_without_resetting_history():
+    previous=legacy()
+    existing=budget.successor(previous,'old-etag')
+    current=dict(schema_version=1,total_brl='260',reserve_brl='40',launches={
+        **previous['launches'],
+        'r5-smoke':{'reserved_brl':'20','reserved_at':'new-1'},
+        'r5-calibration':{'reserved_brl':'20','reserved_at':'new-2'},
+        'a6-smoke':{'reserved_brl':'20','reserved_at':'new-3'},
+    })
+    result=budget.reconcile(current,'current-etag',existing,'successor-etag')
+    assert set(result['launches'])==set(current['launches'])
+    assert budget.allocation(result)==220
+    assert result['launches']['r5-calibration']==current['launches']['r5-calibration']
+    assert result['reconciliations'][0]['etag']=='current-etag'
+
+
+def test_reconcile_refuses_conflicting_reservation_history():
+    previous=legacy()
+    existing=budget.successor(previous,'old-etag')
+    current=dict(schema_version=1,total_brl='260',reserve_brl='40',launches={
+        **previous['launches'],
+        'new':{'reserved_brl':'20','reserved_at':'different'},
+        'newer':{'reserved_brl':'20','reserved_at':'newer'},
+        'newest':{'reserved_brl':'20','reserved_at':'newest'},
+    })
+    existing['launches']['0']['reserved_at']='changed'
+    with pytest.raises(RuntimeError,match='conflict'):
+        budget.reconcile(current,'current-etag',existing,'successor-etag')

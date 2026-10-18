@@ -79,21 +79,28 @@ def outputs_for(cf, name):
     return {item["OutputKey"]: item["OutputValue"] for item in cf.describe_stacks(StackName=name)["Stacks"][0]["Outputs"]}
 
 
-def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial", mode="full", reuse_reservation_from=None):
-    from .budget import reserve, arm, stop, validate_policy, transfer_reservation
+def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial", mode="full", reuse_reservation_from=None, reservation_hours=1):
+    from .budget import reserve_many, arm, stop, validate_policy, transfer_reservation
     validate_policy()
     if region != "us-east-1":
         raise ValueError("Budget policy permits us-east-1 only")
     if dataset not in PROFILES:
         raise ValueError("Unknown pilot dataset")
+    if reservation_hours not in (1, 3):
+        raise ValueError("Reservation duration must be one or three hours")
     if state.get("tasks"):
         raise RuntimeError("Tasks already recorded; use a new experiment/state")
     if reuse_reservation_from:
+        if reservation_hours != 1:
+            raise ValueError("Reservation transfers preserve their original one-hour deadline")
         shutdown = transfer_reservation(s3, autoscaling, bucket, reuse_reservation_from, outputs["Fleet"])
     else:
-        reserve(s3, bucket, outputs["Fleet"])
-        shutdown = arm(autoscaling, outputs["Fleet"])
-    state["budget"] = dict(reserved_brl="20", shutdown_at=shutdown.isoformat(), ledger_bucket=bucket)
+        reservation_ids = [outputs["Fleet"] if unit == 0 else f'{outputs["Fleet"]}-hour{unit+1}'
+                           for unit in range(reservation_hours)]
+        reserve_many(s3, bucket, reservation_ids)
+        shutdown = arm(autoscaling, outputs["Fleet"], duration_seconds=3600*reservation_hours)
+    state["budget"] = dict(reserved_brl=str(20*reservation_hours), reservation_hours=reservation_hours,
+                           shutdown_at=shutdown.isoformat(), ledger_bucket=bucket)
     barrier = f"{experiment}/control/{time.time_ns()}.json"
     tasks = []
     try:
@@ -145,6 +152,7 @@ def main():
     parser.add_argument("--reuse-reservation-from", help="transfer an approved idle-fleet reservation without extending its shutdown deadline")
     parser.add_argument("--dataset", choices=list(PROFILES), default="industrial")
     parser.add_argument("--mode", choices=("full", "smoke"), default="full")
+    parser.add_argument("--reservation-hours", type=int, choices=(1, 3), default=1)
     args = parser.parse_args()
     if args.action in ("provision", "launch") and args.region != "us-east-1":
         raise ValueError("Budget policy permits us-east-1 only")
@@ -152,7 +160,7 @@ def main():
     if args.action == "plan":
         fake_outputs = dict(ExecutionRole="${ExecutionRole}", TaskRole="${TaskRole}", Logs=f"/bankai/{args.experiment}")
         definition = task_definition(args.experiment, args.image, args.region, fake_outputs) if args.image else None
-        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region, args.mode) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=260, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
+        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region, args.mode) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=400, reserve_brl=80, pilot_reserved_brl=20, reservation_hours=args.reservation_hours, max_instances=1, shutdown_seconds=3600*args.reservation_hours), reservations=dict(cpu=16384, memory_mib=28672),
             constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])]), indent=2)); return
     import boto3
     session = boto3.Session(region_name=args.region); cf, ecs = session.client("cloudformation"), session.client("ecs")
@@ -179,7 +187,7 @@ def main():
         require_public_release()
         if not state.get("task_definition"):
             raise ValueError("Register the immutable image first")
-        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset, mode=args.mode, reuse_reservation_from=args.reuse_reservation_from)
+        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset, mode=args.mode, reuse_reservation_from=args.reuse_reservation_from, reservation_hours=args.reservation_hours)
     else:
         tasks = ecs.describe_tasks(cluster=outputs["Cluster"], tasks=state["tasks"])["tasks"] if state.get("tasks") else []
         # AWS response dates are not JSON-native.
