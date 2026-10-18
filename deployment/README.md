@@ -8,7 +8,7 @@ uv run pytest -q tests/test_aws.py tests/test_topology.py
 make docker-smoke
 ```
 
-O workflow Linux/container r4 passou para a implementação anterior; esse aceite não cobre o protocolo r5. O Mac local não tem Docker, então a validação r5 do container depende do GitHub Actions. Gere planos com `bankai-aws plan` e os argumentos de rede/bucket/imagem; o modo smoke deve ser explícito com `--mode smoke`. `pilot-plan.json` é um exemplo offline com identificadores fictícios e zero capacidade, não um plano pronto para deploy.
+O workflow Linux/container r5 passou no GitHub Actions. Isso valida o container Linux, mas não a topologia do host AMD dedicado. Gere planos com `bankai-aws plan` e os argumentos de rede/bucket/imagem; o modo smoke deve ser explícito com `--mode smoke`. `pilot-plan.json` é um exemplo offline com identificadores fictícios e zero capacidade, não um plano pronto para deploy.
 
 Qualidade full: 80 fits (cinco seeds, 16 núcleos). Escala Industrial full: 60 fits novos (4/8/16 núcleos, baseline de quatro). Usar o orchestrator padrão; `scripts/scaling48.py` é leitor/controlador histórico, bloqueado para o v2. Os controladores operacionais usam placement AMD, mas ledger, shutdown, orçamento e aceitação do host devem ser revisados na etapa futura.
 

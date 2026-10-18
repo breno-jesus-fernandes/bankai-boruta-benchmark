@@ -9,8 +9,8 @@
     "bankai_boruta-0.1.0a6-cp311-abi3-win_amd64.whl": "e904271bfeae70b565778ca35b8a5741e6f1849d69032aeb64ff94259d3c7897",
     "bankai_boruta-0.1.0a6.tar.gz": "91fe3066af5ceded8f7fc7a51fb696298548a1cd0616f114656a190bad0ea9a3"
   },
-  "reason": "All six public a6 artifacts were downloaded and SHA256 verified. Local a6 benchmark suite and smoke passed. Linux/container acceptance and published image remain pending; prior r4 acceptance is historical only.",
-  "linux_acceptance": "pending for paper-v2-a6-amd16-r5",
+  "reason": "All six public a6 artifacts were downloaded and SHA256 verified. Local a6 benchmark suite and smoke passed. GitHub Actions r5 Linux/container acceptance passed with 16 successful trials; the dedicated AMD ECS smoke remains pending.",
+  "linux_acceptance": "passed for paper-v2-a6-amd16-r5 in GitHub Actions; AMD host acceptance pending ECS smoke",
   "local_control_cases": 11,
   "r4_linux_acceptance_evidence": {
     "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39151871780",
@@ -33,5 +33,19 @@
     "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_x86_64.whl": "4be1601509f1424c8b49eac9b33b50ca57a67b4254012cc5321429ff5a9f8d09",
     "bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl": "00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259",
     "bankai_boruta-0.1.0a5.tar.gz": "318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a"
+  },
+  "r5_linux_acceptance_evidence": {
+    "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39155054282",
+    "workflow_head_sha": "2b12034c2f5b1aa8fc1154e0fbfbe4c79a507cd7",
+    "workflow_conclusion": "success",
+    "container_job": "success",
+    "smoke_trials": 16,
+    "all_trials_success": true,
+    "native_methods_rust": [
+      "bankai_native_extra_tree",
+      "bankai_native_extra_tree_binned"
+    ],
+    "vmhwm_and_affinity": "verified",
+    "image_published": false
   }
 }
