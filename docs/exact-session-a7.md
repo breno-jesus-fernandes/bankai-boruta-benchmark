@@ -85,7 +85,10 @@ autorizado e verificar deadline e desligamento automático. Se o lote exceder o
 saldo/tempo autorizado, registrar a parte pendente e pedir autorização adicional.
 Nesta entrega não houve alocação de AWS nem alteração do ledger.
 
-O workflow Boruta prepara evidência Linux de paridade e workloads controlados.
+O [workflow Boruta passou na paridade e nos workloads Linux controlados](../verification/exact-session-a7-local/README.md).
+O caso de rodadas fixas reduziu tempo/RSS; o fit completo pequeno teve RSS
+mediano cerca de 0,8 MiB maior, embora tenha reduzido tempo. O runner hospedado
+não substitui o AMD dedicado.
 A ativação por padrão permanece bloqueada até passar em ambos os critérios de
 memória e tempo e na paridade, inclusive Industrial completo. Se a leitura
 indireta regredir, ajustar os buffers e repetir os experimentos antes de ativar.

@@ -48,6 +48,16 @@
     {
       "path": "exact-session-local-large-fixed-t4.json",
       "sha256": "d6b12c1eb438aad966e532efe5267ddce04dc58d55efb1b7e9816b1b87fcb442"
+    },
+    {
+      "path": "exact-session-linux-complete-t1.json",
+      "sha256": "1d8ccbe52804494738b2499f8ebaccfab7bc102ff107a9d85890428843e70a6e"
+    },
+    {
+      "path": "exact-session-linux-fixed-t1.json",
+      "sha256": "566a853d4ac8c6dc9fadcf59ab6ddeafa60f01767720b52caf261e194789b775"
     }
-  ]
+  ],
+  "linux_controlled_ci": "https://github.com/breno-jesus-fernandes/bankai-boruta/actions/runs/39164027968/job/117783104729",
+  "linux_controlled_result": "parity passed; fixed runtime/RSS improved; small complete-fit RSS increased"
 }

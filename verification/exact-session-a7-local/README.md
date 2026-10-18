@@ -1,5 +1,10 @@
 # Exact session a7 validation
 
+This mirrors the Boruta candidate report. Paths beginning `benchmarks/` or `docs/`
+refer to the Boruta repository; the local and Linux observation JSONs are copied
+alongside this file and checked by this directory's manifest.
+
+
 Status: implementation and local parity pass; default activation and release
 acceptance remain pending. Reference: published Boruta 0.1.0a6 / RF 0.1.0a15.
 Candidate: Boruta a7, RF a16 source pinned to
@@ -59,10 +64,27 @@ final candidate. The final standard MT19937/u32 path keeps one explicit native
 permutation buffer and dispatches reads once per feature. Custom-RNG/int64
 fallbacks retain the safe owned-copy boundary.
 
-## Pending gates
+## Linux evidence and pending gates
 
-Hosted Linux CI is being run through the PR, including controlled external RSS
-and VmHWM evidence. Dedicated AMD trials remain pending: workers 1/4/16,
+Hosted Linux controlled validation passed on a four-logical-CPU Azure runner:
+[CI job 117783104729](https://github.com/breno-jesus-fernandes/bankai-boruta/actions/runs/39164027968/job/117783104729).
+The job used commit `6ebe1ed` with the same native/session implementation and RF
+pin as the current candidate. Both cells use one worker and three repetitions.
+Raw JSON is in `benchmarks/results/exact-session-linux-*.json`.
+
+| Linux fixture | a6 median s | session median s | a6 peak RSS MiB | session peak RSS MiB |
+|---|---:|---:|---:|---:|
+| complete_fit | 0.1369 | 0.0974 | 154.9 | 155.7 |
+| fixed_rounds | 1.3345 | 1.1356 | 193.4 | 188.6 |
+
+All Linux trials passed numerical/decision parity. VmHWM reset succeeded and its
+scope is fit in every observation; raw HWM and external RSS are both recorded.
+The fixed workload reduced runtime and RSS, but the small complete-fit workload
+increased median RSS by about 0.8 MiB. This fails a universal time-and-memory
+acceptance claim, even though its runtime improved. The default therefore remains
+materialized. Full cross-platform artifact review is still pending.
+
+Dedicated AMD trials remain pending: workers 1/4/16,
 seeds 42–46, repeated fixed rounds AND complete Industrial, same host and
 sequential variants. The complete Industrial generator, max_iter, patience,
 bootstrap and tree budget are unchanged. Local controlled observations cannot
@@ -73,6 +95,10 @@ candidate campaign has not consumed the existing r5 calibration reservation.
 Its duration/cost must fit the reconciled authorized balance and verified
 automatic shutdown; otherwise the unfinished cells need further authorization.
 
-The session stays opt-in. No PyPI publication was performed. Publish RF a16
+The session stays opt-in. Local ABI3 wheels for both packages and the Boruta source distribution were
+built. A clean environment using those local wheels passed installed-package
+binned dtype and exact-session smokes; wheel/sdist metadata requires a7/RF a16,
+and the sdist includes the tests and comparison script. This does not substitute
+for resolving RF a16 from PyPI after its release. No PyPI publication was performed. Publish RF a16
 first, then verify clean public installation of Boruta a7 and review all
 platform artifacts before an explicitly authorized publishing dispatch.
