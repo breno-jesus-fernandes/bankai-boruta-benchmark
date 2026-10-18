@@ -1,6 +1,6 @@
 # Bankai Boruta benchmark v2
 
-Protocolo `paper-v2-a6-amd16-r5`, gerador `2.0.0`, Bankai Boruta **0.1.0a6** e BankaiRF **0.1.0a15**. A a6 está publicada no PyPI; o lock foi regenerado e os seis artefatos públicos tiveram SHA256 conferido. A aceitação Linux/container do benchmark ainda está pendente. Ainda não há resultados de desempenho r5 ou evidência de melhora de recall em escala real.
+Protocolo `paper-v2-a6-amd16-r5`, gerador `2.0.0`, Bankai Boruta **0.1.0a6** e BankaiRF **0.1.0a15**. A a6 está publicada no PyPI; o lock foi regenerado e os seis artefatos públicos tiveram SHA256 conferido. A aceitação Linux/container passou no GitHub Actions, e o smoke ECS AMD passou com 16/16 trials. Ainda não há resultados de desempenho r5 ou evidência de melhora de recall em escala real.
 
 Quatro métodos: `bankai_native_extra_tree` usa BankaiRF ExtraTrees exato; `bankai_native_extra_tree_binned` usa BankaiRF ExtraTrees com bins e o caminho acelerado de sombras virtuais do BankaiBoruta; os outros são `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. Na a6, ambos os métodos Bankai usam Rust no seletor e na floresta; o caminho exato nativo exige entrada float32, como nos geradores deste benchmark. Os três métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. BankaiBoruta e BorutaPy usam `early_stopping=True`, paciência de 100 iterações (`n_iter_no_change=100`) e limite máximo de 120 iterações. No smoke, o limite é reduzido para quatro, então a parada antecipada não é alcançável. Greedy e o adaptador pertencem somente aos leitores históricos.
 
@@ -53,7 +53,7 @@ uv run bankai-aggregate --results results-v2 --output reports-v2
 uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a6-amd16-r5-quality --scaling results-v2/paper-v2-a6-amd16-r5-scaling --output reports-v2/analysis
 ```
 
-O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
+O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. A campanha full não foi iniciada: o smoke comprova funcionamento, e o ledger atual não tem saldo de lançamento fora da reserva protegida. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
 
 ## Histórico preservado
 
