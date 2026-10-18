@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import boto3
 
 COMPARE = "/opt/compare_exact_session.py"
+BORUTAPY = "/opt/borutapy_max40_pilot.py"
 REFERENCE = "/opt/reference/bin/python"
 CANDIDATE = "/opt/candidate/bin/python"
 BENCHMARK_ROOT = "/opt/bankai-benchmark"
@@ -52,6 +53,15 @@ def main():
                 ContentType="application/json", Metadata={"sha256": digest})
             print(json.dumps({"s3_uri": f"s3://{args.bucket}/{key}",
                 "sha256": digest, "bytes": len(payload)}, sort_keys=True), flush=True)
+    # Keep the sklearn BorutaPy baseline isolated from both Bankai processes and
+    # under the same run ID so all three methods can be joined unambiguously.
+    subprocess.run([CANDIDATE, BORUTAPY,
+        "--bucket", args.bucket, "--experiment", args.experiment,
+        "--run-id", run_id, "--seed", str(args.seed),
+        "--threads", str(args.threads), "--trees", str(args.trees),
+        "--repeats", str(args.repeats), "--max-iter", str(args.max_iter),
+        "--timeout-seconds", str(args.timeout_seconds)],
+        check=True, timeout=args.timeout_seconds * 2 + 120)
     print(json.dumps({"status": "success", "experiment": args.experiment,
         "run_id": run_id, "seed": args.seed, "threads": args.threads,
         "trees": args.trees, "repeats": args.repeats, "max_iter": args.max_iter}, sort_keys=True), flush=True)

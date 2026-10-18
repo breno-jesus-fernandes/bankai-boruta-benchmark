@@ -109,3 +109,8 @@ passaram em paridade. Esses números macOS não substituem Industrial/AMD.
 PRs: [BankaiRF #21](https://github.com/breno-jesus-fernandes/bankai-random-forest/pull/21)
 e [Bankai Boruta #20](https://github.com/breno-jesus-fernandes/bankai-boruta/pull/20).
 Ambas permanecem draft até a revisão dos gates pendentes.
+## BorutaPy ExtraTrees comparison
+
+The max-40 pilot now includes `BorutaPy` 0.4.3 with scikit-learn `ExtraTreesClassifier` as a third, process-isolated method. It uses the same Industrial `full` training data, seed, 100 trees, depth 6, square-root feature sampling, bootstrap, and 16 workers as the Bankai runs. Each method is measured sequentially, with fit time and process RSS recorded separately. BorutaPy uses `max_iter=41` internally because its loop condition is exclusive; this produces the same 40-round ceiling as the Bankai fixed-40 comparison. Its early-stopping patience is 100 to match the capped-40 protocol.
+
+BorutaPy has separate JSON artifacts for `fixed-40` and `capped-40`, stored beside the Bankai artifacts under the same run ID. These are runtime and memory comparisons; BorutaPy uses its own RNG and statistical implementation, so its selected features and importance history are recorded for interpretation rather than required to match Bankai. The image build runs a small BorutaPy ExtraTrees smoke fit before publishing.

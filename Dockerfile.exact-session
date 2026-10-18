@@ -18,7 +18,7 @@ RUN git init /opt/boruta \
     && git -C /opt/boruta fetch --depth 1 origin "$BORUTA_REVISION" \
     && git -C /opt/boruta checkout --detach FETCH_HEAD
 COPY src/bankai_benchmark /opt/bankai-benchmark/src/bankai_benchmark
-COPY scripts/exact_session_pilot.py scripts/verify_exact_session_image.py /opt/
+COPY scripts/exact_session_pilot.py scripts/borutapy_max40_pilot.py scripts/verify_exact_session_image.py /opt/
 RUN /opt/candidate/bin/python /opt/verify_exact_session_image.py
 
 FROM --platform=linux/amd64 python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
@@ -39,6 +39,7 @@ COPY --from=build /opt/candidate /opt/candidate
 COPY --from=build /opt/boruta/benchmarks/compare_exact_session.py /opt/compare_exact_session.py
 COPY --from=build /opt/bankai-benchmark /opt/bankai-benchmark
 COPY --from=build /opt/exact_session_pilot.py /opt/exact_session_pilot.py
+COPY --from=build /opt/borutapy_max40_pilot.py /opt/borutapy_max40_pilot.py
 COPY --from=build /opt/verify_exact_session_image.py /opt/verify_exact_session_image.py
 RUN chown -R benchmark:benchmark /opt
 USER benchmark
