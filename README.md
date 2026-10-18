@@ -11,7 +11,7 @@ Quatro métodos: `bankai_native_extra_tree` usa BankaiRF ExtraTrees exato; `bank
 | Bioinformática | 50.000 | 12.500 | 2.000 | 150 | 8 | 120 | 0,5 | 1 |
 | Cibersegurança | 400.000 | 100.000 | 150 | 100 | 6 | 120 | 0,1 | 1 |
 
-Todos usam 63 bins. A amostragem é `sqrt`, exceto Bioinformática, que usa 0,15. O teste tem 25% das linhas do treino. O smoke reduz para 400/100 linhas, pelo menos 40 colunas (60 em Cibersegurança), oito árvores, profundidade três e quatro iterações. Não serve para comparar desempenho ou calibrar recall.
+Somente o método Bankai binned usa 63 bins; os métodos ExtraTrees exatos não usam bins. A amostragem é `sqrt`, exceto Bioinformática, que usa 0,15. O teste tem 25% das linhas do treino. O smoke reduz para 400/100 linhas, pelo menos 40 colunas (60 em Cibersegurança), oito árvores, profundidade três e quatro iterações. Não serve para comparar desempenho ou calibrar recall.
 
 Os termos padronizados recebem pesos fixos: Industrial `[1,1,0.25,0.25,0.02,0.02]`; Crédito sete termos de peso 1, quatro de 0,25 e três de 0,02; Cibersegurança repete, nos grupos step/periódico/esparso, dez pesos 1, seis 0,25 e quatro 0,02. Bioinformática conserva dez termos correlacionados de peso 0,35 e dez termos de peso 1, cada um `standardize(tanh(2*u*v)+0.35*(u+v)/sqrt(2))`. Seu subtipo é `interaction_marginal_signal`, distinto da interação pura histórica.
 
@@ -55,8 +55,13 @@ uv run bankai-aggregate --results results-v2 --output reports-v2
 uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a6-amd16-r5-quality --scaling results-v2/paper-v2-a6-amd16-r5-scaling --output reports-v2/analysis
 ```
 
-O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. A campanha full não foi iniciada: o smoke comprova funcionamento, e o ledger atual não tem saldo de lançamento fora da reserva protegida. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
+A campanha v2 de escala usa baseline de quatro CPUs e apenas observações novas. A campanha full não foi iniciada: o smoke comprova funcionamento, e a liberação dos lotes depende da reconciliação do ledger e da calibração autorizada descrita em BUDGET.md. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
 
 ## Histórico preservado
 
 [README a4 de 17/10/2026](docs/history/a4-20261017/README.md) contém resultados e instruções daquela campanha, não defaults v2. Resultados sob `verification/campaign-20261017`, `verification/pilot-20261017`, `results-public-a4*` e relatórios existentes não foram recalculados. Checksums históricos continuam válidos. `config-paper-v1.json` preserva o mapeamento antigo; leitores usam o manifest para escolher o protocolo. `scaling48.py` aceita somente arquivos históricos e recusa execução v2; o controlador antigo não é o caminho da nova escala.
+
+
+## Candidato exato a7 (separado da referência a6)
+
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). O caminho novo permanece optativo, sem substituir pins, imagens, observações ou resultados históricos a6/a15. A validação AMD 1/4/16 workers e Industrial completo está pendente; esta atualização não alocou AWS nem alterou reservas.

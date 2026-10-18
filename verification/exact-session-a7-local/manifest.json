@@ -1,0 +1,63 @@
+{
+  "protocol": "exact-session-a7-v1",
+  "reference": {
+    "bankai-boruta": "0.1.0a6",
+    "bankai-random-forest": "0.1.0a15"
+  },
+  "candidate": {
+    "bankai-boruta": "0.1.0a7",
+    "bankai-random-forest": "0.1.0a16",
+    "rf_revision": "da52a5bc0e2358911131d3b06d9cea65fc360505"
+  },
+  "boruta_implementation_commit": "12a3296",
+  "boruta_pr": "https://github.com/breno-jesus-fernandes/bankai-boruta/pull/20",
+  "rf_pr": "https://github.com/breno-jesus-fernandes/bankai-random-forest/pull/21",
+  "benchmark_frozen_base": "106069e",
+  "amd_acceptance": "pending",
+  "aws_capacity_provisioned": false,
+  "budget_ledger_mutated": false,
+  "files": [
+    {
+      "path": "exact-session-local-complete-t1.json",
+      "sha256": "daa8f41c5d1281f21debcb45df0fcda5629fc597bea3183c3ec0db1506607400"
+    },
+    {
+      "path": "exact-session-local-complete-t16.json",
+      "sha256": "e70e9cb9adb9c10438a1edd2e8b777712684793ec35db7f35218a84317daa0cb"
+    },
+    {
+      "path": "exact-session-local-complete-t4.json",
+      "sha256": "20495af9b7616d8ea023e0e8efe6b2e61356db1a7b733c0d76c929d8971a236a"
+    },
+    {
+      "path": "exact-session-local-fixed-t1.json",
+      "sha256": "efe6db183f22ff954c314ad89a0ded9078b37f05e7be73c154e5dc08fb7683f9"
+    },
+    {
+      "path": "exact-session-local-fixed-t16.json",
+      "sha256": "96371b8811d3eba133746193272ff33d684fb8ef7f2929d81199538b0e63ca53"
+    },
+    {
+      "path": "exact-session-local-fixed-t4.json",
+      "sha256": "dcd1db80520009d1ca2079102d909d76594c014cc305634b9024cfd429afcc3b"
+    },
+    {
+      "path": "exact-session-local-large-fixed-t1.json",
+      "sha256": "04f4998c8f7d2e383bc0c19661bcec9d6ec53e625189a6052c7af5ef62cec86b"
+    },
+    {
+      "path": "exact-session-local-large-fixed-t4.json",
+      "sha256": "d6b12c1eb438aad966e532efe5267ddce04dc58d55efb1b7e9816b1b87fcb442"
+    },
+    {
+      "path": "exact-session-linux-complete-t1.json",
+      "sha256": "1d8ccbe52804494738b2499f8ebaccfab7bc102ff107a9d85890428843e70a6e"
+    },
+    {
+      "path": "exact-session-linux-fixed-t1.json",
+      "sha256": "566a853d4ac8c6dc9fadcf59ab6ddeafa60f01767720b52caf261e194789b775"
+    }
+  ],
+  "linux_controlled_ci": "https://github.com/breno-jesus-fernandes/bankai-boruta/actions/runs/39164027968/job/117783104729",
+  "linux_controlled_result": "parity passed; fixed runtime/RSS improved; small complete-fit RSS increased"
+}

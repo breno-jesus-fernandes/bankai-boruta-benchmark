@@ -14,3 +14,8 @@ A atestação `src/bankai_benchmark/release-verification.json` distingue hashes 
 Antes da campanha full, a topologia do host AMD c7a.4xlarge foi verificada no smoke ECS: 16 núcleos físicos, uma thread por núcleo e afinidade observada. A campanha de escala ainda precisa exercitar os conjuntos aninhados de 4/8/16. A imagem foi publicada somente por digest, com evidência CI da a6.
 
 Validação CloudFormation local por testes estruturais está incluída. Schema completo, segurança/compliance por ferramentas e validação de serviço AWS têm status separado no relatório; aprovação nos testes Python não significa aceitação AWS. Nenhuma chamada de validação/deploy AWS é necessária nesta etapa.
+
+
+## Candidato exato a7 (separado da referência a6)
+
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). O caminho novo permanece optativo, sem substituir pins, imagens, observações ou resultados históricos a6/a15. A validação AMD 1/4/16 workers e Industrial completo está pendente; esta atualização não alocou AWS nem alterou reservas.

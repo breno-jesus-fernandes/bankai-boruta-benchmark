@@ -13,3 +13,8 @@ O workflow Linux/container r5 passou no GitHub Actions, e o smoke ECS confirmou 
 Qualidade full: 80 fits (cinco seeds, 16 núcleos). Escala Industrial full: 60 fits novos (4/8/16 núcleos, baseline de quatro). O ledger BRL400 preserva o antigo e está reconciliado com as onze reservas v2; novas tarefas usam `campaign-400-brl.json`. A calibração Industrial foi autorizada com máximo de três horas, reserva atômica de R$60 e shutdown AWS verificado antes do scale-up. Usar o orchestrator padrão; `scripts/scaling48.py` é leitor/controlador histórico, bloqueado para o v2. As campanhas completas dependem do tempo/memória observados na calibração.
 
 Publicação: a6 já está publicada e o lock instala `bankai-boruta==0.1.0a6`. CI executa suíte e aceitação Linux antes de publicar a imagem. É necessário publicar um novo digest r5 antes do smoke ECS. A reserva de R$20 previamente aprovada será reaproveitada sem elevar o teto, com uma instância e shutdown automático no prazo original. [Runbook a4](../docs/history/a4-20261017/deployment-README.md).
+
+
+## Candidato exato a7 (separado da referência a6)
+
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](../docs/exact-session-a7.md). O caminho novo permanece optativo, sem substituir pins, imagens, observações ou resultados históricos a6/a15. A validação AMD 1/4/16 workers e Industrial completo está pendente; esta atualização não alocou AWS nem alterou reservas.
