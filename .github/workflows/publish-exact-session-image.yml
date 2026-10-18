@@ -1,0 +1,63 @@
+name: publish exact-session candidate image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-exact-session-image
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY: bankai-image-publisher-images
+      BORUTA_REVISION: b0f415ebed8f8fe6ab304bfde4ba9dff19c295bb
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+      - name: Build and verify paired a6/a15 and a7/a16 environments
+        run: |
+          docker buildx build --platform linux/amd64 --load \
+            --build-arg VCS_REF="$GITHUB_SHA" \
+            --build-arg BORUTA_REVISION="$BORUTA_REVISION" \
+            -f Dockerfile.exact-session -t bankai-exact-session:publish .
+          docker run --rm --platform linux/amd64 \
+            --entrypoint /opt/candidate/bin/python \
+            bankai-exact-session:publish /opt/verify_exact_session_image.py
+      - uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: ${{ vars.AWS_IMAGE_PUBLISH_ROLE }}
+          aws-region: us-east-1
+          role-session-name: exact-a7-image-${{ github.run_id }}
+          role-duration-seconds: 900
+          unset-current-credentials: true
+      - name: Verify image publisher identity
+        run: |
+          aws sts get-caller-identity > aws-caller.json
+          jq -e '.Account == "642504869083" and (.Arn | startswith("arn:aws:sts::642504869083:assumed-role/bankai-image-publisher-Publisher-"))' aws-caller.json
+      - uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2
+        id: login
+      - name: Publish candidate image by immutable digest
+        env:
+          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
+        run: |
+          set -euo pipefail
+          image_tag="exact-a7-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          image_uri="${ECR_REGISTRY}/${ECR_REPOSITORY}:${image_tag}"
+          docker tag bankai-exact-session:publish "$image_uri"
+          docker push "$image_uri"
+          image_digest=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$image_tag" --query 'imageDetails[0].imageDigest' --output text)
+          [[ "$image_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          jq -n --arg revision "$GITHUB_SHA" --arg image "${ECR_REGISTRY}/${ECR_REPOSITORY}@${image_digest}" --arg tag "$image_tag" --arg boruta_revision "$BORUTA_REVISION" --arg run "$GITHUB_RUN_ID" --slurpfile caller aws-caller.json '{source_revision:$revision,boruta_revision:$boruta_revision,image:$image,tag:$tag,workflow_run:$run,aws_caller:$caller[0]}' > published-exact-session-image.json
+          cat published-exact-session-image.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: published-exact-session-image
+          path: published-exact-session-image.json
+          retention-days: 30
