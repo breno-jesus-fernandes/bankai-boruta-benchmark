@@ -1,15 +1,15 @@
 # Bankai Boruta benchmark v2
 
-Protocolo `paper-v2-a5-amd16-r2`, gerador `2.0.0`, Bankai Boruta **0.1.0a5** e BankaiRF **0.1.0a15**. Esta revisão entrega implementação e validação local. Ainda não há resultados de desempenho v2 ou evidência de melhora de recall em escala real.
+Protocolo `paper-v2-a5-amd16-r4`, gerador `2.0.0`, Bankai Boruta **0.1.0a5** e BankaiRF **0.1.0a15**. Esta revisão entrega implementação e validação local. Ainda não há resultados de desempenho v2 ou evidência de melhora de recall em escala real.
 
-Três métodos: `bankai_native_extra_tree`, `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. `bankai_native_extra_tree` identifica explicitamente o caminho nativo do BankaiBoruta com BankaiRF em modo Extra Trees. Os dois métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. O Bankai clássico usa `perc=100`, alpha 0,05, duas etapas estatísticas e sem early stopping. Greedy pertence somente ao histórico. `bankai_classic_adapter` continua disponível apenas na leitura dos resultados históricos.
+Três métodos: `bankai_native_extra_tree`, `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. `bankai_native_extra_tree` identifica explicitamente o caminho nativo do BankaiBoruta com BankaiRF em modo Extra Trees. Os dois métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. BankaiBoruta e BorutaPy usam `early_stopping=True`, paciência de 100 iterações (`n_iter_no_change=100`) e limite máximo de 120 iterações. No smoke, o limite é reduzido para quatro, então a parada antecipada não é alcançável. Greedy pertence somente ao histórico. `bankai_classic_adapter` continua disponível apenas na leitura dos resultados históricos.
 
 | Perfil | Treino N | Teste N | P | Árvores | Profundidade | Iterações máximas | Prevalência | SNR |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Industrial | 200.000 | 50.000 | 500 | 100 | 6 | 50 | 0,5 | 1 |
-| Crédito | 300.000 | 75.000 | 300 | 100 | 6 | 50 | 0,2 | 1 |
-| Bioinformática | 50.000 | 12.500 | 2.000 | 150 | 8 | 60 | 0,5 | 1 |
-| Cibersegurança | 400.000 | 100.000 | 150 | 100 | 6 | 40 | 0,1 | 1 |
+| Industrial | 200.000 | 50.000 | 500 | 100 | 6 | 120 | 0,5 | 1 |
+| Crédito | 300.000 | 75.000 | 300 | 100 | 6 | 120 | 0,2 | 1 |
+| Bioinformática | 50.000 | 12.500 | 2.000 | 150 | 8 | 120 | 0,5 | 1 |
+| Cibersegurança | 400.000 | 100.000 | 150 | 100 | 6 | 120 | 0,1 | 1 |
 
 Todos usam 63 bins. A amostragem é `sqrt`, exceto Bioinformática, que usa 0,15. O teste tem 25% das linhas do treino. O smoke reduz para 400/100 linhas, pelo menos 40 colunas (60 em Cibersegurança), oito árvores, profundidade três e quatro iterações. Não serve para comparar desempenho ou calibrar recall.
 
@@ -47,10 +47,10 @@ Qualidade: quatro perfis × três métodos × cinco seeds (42–46) × 16 núcle
 
 ```sh
 # Executar somente depois da aceitação Linux/container e aprovação da campanha futura.
-uv run bankai-benchmark full --suite quality --experiment paper-v2-a5-amd16-r2 --results results-v2
-uv run bankai-benchmark full --suite scaling --experiment paper-v2-a5-amd16-r2 --results results-v2
+uv run bankai-benchmark full --suite quality --experiment paper-v2-a5-amd16-r4 --results results-v2
+uv run bankai-benchmark full --suite scaling --experiment paper-v2-a5-amd16-r4 --results results-v2
 uv run bankai-aggregate --results results-v2 --output reports-v2
-uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a5-amd16-r2-quality --scaling results-v2/paper-v2-a5-amd16-r2-scaling --output reports-v2/analysis
+uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a5-amd16-r4-quality --scaling results-v2/paper-v2-a5-amd16-r4-scaling --output reports-v2/analysis
 ```
 
 O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).

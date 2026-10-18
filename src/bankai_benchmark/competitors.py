@@ -59,7 +59,8 @@ class PreparedSelector:
         backend = "lightgbm" if "lightgbm" in name else ("et" if name == "borutapy_sklearn_et" else "bankai")
         model = estimator(trial, backend)
         common = dict(n_estimators=cfg.trees, perc=100, alpha=cfg.alpha, two_step=True,
-                      max_iter=cfg.max_iter, random_state=trial.seed, early_stopping=False)
+                      max_iter=cfg.max_iter, random_state=trial.seed, early_stopping=True,
+                      n_iter_no_change=100)
         if name.startswith("bankai"):
             self.selector = BankaiBoruta(model, **common, greedy=False)
         else:

@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pytest
 from sklearn.base import clone
-from bankai_benchmark.competitors import estimator,fit_select
+from bankai_benchmark.competitors import estimator,fit_select,PreparedSelector
 from bankai_benchmark.config import COMPETITORS,Trial
 from bankai_benchmark.datasets import generate_dataset
 from bankai_benchmark.metrics import downstream,selection_metrics
@@ -45,3 +45,13 @@ def test_lightgbm_width_and_cloning():
 def test_extra_trees_bootstrap_and_current_methods():
     assert COMPETITORS == ('bankai_native_extra_tree','borutapy_lightgbm_rf','borutapy_sklearn_et')
     assert estimator(trial('borutapy_sklearn_et'),'et').bootstrap is True
+
+@pytest.mark.parametrize('competitor',COMPETITORS)
+def test_both_selectors_use_the_same_early_stopping_policy(competitor):
+    selector=PreparedSelector(trial(competitor)).selector
+    assert selector.early_stopping is True
+    assert selector.n_iter_no_change == 100
+
+def test_full_profiles_allow_patience_100_to_stop_before_the_iteration_cap():
+    from bankai_benchmark.config import PROFILES
+    assert all(cfg.max_iter == 120 for cfg in PROFILES.values())

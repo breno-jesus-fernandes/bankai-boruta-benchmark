@@ -5,7 +5,7 @@ from pathlib import Path
 
 SCHEMA_VERSION = 1
 GENERATOR_VERSION = "2.0.0"
-PROTOCOL = "paper-v2-a5-amd16-r2"
+PROTOCOL = "paper-v2-a5-amd16-r4"
 MACHINE = dict(instance_type="c7a.4xlarge", physical_cores=16, threads_per_core=1, memory_gib=32)
 SEEDS = (42, 43, 44, 45, 46)
 HISTORICAL_COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "bankai_greedy_native",
@@ -51,10 +51,10 @@ class Profile:
 
 
 PROFILES = {
-    "industrial": Profile("industrial", 200000, 500, 100, 6, 63, "sqrt", 50, .5, 1.),
-    "credito": Profile("credito", 300000, 300, 100, 6, 63, "sqrt", 50, .2, 1.),
-    "bioinformatica": Profile("bioinformatica", 50000, 2000, 150, 8, 63, .15, 60, .5, 1.),
-    "ciberseguranca": Profile("ciberseguranca", 400000, 150, 100, 6, 63, "sqrt", 40, .1, 1.),
+    "industrial": Profile("industrial", 200000, 500, 100, 6, 63, "sqrt", 120, .5, 1.),
+    "credito": Profile("credito", 300000, 300, 100, 6, 63, "sqrt", 120, .2, 1.),
+    "bioinformatica": Profile("bioinformatica", 50000, 2000, 150, 8, 63, .15, 120, .5, 1.),
+    "ciberseguranca": Profile("ciberseguranca", 400000, 150, 100, 6, 63, "sqrt", 120, .1, 1.),
 }
 RELEVANT_COUNTS = dict(industrial=12, credito=20, bioinformatica=30, ciberseguranca=60)
 

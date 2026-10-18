@@ -34,7 +34,7 @@ def test_dataset_contract(dataset,tmp_path):
     assert not np.array_equal(a.X_train,generate_dataset(dataset,43,'smoke').X_train)
 
 def test_full_geometry_without_allocations():
-    assert [(p.n,p.p,p.trees,p.depth,p.max_iter) for p in PROFILES.values()] == [(200000,500,100,6,50),(300000,300,100,6,50),(50000,2000,150,8,60),(400000,150,100,6,40)]
+    assert [(p.n,p.p,p.trees,p.depth,p.max_iter) for p in PROFILES.values()] == [(200000,500,100,6,120),(300000,300,100,6,120),(50000,2000,150,8,120),(400000,150,100,6,120)]
     for name in PROFILES:
         for mode in ['full','smoke','smoke-matrix']:assert profile(name,mode).p >= RELEVANT_COUNTS[name]
     assert allocate(5,[1,1,1]).tolist() == [2,2,1]
