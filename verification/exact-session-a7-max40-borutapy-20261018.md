@@ -20,6 +20,13 @@ all repetitions: `13, 41, 45, 79, 126, 270, 298, 320`. Bankai retained feature
 selection results, not an assertion of statistical parity between independent
 implementations.
 
+Against the generator's 12 relevant features (the union of its strong, medium,
+and weak intensity groups), confirmed-only precision was **1.000** and recall
+was **0.667** for all three methods: each confirmed 8 true features and no
+irrelevant features. If tentative features are counted as selected, precision
+is **0.889** for either Bankai variant (the extra tentative feature 64 is
+irrelevant) and **1.000** for BorutaPy; recall remains **0.667** for all.
+
 BorutaPy's median run was about 20–21% shorter than the Bankai medians, while
 using about 199 MiB more RSS than the materialized reference and about 547 MiB
 more than the virtual session. Interpret the time together with actual rounds:
