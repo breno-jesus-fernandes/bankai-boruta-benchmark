@@ -25,12 +25,13 @@ def main():
     parser.add_argument("--trees", type=int, default=100)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--timeout-seconds", type=int, default=2400)
+    parser.add_argument("--max-iter", type=int, default=40)
     args = parser.parse_args()
 
     region = os.environ.get("AWS_REGION", "us-east-1")
     s3 = boto3.client("s3", region_name=region)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    configurations = (("fixed-5", 5), ("complete", 0))
+    configurations = (("fixed-40", 40), ("capped-40", 0))
     with tempfile.TemporaryDirectory(prefix="exact-session-a7-") as temporary:
         for label, rounds in configurations:
             output = Path(temporary) / f"industrial-seed{args.seed}-t{args.threads}-{label}.json"
@@ -40,7 +41,7 @@ def main():
                 "--benchmark-root", BENCHMARK_ROOT,
                 "--trees", str(args.trees), "--threads", str(args.threads),
                 "--seed", str(args.seed), "--fixed-rounds", str(rounds),
-                "--max-iter", "120", "--repeats", str(args.repeats),
+                "--max-iter", str(args.max_iter), "--repeats", str(args.repeats),
                 "--timeout-seconds", str(args.timeout_seconds),
                 "--output", str(output)]
             subprocess.run(command, check=True, timeout=args.timeout_seconds + 120)
@@ -53,7 +54,7 @@ def main():
                 "sha256": digest, "bytes": len(payload)}, sort_keys=True), flush=True)
     print(json.dumps({"status": "success", "experiment": args.experiment,
         "run_id": run_id, "seed": args.seed, "threads": args.threads,
-        "trees": args.trees, "repeats": args.repeats}, sort_keys=True), flush=True)
+        "trees": args.trees, "repeats": args.repeats, "max_iter": args.max_iter}, sort_keys=True), flush=True)
 
 
 if __name__ == "__main__":

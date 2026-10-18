@@ -1,0 +1,38 @@
+{
+  "protocol": "exact-session-a7-v1",
+  "stack": "bankai-exact-session-a7-pilot",
+  "outputs": {
+    "Fleet": "bankai-exact-session-a7-pilot-Fleet-TpHTdj53BYMv",
+    "CapacityProvider": "exact-session-a7-v1",
+    "Cluster": "exact-session-a7-v1",
+    "Logs": "/bankai/exact-session-a7-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-exact-session-a7-pilot-TaskRole-gWMidqiFy40j",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-exact-session-a7-pilot-ExecutionRole-Tf692hHKU7U4"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:4a4663a4320f0e101567a6af86b5910d31fac39175165da0b8cc0aa784309de6",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/exact-session-a7-v1:1",
+  "seed": 42,
+  "threads": 16,
+  "trees": 100,
+  "repeats": 3,
+  "reserved_brl": "20",
+  "shutdown_at": "2026-10-18T22:36:00+00:00",
+  "status": "completed",
+  "host": "i-0828e146a85dc18e1",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/exact-session-a7-v1/add1972e3e674e5e9f6f53d2799deaaa",
+  "exit_code": 0,
+  "stopped_at": "2026-10-18T21:49:08Z",
+  "fleet_empty_at": "2026-10-18T21:50:19Z",
+  "result_objects": [
+    {
+      "key": "exact-session-a7-v1/pilot/20261018T213834Z/industrial-seed42-t16-fixed-5.json",
+      "bytes": 777050,
+      "parity": "passed"
+    },
+    {
+      "key": "exact-session-a7-v1/pilot/20261018T213834Z/industrial-seed42-t16-complete.json",
+      "bytes": 6537196,
+      "parity": "passed"
+    }
+  ]
+}
