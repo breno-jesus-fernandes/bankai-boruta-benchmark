@@ -22,6 +22,31 @@ seed 42, one thread, eight trees, depth three, and Classic `max_iter=4`.
 Greedy retains `ceil(log2(P / .05))` rounds. Measured validation, machine details,
 and limitations are in [VERIFICATION.md](VERIFICATION.md).
 
+## Measured performance (published 0.1.0a4)
+
+Bankai Classic native was **1.57× faster than BorutaPy–LightGBM RF** and
+**1.50× faster than BorutaPy–sklearn ExtraTrees**, using the geometric mean of
+20 paired fit-time ratios per comparison (four synthetic profiles × five seeds).
+A speedup is `BorutaPy fit time / Bankai fit time`; values above 1 favor Bankai.
+
+| Synthetic profile | vs BorutaPy–LightGBM RF | vs BorutaPy–ExtraTrees |
+|---|---:|---:|
+| Industrial | 2.04× | 1.52× |
+| Credit | 1.56× | 1.15× |
+| Bioinformatics | 1.32× | 2.25× |
+| Cybersecurity | 1.44× | 1.30× |
+| **Global geometric mean** | **1.57×** | **1.50×** |
+
+These measurements use published `bankai-boruta==0.1.0a4`,
+`bankai-random-forest==0.1.0a15` and `Boruta==0.4.3`, with 16 threads on
+AWS EC2 c7i.4xlarge. Tree counts and depth bounds were matched; backend split
+and sampling semantics differ. This is a fit-time comparison on these profiles,
+not a universal speed or selection-quality guarantee, nor a measurement of later
+API/backend changes. See the [raw results, methodology and quality trade-offs](https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/tree/baab350fe6acaf4c45d356ff0c66d8925078d4e0/verification/campaign-20261017).
+
+Recompute these ratios with `python scripts/summarize_readme_speedups.py`;
+[the numeric summary](verification/readme-speedups.json) retains full precision.
+
 ## Release gate
 
 The suite pins public `bankai-boruta==0.1.0a4` from PyPI. This release includes

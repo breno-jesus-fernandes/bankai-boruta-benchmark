@@ -1,0 +1,27 @@
+{
+  "baseline": "bankai_classic_native",
+  "threads": 16,
+  "statistic": "exp(mean(log(reference_seconds / baseline_seconds)))",
+  "comparisons": {
+    "borutapy_lightgbm_rf": {
+      "paired_observations": 20,
+      "geometric_mean_speedup": 1.5683955148043403,
+      "by_dataset": {
+        "industrial": 2.0420798376176803,
+        "credito": 1.5594908489908494,
+        "bioinformatica": 1.3179003107847527,
+        "ciberseguranca": 1.441731071317295
+      }
+    },
+    "borutapy_sklearn_et": {
+      "paired_observations": 20,
+      "geometric_mean_speedup": 1.5039960339587652,
+      "by_dataset": {
+        "industrial": 1.518624079133975,
+        "credito": 1.1539479867509443,
+        "bioinformatica": 2.251918339313538,
+        "ciberseguranca": 1.29657490247573
+      }
+    }
+  }
+}
