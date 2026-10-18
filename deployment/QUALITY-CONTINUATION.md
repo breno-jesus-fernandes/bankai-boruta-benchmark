@@ -52,3 +52,18 @@ Stopping the local agent alone does not terminate EC2 immediately. The AWS
 one-hour schedule remains the fallback; to stop early, zero the active ASG and
 stop its ECS task, using the names in `controller.json`. Do not restart a prior
 paid attempt without reviewing its reservation and results.
+
+## Explicit Bioinformatica extension
+
+On 2026-10-18 UTC the user authorized one additional 30-minute interval for the
+already running Bioinformatica task. The original shutdown was 00:05:14 UTC;
+the new verified AWS shutdown is 00:35:14 UTC. An additional BRL20 reservation
+was recorded as `pilot-20261017-bioinformatica-extension-30m` in the same ledger.
+The total/reserve policy remains BRL200/BRL40. This does not extend any other
+shard or authorize further automatic extensions.
+
+The local monitor was paused during the update and replaced using the explicit
+`--resume-active bioinformatica` option. This option verifies the AWS shutdown
+and existing task definition, then monitors that task without another launch.
+The running ECS task, image, manifest, and measurements were preserved. After
+Bioinformatica succeeds, the remaining Ciberseguranca stage continues normally.

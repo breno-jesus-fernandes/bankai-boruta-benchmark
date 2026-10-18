@@ -76,3 +76,48 @@ def test_cleanup_zeros_fleet_and_stops_running_task_before_waiting(tmp_path, mon
     stop.assert_called_once_with(controller.asg, "fleet")
     controller.ecs.stop_task.assert_called_once()
     controller.wait_empty.assert_called_once_with("fleet")
+
+
+def resume_controller(tmp_path):
+    from datetime import datetime, timezone
+    controller = bare_controller(tmp_path)
+    controller.args.task_definition = "definition"
+    stage = {"fleet": "fleet", "status": "running", "tasks": ["task"],
+             "shutdown_at": "2099-01-01T00:00:00+00:00"}
+    controller.state["stages"]["bioinformatica"] = stage
+    controller.asg.describe_scheduled_actions.return_value = {"ScheduledUpdateGroupActions": [
+        {"StartTime": datetime(2099, 1, 1, tzinfo=timezone.utc),
+         "MinSize": 0, "MaxSize": 0, "DesiredCapacity": 0}]}
+    controller.ecs.get_paginator.return_value.paginate.return_value = [{"taskArns": ["task"]}]
+    controller.ecs.describe_tasks.return_value = {"tasks": [{"lastStatus": "RUNNING", "taskDefinitionArn": "definition"}]}
+    controller.monitor = Mock()
+    controller.cleanup = Mock()
+    controller.summary = Mock()
+    return controller, stage
+
+
+def test_resume_reuses_task_without_new_capacity_or_deadline_changes(tmp_path):
+    controller, stage = resume_controller(tmp_path)
+    controller.resume("bioinformatica")
+    controller.monitor.assert_called_once_with("bioinformatica", stage)
+    controller.cleanup.assert_called_once_with(stage)
+    controller.ecs.run_task.assert_not_called()
+    controller.asg.create_auto_scaling_group.assert_not_called()
+    controller.asg.put_scheduled_update_group_action.assert_not_called()
+
+
+def test_resume_rejects_mismatched_aws_deadline_before_touching_task(tmp_path):
+    controller, _ = resume_controller(tmp_path)
+    controller.asg.describe_scheduled_actions.return_value["ScheduledUpdateGroupActions"][0]["MaxSize"] = 1
+    with pytest.raises(RuntimeError, match="armed AWS shutdown"):
+        controller.resume("bioinformatica")
+    controller.monitor.assert_not_called()
+    controller.cleanup.assert_not_called()
+
+
+def test_resume_monitor_failure_still_cleans_up(tmp_path):
+    controller, stage = resume_controller(tmp_path)
+    controller.monitor.side_effect = TimeoutError("deadline")
+    with pytest.raises(TimeoutError):
+        controller.resume("bioinformatica")
+    controller.cleanup.assert_called_once_with(stage)

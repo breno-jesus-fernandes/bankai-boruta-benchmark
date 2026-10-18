@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-18T00:04:48.596158+00:00",
+  "authorized_extension_minutes": 30,
+  "original_deadline": "2026-10-18T00:05:14+00:00",
+  "verified_deadline": "2026-10-18T00:35:14+00:00",
+  "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/pilot-20261017/b2fac6419563497781d158f0d35a3c54",
+  "task_status": "RUNNING",
+  "extra_reserved_brl": "20",
+  "campaign_allocated_brl": "80",
+  "campaign_total_brl": "200",
+  "campaign_retained_reserve_brl": "40",
+  "new_task_launched": false
+}

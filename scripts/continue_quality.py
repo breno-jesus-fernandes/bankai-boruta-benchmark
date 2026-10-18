@@ -219,6 +219,33 @@ class Controller:
                 self.ecs.stop_task(cluster=self.args.cluster, task=task, reason="Budget-controlled quality shard finished or failed")
         self.wait_empty(stage["fleet"])
 
+    def resume(self, dataset):
+        """Explicitly resume monitoring an existing task; never relaunch/reserve."""
+        stage = self.state["stages"].get(dataset, {})
+        if stage.get("status") != "running" or len(stage.get("tasks", [])) != 1:
+            raise RuntimeError("Resume requires one recorded running task")
+        deadline = datetime.fromisoformat(stage["shutdown_at"])
+        actions = self.asg.describe_scheduled_actions(AutoScalingGroupName=stage["fleet"],
+            ScheduledActionNames=["bankai-budget-shutdown"])["ScheduledUpdateGroupActions"]
+        if (len(actions) != 1 or actions[0]["StartTime"] != deadline
+                or any(actions[0].get(k) != 0 for k in ("MinSize", "MaxSize", "DesiredCapacity"))
+                or datetime.now(timezone.utc) >= deadline):
+            raise RuntimeError("Resume deadline does not match an armed AWS shutdown")
+        tasks = [t for page in self.ecs.get_paginator("list_tasks").paginate(cluster=self.args.cluster)
+                 for t in page["taskArns"]]
+        if set(tasks) != set(stage["tasks"]):
+            raise RuntimeError("Cluster tasks differ from the recorded resume task")
+        described = self.ecs.describe_tasks(cluster=self.args.cluster, tasks=tasks)
+        if (described.get("failures") or len(described["tasks"]) != 1
+                or described["tasks"][0]["lastStatus"] != "RUNNING"
+                or described["tasks"][0]["taskDefinitionArn"] != self.args.task_definition):
+            raise RuntimeError("Recorded task is no longer running the verified definition")
+        self.summary(f"{dataset}: monitor retomado; corte {deadline:%H:%M UTC}", notify=True)
+        try:
+            self.monitor(dataset, stage)
+        finally:
+            self.cleanup(stage)
+
     def run(self):
         source = self.group(self.args.source_fleet)
         if not str(source["LaunchTemplate"]["Version"]).isdigit():
@@ -229,6 +256,17 @@ class Controller:
         results, expected, _ = self.sync()
         if not dataset_complete(results, expected, "industrial"):
             raise RuntimeError("Industrial pilot is not complete")
+        if self.args.resume_active:
+            self.resume(self.args.resume_active)
+            deadline = time.monotonic() + 300
+            while True:
+                try:
+                    self.assert_idle_cluster()
+                    break
+                except RuntimeError:
+                    if time.monotonic() >= deadline:
+                        raise
+                    time.sleep(30)
         # Initial pilot has finished; remove idle paid capacity before next shard.
         if self.ecs.list_tasks(cluster=self.args.cluster)["taskArns"]:
             raise RuntimeError("Cluster still busy; leaving it untouched")
@@ -267,6 +305,8 @@ def main():
     for name in ("profile", "bucket", "experiment", "cluster", "source-fleet", "task-definition", "image", "directory"):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--notify", action="store_true")
+    parser.add_argument("--resume-active", choices=DATASETS,
+                        help="Resume only the recorded running task after a reviewed controller/deadline change")
     args = parser.parse_args()
     directory = Path(args.directory)
     directory.mkdir(parents=True, exist_ok=True)
