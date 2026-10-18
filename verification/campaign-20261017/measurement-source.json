@@ -1,0 +1,22 @@
+{
+  "source_revision": "e11befc25ceb16e0367b965df8f17c6f7a6890ed",
+  "workflow_url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39059529475",
+  "package_source_hash": "dfc46f7c44ec9cfa23fc43603256d024a03a5c1c172752084cc28b7afd45af52",
+  "manifest_source_hash": "dfc46f7c44ec9cfa23fc43603256d024a03a5c1c172752084cc28b7afd45af52",
+  "source_matches_measurements": true,
+  "package_files": {
+    "__init__.py": "53257e5bd3e33706d2d15fd426f8b92b543af7142bba1c0c333e54c70c4ae43a",
+    "aggregate_latex.py": "1860252423af12a021fad1f5352e3941a8ad6fd3a120f6ba80ad97f841d07609",
+    "aws_ecs.py": "218a8bafa065070f2d49547c7d9fa0f9b1ff2c8448438a4da6333c9e6b51a852",
+    "budget.py": "e31d9b0cbe5aa9767ad99fa0986db67186ee92da4cbcba8bddeae0d59126bc2f",
+    "competitors.py": "57f4500a43022ddf3fa5e34dc13562bc745985619666f8fb8cf61c519f70f834",
+    "config.py": "86f399a9b42be0f0333f52c67443ac1567e180379f56058ef930935beeeced5a",
+    "datasets.py": "fc9f0aac25da55cd9b428d6480a5de32aee96f3746d0f59c86fe0c467be7ddbc",
+    "ecs_entrypoint.py": "a4b7bc27bdf97c61a96e19b0d0576d2383b4e1b21d47f4b04a8fd684500cd2d1",
+    "metrics.py": "4936ff4beb45c7af7aa4a07031ed3cb7ef0d969db953528c896b2be65c9475eb",
+    "orchestrator.py": "f1a8e8c3b42173ab9d52f0d856ccc25877c76cf95bb0050651220a9edc24b560",
+    "worker_single_run.py": "46ffe63342bd86f207881b3430ed06c104cc2f48998e3c8af87739fe15a822eb"
+  },
+  "measured_image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+  "scaling_manifest_source_hash": "dfc46f7c44ec9cfa23fc43603256d024a03a5c1c172752084cc28b7afd45af52"
+}

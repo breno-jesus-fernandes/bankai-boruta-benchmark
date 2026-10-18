@@ -22,7 +22,6 @@ def infrastructure(experiment, bucket, subnets, security_groups):
         resources[name] = dict(Type="AWS::"+kind, Properties=properties)
     def role(name, service, policies=None, managed=None):
         resource(name, "IAM::Role", AssumeRolePolicyDocument=dict(Version="2012-10-17", Statement=[dict(Effect="Allow", Principal={"Service": service}, Action="sts:AssumeRole")]), ManagedPolicyArns=managed or [], Policies=policies or [])
-    resource("Repository", "ECR::Repository", RepositoryName=experiment, ImageTagMutability="IMMUTABLE", EmptyOnDelete=True, ImageScanningConfiguration=dict(ScanOnPush=True))
     resource("Cluster", "ECS::Cluster", ClusterName=experiment)
     resource("Logs", "Logs::LogGroup", LogGroupName=f"/bankai/{experiment}", RetentionInDays=1)
     role("InstanceRole", "ec2.amazonaws.com", managed=["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"])
@@ -44,7 +43,7 @@ def infrastructure(experiment, bucket, subnets, security_groups):
     resource("Association", "ECS::ClusterCapacityProviderAssociations", Cluster=ref("Cluster"), CapacityProviders=[ref("CapacityProvider")], DefaultCapacityProviderStrategy=[dict(CapacityProvider=ref("CapacityProvider"), Weight=1)])
     return dict(AWSTemplateFormatVersion="2010-09-09", Description="Budget-limited benchmark pilot; capacity remains zero until AWS shutdown is verified.", Metadata={"AWSToolsMetrics": {"AWSAgentToolkit": "aws-cloudformation@3"}, "com.aws.cloudformation.Context": {"ref": ["README.md", "BUDGET.md"]}}, Parameters=dict(EcsAmi=dict(Type="AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>", Default=AMI_PARAMETER)),
         Resources=resources, Outputs={name: {"Value": value} for name, value in dict(Cluster=ref("Cluster"), CapacityProvider=ref("CapacityProvider"),
-            Fleet=ref("Fleet"), Repository=attr("Repository", "RepositoryUri"), ExecutionRole=attr("ExecutionRole", "Arn"), TaskRole=attr("TaskRole", "Arn"), Logs=ref("Logs")).items()})
+            Fleet=ref("Fleet"), ExecutionRole=attr("ExecutionRole", "Arn"), TaskRole=attr("TaskRole", "Arn"), Logs=ref("Logs")).items()})
 
 
 def task_definition(experiment, image, region, outputs):

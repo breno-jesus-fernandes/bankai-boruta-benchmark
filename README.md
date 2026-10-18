@@ -5,6 +5,10 @@ datasets, one fresh OS process per trial, and manifest-validated paper reports.
 New benchmark code is MIT-licensed. Bankai artifacts and the upstream patch retain
 their GPL license; see [DEPENDENCIES.md](DEPENDENCIES.md).
 
+The [completed October 2026 campaign](verification/campaign-20261017/README.md)
+includes 210 successful measurements, source-verified raw data, quality/scaling
+comparisons, paper tables, vector figures and a read-only AWS cost/resource audit.
+
 ```sh
 uv sync --locked
 make test
@@ -61,6 +65,11 @@ not the two-minute smoke target. Full quality uses all four datasets, seeds
 Full campaigns discard two warmups with seeds 900001/900002. Warmups run in fresh
 processes and warm system caches; measured workers are still fresh processes.
 Quality and scaling receive separate experiment IDs (`NAME-quality`/`NAME-scaling`).
+
+The currently approved reduced scaling campaign measures **4 and 8 threads**
+only and reuses the original Industrial quality results at 16 threads. It uses
+five seeds per configuration, paired speedups relative to four threads, and a
+separate BRL60/three-hour guard. See [the reduced scaling plan](deployment/SCALING48.md).
 
 ## Data generation and frozen implementation choices
 

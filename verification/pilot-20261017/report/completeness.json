@@ -1,0 +1,428 @@
+{
+  "expected": 140,
+  "final_paper_ready": false,
+  "issues": [
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_adapter_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_adapter_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_adapter_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_adapter_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_classic_adapter_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_greedy_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_greedy_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_greedy_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_greedy_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/bankai_greedy_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_lightgbm_rf_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_lightgbm_rf_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_lightgbm_rf_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_lightgbm_rf_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_lightgbm_rf_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_sklearn_et_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_sklearn_et_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_sklearn_et_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_sklearn_et_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/borutapy_sklearn_et_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_bankai_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_bankai_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_bankai_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_bankai_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_bankai_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_lightgbm_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_lightgbm_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_lightgbm_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_lightgbm_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/credito/greedy_borutapy_lightgbm_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_adapter_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_adapter_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_adapter_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_adapter_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_classic_adapter_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_greedy_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_greedy_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_greedy_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_greedy_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/bankai_greedy_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_lightgbm_rf_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_lightgbm_rf_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_lightgbm_rf_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_lightgbm_rf_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_lightgbm_rf_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_sklearn_et_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_sklearn_et_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_sklearn_et_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_sklearn_et_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/borutapy_sklearn_et_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_bankai_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_bankai_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_bankai_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_bankai_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_bankai_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_lightgbm_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_lightgbm_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_lightgbm_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_lightgbm_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/bioinformatica/greedy_borutapy_lightgbm_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_adapter_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_adapter_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_adapter_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_adapter_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_classic_adapter_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_greedy_native_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_greedy_native_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_greedy_native_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_greedy_native_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/bankai_greedy_native_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_lightgbm_rf_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_sklearn_et_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_sklearn_et_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_sklearn_et_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_sklearn_et_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/borutapy_sklearn_et_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_bankai_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_bankai_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_bankai_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_bankai_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_bankai_s46_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_lightgbm_s42_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_lightgbm_s43_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_lightgbm_s44_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_lightgbm_s45_t16.json",
+      "status": "missing"
+    },
+    {
+      "key": "pilot-20261017-quality/raw/ciberseguranca/greedy_borutapy_lightgbm_s46_t16.json",
+      "status": "missing"
+    }
+  ],
+  "quantile_method": "linear",
+  "successful": 35
+}

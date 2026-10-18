@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "stack_name": "bankai-pilot-20261017",
+  "stack_status": "CREATE_COMPLETE",
+  "region": "us-east-1",
+  "account": "642504869083",
+  "change_set_name": "pilot-review-20261017-v2",
+  "change_set_arn": "arn:aws:cloudformation:us-east-1:642504869083:changeSet/pilot-review-20261017-v2/6f044df7-76ab-4815-9e09-1960c74b3eae",
+  "execution": "completed",
+  "creator_arn": "arn:aws:iam::642504869083:root",
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+  "outputs": {
+    "cluster": "pilot-20261017",
+    "capacity_provider": "pilot-20261017",
+    "fleet": "bankai-pilot-20261017-Fleet-UEWu3HaoKGNb",
+    "logs": "/bankai/pilot-20261017",
+    "execution_role": "arn:aws:iam::642504869083:role/bankai-pilot-20261017-ExecutionRole-GBBFr2uz0yTd",
+    "task_role": "arn:aws:iam::642504869083:role/bankai-pilot-20261017-TaskRole-u2mjL7VDtkMC"
+  },
+  "autoscaling_group": {
+    "min_size": 0,
+    "desired_capacity": 0,
+    "max_size": 1,
+    "instances": []
+  },
+  "active_ecs_container_instances": [],
+  "ec2_instances_started": 0,
+  "ecs_tasks_started": 0,
+  "observed_at_utc": "2026-10-17T21:31:42Z"
+}

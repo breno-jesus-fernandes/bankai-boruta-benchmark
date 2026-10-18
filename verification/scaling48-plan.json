@@ -1,0 +1,38 @@
+{
+  "dataset": "industrial",
+  "new_threads": [
+    4,
+    8
+  ],
+  "reused_threads": [
+    16
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "competitors": [
+    "bankai_classic_native",
+    "bankai_classic_adapter",
+    "bankai_greedy_native",
+    "borutapy_lightgbm_rf",
+    "borutapy_sklearn_et",
+    "greedy_borutapy_bankai",
+    "greedy_borutapy_lightgbm"
+  ],
+  "new_measurements": 70,
+  "reused_measurements": 35,
+  "discarded_warmups": 28,
+  "baseline_threads": 4,
+  "maximum_seconds_including_boot": 10800,
+  "reserved_brl": "60",
+  "campaign_total_brl": "200",
+  "retained_reserve_brl": "40",
+  "queue_after": "140 quality successes and previous EC2 termination",
+  "runner_sha256": "f52c45168c15685a2e4be45929faeed832ed2498ebbf1ad3ac80bad20fa0939d",
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+  "baseline_root": "verification/pilot-20261017/input"
+}

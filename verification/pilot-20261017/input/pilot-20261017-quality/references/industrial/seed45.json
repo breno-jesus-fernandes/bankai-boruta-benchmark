@@ -1,0 +1,21 @@
+{
+  "all_features": {
+    "accuracy": 0.74644,
+    "balanced_accuracy": 0.74644,
+    "f1": 0.7495753170307747,
+    "roc_auc": 0.8261050304,
+    "seconds": 14.226795436999964,
+    "selected_count": 500
+  },
+  "dataset_hash": "f6918f80b1741cfbc387c5fda985bb0e2f952d934dbda421c3389e2211a2af7b",
+  "oracle": {
+    "accuracy": 0.78764,
+    "balanced_accuracy": 0.78764,
+    "f1": 0.7884776285907805,
+    "roc_auc": 0.8740143904,
+    "seconds": 1.872704280999983,
+    "selected_count": 12
+  },
+  "schema_version": 1,
+  "seed": 45
+}

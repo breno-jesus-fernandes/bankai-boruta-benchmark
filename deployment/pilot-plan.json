@@ -20,17 +20,6 @@
       }
     },
     "Resources": {
-      "Repository": {
-        "Type": "AWS::ECR::Repository",
-        "Properties": {
-          "RepositoryName": "pilot-20261017",
-          "ImageTagMutability": "IMMUTABLE",
-          "EmptyOnDelete": true,
-          "ImageScanningConfiguration": {
-            "ScanOnPush": true
-          }
-        }
-      },
       "Cluster": {
         "Type": "AWS::ECS::Cluster",
         "Properties": {
@@ -278,14 +267,6 @@
           "Ref": "Fleet"
         }
       },
-      "Repository": {
-        "Value": {
-          "Fn::GetAtt": [
-            "Repository",
-            "RepositoryUri"
-          ]
-        }
-      },
       "ExecutionRole": {
         "Value": {
           "Fn::GetAtt": [
@@ -309,7 +290,49 @@
       }
     }
   },
-  "task_definition": null,
+  "task_definition": {
+    "family": "pilot-20261017",
+    "requiresCompatibilities": [
+      "EC2"
+    ],
+    "networkMode": "bridge",
+    "cpu": "16384",
+    "memory": "28672",
+    "executionRoleArn": "${ExecutionRole}",
+    "taskRoleArn": "${TaskRole}",
+    "runtimePlatform": {
+      "cpuArchitecture": "X86_64",
+      "operatingSystemFamily": "LINUX"
+    },
+    "containerDefinitions": [
+      {
+        "name": "benchmark",
+        "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+        "essential": true,
+        "cpu": 16384,
+        "memory": 28672,
+        "entryPoint": [
+          "/app/.venv/bin/python",
+          "-m",
+          "bankai_benchmark.ecs_entrypoint"
+        ],
+        "environment": [
+          {
+            "name": "BENCHMARK_IMAGE_DIGEST",
+            "value": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/bankai/pilot-20261017",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "benchmark"
+          }
+        }
+      }
+    ]
+  },
   "commands": [
     [
       "full",

@@ -16,7 +16,10 @@ bankai-aggregate = "bankai_benchmark.aggregate_latex:main"
 bankai-aws = "bankai_benchmark.aws_ecs:main"
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = [
+    "matplotlib>=3.9,<4",
+    "pytest>=8",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/bankai_benchmark"]

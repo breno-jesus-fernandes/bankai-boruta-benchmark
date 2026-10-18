@@ -1,0 +1,34 @@
+# FINAL
+
+Expected: 140. Successful: 140. Missing/failed: 0.
+
+| Dataset | Method | Threads | Seeds | Fit seconds, median [Q1, Q3] |
+|---|---|---:|---:|---|
+| industrial | bankai_classic_native | 16 | 5/5 | 23.59653216600003 [22.645793240999993, 24.393446275000002] |
+| industrial | bankai_classic_adapter | 16 | 5/5 | 28.86246652799997 [28.190566073000014, 29.288685780000037] |
+| industrial | bankai_greedy_native | 16 | 5/5 | 36.70953976599992 [36.64762939100001, 36.71161110799994] |
+| industrial | borutapy_lightgbm_rf | 16 | 5/5 | 51.25005178300012 [50.82995681800003, 52.96511223000016] |
+| industrial | borutapy_sklearn_et | 16 | 5/5 | 37.71873815700019 [37.69075169300004, 37.925296376999995] |
+| industrial | greedy_borutapy_bankai | 16 | 5/5 | 39.990577794000046 [39.98664860200006, 40.09153312500007] |
+| industrial | greedy_borutapy_lightgbm | 16 | 5/5 | 64.52281134200007 [64.397167438, 65.40048426700014] |
+| credito | bankai_classic_native | 16 | 5/5 | 23.727828164000016 [20.75241176000003, 24.069969646999994] |
+| credito | bankai_classic_adapter | 16 | 5/5 | 28.677847967000048 [25.787901104999946, 29.29825685899999] |
+| credito | bankai_greedy_native | 16 | 5/5 | 30.20090846300002 [30.166803394, 30.219940734000033] |
+| credito | borutapy_lightgbm_rf | 16 | 5/5 | 38.262723564 [38.09178136100002, 39.78164638399994] |
+| credito | borutapy_sklearn_et | 16 | 5/5 | 26.721875871000066 [24.525628177999806, 26.856525841999883] |
+| credito | greedy_borutapy_bankai | 16 | 5/5 | 33.37512103500012 [33.35053807200006, 33.50451028400016] |
+| credito | greedy_borutapy_lightgbm | 16 | 5/5 | 51.91268023900011 [51.86291230699999, 52.05990845699989] |
+| bioinformatica | bankai_classic_native | 16 | 5/5 | 53.65725849100005 [50.781078254999954, 53.978493098] |
+| bioinformatica | bankai_classic_adapter | 16 | 5/5 | 63.34829875699995 [61.79367327800003, 63.50796854500004] |
+| bioinformatica | bankai_greedy_native | 16 | 5/5 | 97.40239440200003 [97.26050947600015, 97.66119806900019] |
+| bioinformatica | borutapy_lightgbm_rf | 16 | 5/5 | 69.20100475899994 [67.09285037599989, 69.8888634279997] |
+| bioinformatica | borutapy_sklearn_et | 16 | 5/5 | 117.86339272499981 [117.27867838500015, 119.00255752400017] |
+| bioinformatica | greedy_borutapy_bankai | 16 | 5/5 | 98.8478129680002 [98.53855037799985, 99.14274954899975] |
+| bioinformatica | greedy_borutapy_lightgbm | 16 | 5/5 | 113.12557699399986 [113.10304338200058, 113.3110864780001] |
+| ciberseguranca | bankai_classic_native | 16 | 5/5 | 20.525297060999947 [20.318779697000025, 26.360409414000003] |
+| ciberseguranca | bankai_classic_adapter | 16 | 5/5 | 23.877900329 [23.831628589999923, 30.83996372699994] |
+| ciberseguranca | bankai_greedy_native | 16 | 5/5 | 23.669585048000044 [23.562743440999952, 23.697763999000017] |
+| ciberseguranca | borutapy_lightgbm_rf | 16 | 5/5 | 34.42527908199986 [30.204771946999927, 34.93090574600001] |
+| ciberseguranca | borutapy_sklearn_et | 16 | 5/5 | 27.40230471299992 [27.018709390999902, 35.282445569000174] |
+| ciberseguranca | greedy_borutapy_bankai | 16 | 5/5 | 24.764180312999997 [24.673654366999926, 24.83903807999991] |
+| ciberseguranca | greedy_borutapy_lightgbm | 16 | 5/5 | 33.29912332499998 [33.193654814999945, 33.439035358999945] |
