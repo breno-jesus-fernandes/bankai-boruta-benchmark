@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0,str(Path(__file__).parents[1]/'scripts'))
 from analyze_campaign import paired_comparisons
-from bankai_benchmark.config import COMPETITORS,SEEDS,Trial
+from bankai_benchmark.config import HISTORICAL_COMPETITORS as COMPETITORS,SEEDS,Trial
 from test_aggregation import fake_result
 
 

@@ -20,8 +20,8 @@ def main():
     started = time.perf_counter()
     subprocess.run(command, check=True)
     elapsed = time.perf_counter()-started
-    paths = sorted(Path(args.results).glob('*/raw/**/*.json'))
-    assert len(paths) == (4 if args.dataset else 16)
+    paths = sorted((Path(args.results)/(PROTOCOL+'-smoke-quality')).glob('raw/**/*.json'))
+    assert len(paths) == (3 if args.dataset else 12)
     before = {str(p): (p.stat().st_mtime_ns, hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths}
     assert all(json.loads(p.read_text())['status'] == 'success' for p in paths)
     subprocess.run([sys.executable, '-m', 'bankai_benchmark.aggregate_latex', '--results', args.results, '--output', args.output, '--provisional'], check=True)

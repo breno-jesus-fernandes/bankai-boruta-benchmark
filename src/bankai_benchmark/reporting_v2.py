@@ -25,7 +25,9 @@ def report(quality_root, scaling_root, output):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    labels = dict(zip(COMPETITORS, ('Classic native', 'Classic adapter', 'BorutaPy LightGBM RF', 'BorutaPy ExtraTrees')))
+    labels = {'bankai_native_extra_tree': 'Bankai native ExtraTrees',
+              'borutapy_lightgbm_rf': 'BorutaPy LightGBM RF',
+              'borutapy_sklearn_et': 'BorutaPy ExtraTrees'}
     rows = list(csv.DictReader((output/'quality/summary_by_dataset.csv').open()))
     for metric in ('fit_seconds', 'peak_rss_gib', 'recall'):
         fig, axes = plt.subplots(2, 2, figsize=(11, 7), layout='constrained')

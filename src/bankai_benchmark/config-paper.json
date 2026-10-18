@@ -3,16 +3,14 @@
   "dataset": "industrial",
   "threads": 16,
   "methods": {
-    "CR": "bankai_classic_native",
-    "CA": "bankai_classic_adapter",
+    "CR": "bankai_native_extra_tree",
     "BP": "borutapy_lightgbm_rf",
     "ET": "borutapy_sklearn_et"
   },
   "time_tokens": {
     "CR": "CR",
-    "CA": "CA",
     "BP": "BP",
     "ET": "ET"
   },
-  "protocol": "paper-v2-a5-amd16"
+  "protocol": "paper-v2-a5-amd16-r2"
 }

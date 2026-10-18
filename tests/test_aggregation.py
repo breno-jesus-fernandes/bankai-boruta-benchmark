@@ -30,19 +30,18 @@ def test_every_placeholder_and_paired_ratios():
     for c in COMPETITORS:
         for i,s in enumerate(SEEDS):
             t=Trial('test-quality','quality','full','industrial',c,s,16)
-            rows.append(fake_result(t,time=(i+1)*(2 if c == 'bankai_classic_adapter' else 1),recall=.8 if c == 'bankai_classic_native' else .7))
+            rows.append(fake_result(t,time=(i+1),recall=.8 if c == 'bankai_native_extra_tree' else .7))
     tokens,complete=placeholder_values(rows,mapping)
     assert complete
-    assert set(tokens) == {'CR','CA','BP','ET','mCR','mCA','mBP','mET','rCR','rCA','rBP','rET','infoC','ruidoC','razao','delta'}
-    assert tokens['razao'] == 2 and tokens['delta'] == pytest.approx(10)
-    assert tokens['CR'] == 3 and tokens['CA'] == 6 and tokens['ET'] == 3
-    assert all(tokens[k] == 2 for k in ('mCR','mCA','mBP','mET'))
+    assert set(tokens) == {'CR','BP','ET','mCR','mBP','mET','rCR','rBP','rET','infoC','ruidoC'}
+    assert tokens['CR'] == 3 and tokens['BP'] == 3 and tokens['ET'] == 3
+    assert all(tokens[k] == 2 for k in ('mCR','mBP','mET'))
     assert tokens['infoC'] == 10 and tokens['ruidoC'] == 5
     assert not placeholder_values(rows[1:],mapping)[1]
 
 
 def test_manifest_reports_and_failures(tmp_path):
-    trials=tuple(Trial('test-scaling','scaling','full','industrial','bankai_classic_native',s,t) for t in [1,2] for s in [42,43])
+    trials=tuple(Trial('test-scaling','scaling','full','industrial','bankai_native_extra_tree',s,t) for t in [1,2] for s in [42,43])
     root=tmp_path/'results';atomic_json(root/'test-scaling/manifest.json',manifest_for(trials))
     times=[2,100,1,100]
     for t,time in zip(trials,times):atomic_json(root/t.key,fake_result(t,time))

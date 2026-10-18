@@ -9,7 +9,7 @@ from bankai_benchmark.config import COMPETITORS,Trial
 from bankai_benchmark.datasets import generate_dataset
 from bankai_benchmark.metrics import downstream,selection_metrics
 
-def trial(competitor='bankai_classic_native'):return Trial('test-quality','quality','smoke','industrial',competitor,42,1)
+def trial(competitor='bankai_native_extra_tree'):return Trial('test-quality','quality','smoke','industrial',competitor,42,1)
 
 def test_hand_metrics():
     m=selection_metrics(np.array([1,0,1,0],bool),[0,1],{'signal':[0,1],'trap_noise':[2],'absent':[]})
@@ -31,7 +31,7 @@ def test_selectors(competitor):
     assert result.effective_parameters['n_estimators'] == 8
     assert result.rounds == (ceil(log2(40/.05)) if 'greedy' in competitor else 3)
     json.dumps(result.effective_parameters,allow_nan=False)
-    if competitor.endswith('native'):assert result.diagnostics['path'] == 'rust'
+    if competitor == 'bankai_native_extra_tree':assert result.diagnostics['path'] == 'rust'
 
 def test_lightgbm_width_and_cloning():
     model=clone(estimator(trial('borutapy_lightgbm_rf'),'lightgbm'))
@@ -41,3 +41,7 @@ def test_lightgbm_width_and_cloning():
     model.fit(X[:,:20],y);assert model.colsample_bytree == 4/20
     model=estimator(replace(trial(),dataset='bioinformatica'),'lightgbm')
     model.fit(X,y);assert model.colsample_bytree == .15
+
+def test_extra_trees_bootstrap_and_current_methods():
+    assert COMPETITORS == ('bankai_native_extra_tree','borutapy_lightgbm_rf','borutapy_sklearn_et')
+    assert estimator(trial('borutapy_sklearn_et'),'et').bootstrap is True

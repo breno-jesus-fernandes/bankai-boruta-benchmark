@@ -33,7 +33,7 @@ def estimator(trial, backend):
         return BankaiRandomForestClassifier(**common, max_features=cfg.max_features, max_bins=cfg.bins,
                    extra_trees=True, extra_trees_backend="binned", importance_type="gain", bootstrap=True)
     if backend == "et":
-        return ExtraTreesClassifier(**common, max_features=cfg.max_features, bootstrap=False)
+        return ExtraTreesClassifier(**common, max_features=cfg.max_features, bootstrap=True)
     return WidthAwareLGBM(**common, boosting_type="rf", num_leaves=2**cfg.depth, max_bin=cfg.bins,
                          subsample=.8, subsample_freq=1, colsample_bytree=1.0 if cfg.max_features == "sqrt" else cfg.max_features,
                          importance_type="gain", verbosity=-1, deterministic=True, force_col_wise=True,
@@ -61,8 +61,7 @@ class PreparedSelector:
         common = dict(n_estimators=cfg.trees, perc=100, alpha=cfg.alpha, two_step=True,
                       max_iter=cfg.max_iter, random_state=trial.seed, early_stopping=False)
         if name.startswith("bankai"):
-            self.selector = BankaiBoruta(model, **common, greedy=False,
-                               importance_getter="feature_importances_" if name.endswith("adapter") else "auto")
+            self.selector = BankaiBoruta(model, **common, greedy=False)
         else:
             self.selector = BorutaPy(model, **common)
 
@@ -75,7 +74,7 @@ class PreparedSelector:
         selector = self.selector
         diagnostics = getattr(selector, "diagnostics_", {"path": "python"})
         if name.startswith("bankai"):
-            expected = "python" if name.endswith("adapter") else "rust"
+            expected = "rust"
             if diagnostics["path"] != expected:
                 raise RuntimeError(f"Required {expected} path, got {diagnostics}")
         rounds = len(selector.importance_history_)-1 if isinstance(selector, BorutaPy) else selector.n_iter_

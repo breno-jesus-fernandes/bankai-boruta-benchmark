@@ -8,10 +8,11 @@ from bankai_benchmark.datasets import cache_dataset
 from bankai_benchmark.orchestrator import ensure_manifest,execute,manifest_for,runnable,upload,restore,run_trial,require_public_release
 
 def test_grids_and_resume(tmp_path):
-    assert len(trial_grid('x','smoke','quality')) == 16
-    assert len(trial_grid('x','smoke-matrix','quality')) == 64
-    assert len(trial_grid('x','full','quality')) == 80
-    assert len(trial_grid('x','full','scaling')) == 100
+    assert len(trial_grid('x','smoke','quality')) == 12
+    assert len(trial_grid('x','smoke-matrix','quality')) == 48
+    assert len(trial_grid('x','full','quality')) == 60
+    assert len(trial_grid('x','full','scaling')) == 75
+    assert {t.threads for t in trial_grid('x','full','scaling')} == {1, 2, 4, 8, 16}
     trials=trial_grid('x','smoke','quality');m=manifest_for(trials);p=tmp_path/'manifest.json'
     ensure_manifest(p,m);ensure_manifest(p,m)
     with pytest.raises(ValueError):ensure_manifest(p,dict(m,mode='full'))
@@ -41,7 +42,7 @@ def test_timeout_cleanup(tmp_path):
 
 
 def test_fresh_worker(tmp_path):
-    trial=Trial('test-quality','quality','smoke','industrial','bankai_classic_native',42,1)
+    trial=Trial('test-quality','quality','smoke','industrial','bankai_native_extra_tree',42,1)
     cache=cache_dataset(tmp_path/'cache','industrial',42,'smoke');output=tmp_path/'success.json'
     result=run_trial(trial,cache,output,120);m=result['execution_metrics']
     assert result['status'] == 'success' and m['peak_rss_gib'] >= m['baseline_rss_bytes']/2**30

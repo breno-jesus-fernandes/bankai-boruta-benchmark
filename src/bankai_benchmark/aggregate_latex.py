@@ -4,7 +4,7 @@ import csv
 import json
 from pathlib import Path
 import numpy as np
-from .config import atomic_json, digest, SEEDS
+from .config import atomic_json, digest, SEEDS, PROTOCOL
 
 QUANTILE_METHOD = "linear"
 
@@ -32,7 +32,7 @@ def validated_results(root):
         manifest = json.loads(path.read_text())
         if digest({k: v for k, v in manifest.items() if k != "configuration_hash"}) != manifest["configuration_hash"]:
             raise ValueError(f"Manifest checksum mismatch: {path}")
-        if manifest.get("protocol") not in (None, "paper-v2-a5-amd16"):
+        if manifest.get("protocol") not in (None, PROTOCOL, "paper-v2-a5-amd16"):
             raise ValueError("Unsupported benchmark protocol")
         fingerprints.add(digest(dict(source=manifest["source_hash"], packages=manifest["package_versions"], protocol=manifest.get("protocol", "paper-v1-a4"))))
         for spec in manifest["trials"]:
@@ -84,8 +84,9 @@ def placeholder_values(results, mapping):
         tokens["info"+suffix] = median(alias, "selection_metrics", "tp")
         tokens["ruido"+suffix] = median(alias, "selection_metrics", "fp")
     opts = dict(threads=mapping["threads"], dataset=mapping["dataset"])
-    tokens["razao"] = distribution(paired(results, mapping["methods"]["CA"], mapping["methods"]["CR"], "time", **opts))["median"]
-    tokens["delta"] = distribution(paired(results, mapping["methods"]["CR"], mapping["methods"]["CA"], "recall", **opts))["median"]
+    if "CA" in mapping["methods"]:
+        tokens["razao"] = distribution(paired(results, mapping["methods"]["CA"], mapping["methods"]["CR"], "time", **opts))["median"]
+        tokens["delta"] = distribution(paired(results, mapping["methods"]["CR"], mapping["methods"]["CA"], "recall", **opts))["median"]
     return tokens, complete
 
 
@@ -145,7 +146,7 @@ def aggregate(root, output, provisional=False, mapping_path=None):
             **{f"efficiency_{k}": v for k, v in distribution([v/row["threads"] for v in values]).items()}))
     write_csv(output/"thread_scaling.csv", scaling)
     manifests = [json.loads(p.read_text()) for p in Path(root).rglob("manifest.json")]
-    current = all(m.get("protocol") == "paper-v2-a5-amd16" for m in manifests)
+    current = all(m.get("protocol") == PROTOCOL for m in manifests)
     mapping = json.loads(Path(mapping_path or Path(__file__).with_name("config-paper.json" if current else "config-paper-v1.json")).read_text())
     tokens, placeholder_complete = placeholder_values(results, mapping)
     complete = placeholder_complete and not issues

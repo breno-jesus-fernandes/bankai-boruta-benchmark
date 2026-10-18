@@ -1,8 +1,8 @@
 # Bankai Boruta benchmark v2
 
-Protocolo `paper-v2-a5-amd16`, gerador `2.0.0`, Bankai Boruta **0.1.0a5** e BankaiRF **0.1.0a15**. Esta revisão entrega implementação e validação local. Ainda não há resultados de desempenho v2 ou evidência de melhora de recall em escala real.
+Protocolo `paper-v2-a5-amd16-r2`, gerador `2.0.0`, Bankai Boruta **0.1.0a5** e BankaiRF **0.1.0a15**. Esta revisão entrega implementação e validação local. Ainda não há resultados de desempenho v2 ou evidência de melhora de recall em escala real.
 
-Quatro métodos: `bankai_classic_native`, `bankai_classic_adapter`, `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. O clássico usa `perc=100`, alpha 0,05, duas etapas estatísticas e sem early stopping. Orçamentos, profundidade, bins, bootstrap e amostragem de cada backend permanecem como na a4; ExtraTrees não usa bootstrap, BankaiRF usa, e LightGBM RF usa subsample 0,8. Greedy pertence somente ao histórico.
+Três métodos: `bankai_native_extra_tree`, `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. `bankai_native_extra_tree` identifica explicitamente o caminho nativo do BankaiBoruta com BankaiRF em modo Extra Trees. Os dois métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. O Bankai clássico usa `perc=100`, alpha 0,05, duas etapas estatísticas e sem early stopping. Greedy pertence somente ao histórico. `bankai_classic_adapter` continua disponível apenas na leitura dos resultados históricos.
 
 | Perfil | Treino N | Teste N | P | Árvores | Profundidade | Iterações máximas | Prevalência | SNR |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -43,14 +43,14 @@ Precisão, recall, F1, FDR, falsos positivos trap e seleções tentativas são r
 
 Alvo: `c7a.4xlarge`, AMD EPYC, 16 núcleos físicos, uma thread por núcleo, 32 GiB ([especificação AWS](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html)). ECS sobre EC2, uma tarefa por host, reserva 16 CPUs e 28 GiB. `MACHINE` em `config.py` centraliza a identidade; templates e placement usam esse alvo, capacidade desejada zero nos planos offline.
 
-Qualidade: quatro perfis × quatro métodos × cinco seeds (42–46) × 16 núcleos = 80 fits. Escala: Industrial × quatro métodos × cinco seeds × 1/2/4/8/16 núcleos = 100 fits independentes. Dois warmups por célula usam seeds 900001/900002. Não reutilizar observações da qualidade ou da a4 na escala v2.
+Qualidade: quatro perfis × três métodos × cinco seeds (42–46) × 16 núcleos = 60 fits. Escala: Industrial × três métodos × cinco seeds × 1/2/4/8/16 núcleos = 75 fits independentes. Dois warmups por célula usam seeds 900001/900002. Não reutilizar observações anteriores ou da a4 na escala r2.
 
 ```sh
 # Executar somente depois da aceitação Linux/container e aprovação da campanha futura.
-uv run bankai-benchmark full --suite quality --experiment paper-v2-a5-amd16 --results results-v2
-uv run bankai-benchmark full --suite scaling --experiment paper-v2-a5-amd16 --results results-v2
+uv run bankai-benchmark full --suite quality --experiment paper-v2-a5-amd16-r2 --results results-v2
+uv run bankai-benchmark full --suite scaling --experiment paper-v2-a5-amd16-r2 --results results-v2
 uv run bankai-aggregate --results results-v2 --output reports-v2
-uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a5-amd16-quality --scaling results-v2/paper-v2-a5-amd16-scaling --output reports-v2/analysis
+uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a5-amd16-r2-quality --scaling results-v2/paper-v2-a5-amd16-r2-scaling --output reports-v2/analysis
 ```
 
 O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).

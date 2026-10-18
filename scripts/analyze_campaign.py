@@ -110,7 +110,7 @@ def main():
     parser.add_argument('--quality',required=True);parser.add_argument('--scaling',required=True)
     parser.add_argument('--output',required=True)
     args=parser.parse_args();out=Path(args.output);out.mkdir(parents=True,exist_ok=True)
-    if any(json.loads(p.read_text()).get("protocol") == "paper-v2-a5-amd16" for p in Path(args.quality).rglob("manifest.json")):
+    if any(json.loads(p.read_text()).get("protocol", "").startswith("paper-v2-a5-amd16") for p in Path(args.quality).rglob("manifest.json")):
         from bankai_benchmark.reporting_v2 import report
         report(args.quality, args.scaling, out)
         return

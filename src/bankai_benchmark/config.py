@@ -5,12 +5,12 @@ from pathlib import Path
 
 SCHEMA_VERSION = 1
 GENERATOR_VERSION = "2.0.0"
-PROTOCOL = "paper-v2-a5-amd16"
+PROTOCOL = "paper-v2-a5-amd16-r2"
 MACHINE = dict(instance_type="c7a.4xlarge", physical_cores=16, threads_per_core=1, memory_gib=32)
 SEEDS = (42, 43, 44, 45, 46)
 HISTORICAL_COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "bankai_greedy_native",
                "borutapy_lightgbm_rf", "borutapy_sklearn_et", "greedy_borutapy_bankai", "greedy_borutapy_lightgbm")
-COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "borutapy_lightgbm_rf", "borutapy_sklearn_et")
+COMPETITORS = ("bankai_native_extra_tree", "borutapy_lightgbm_rf", "borutapy_sklearn_et")
 EFFECT_WEIGHTS = {
     "industrial": [1, 1, .25, .25, .02, .02],
     "credito": [1.]*7 + [.25]*4 + [.02]*3,

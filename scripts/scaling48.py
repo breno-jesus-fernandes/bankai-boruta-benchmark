@@ -26,7 +26,7 @@ def reduced_grid(experiment_id, mode, suite, dataset=None):
     if mode != "full" or suite != "scaling" or dataset not in (None, "industrial"):
         raise ValueError("This entry point permits Industrial full scaling only")
     from bankai_benchmark.config import PROTOCOL
-    if PROTOCOL == "paper-v2-a5-amd16":
+    if PROTOCOL.startswith("paper-v2"):
         raise ValueError("Historical scaling48 runner cannot execute protocol v2; use full --suite scaling")
     return tuple(sorted((t for t in original_grid(experiment_id, mode, suite, dataset)
                          if t.threads in (4, 8)),
@@ -61,7 +61,7 @@ def compatibility(row):
 
 def compare(baseline_root, scaling_root, output):
     for root in (baseline_root, scaling_root):
-        if any(json.loads(p.read_text()).get("protocol") == "paper-v2-a5-amd16" for p in Path(root).rglob("manifest.json")):
+        if any(json.loads(p.read_text()).get("protocol", "").startswith("paper-v2") for p in Path(root).rglob("manifest.json")):
             raise ValueError("Historical scaling48 cannot reuse protocol v2 observations")
     baseline, _, _ = validated_results(baseline_root)
     baseline = [r for r in baseline if r['dataset'] == 'industrial'
