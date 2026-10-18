@@ -24,3 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: make docker-smoke
+      - name: Build and verify the isolated exact-session image
+        run: |
+          docker build --platform linux/amd64 --build-arg VCS_REF="$GITHUB_SHA" -f Dockerfile.exact-session -t bankai-exact-session:ci .
+          docker run --rm --platform linux/amd64 --entrypoint /opt/candidate/bin/python bankai-exact-session:ci /opt/verify_exact_session_image.py

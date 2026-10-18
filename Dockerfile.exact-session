@@ -1,0 +1,46 @@
+FROM --platform=linux/amd64 python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89 AS build
+RUN apt-get update && apt-get install -y --no-install-recommends git libgomp1 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir uv==0.13.1
+WORKDIR /opt/benchmark
+COPY pyproject.toml uv.lock ./
+RUN uv export --locked --no-dev --no-emit-project --no-hashes --format requirements-txt --output-file /tmp/reference.txt \
+    && sed -e 's/bankai-boruta==0.1.0a6/bankai-boruta==0.1.0a7/' \
+           -e 's/bankai-random-forest==0.1.0a15/bankai-random-forest==0.1.0a16/' \
+           /tmp/reference.txt > /tmp/candidate.txt \
+    && uv venv --python /usr/local/bin/python3 /opt/reference \
+    && uv pip install --python /opt/reference/bin/python -r /tmp/reference.txt \
+    && uv venv --python /usr/local/bin/python3 /opt/candidate \
+    && uv pip install --python /opt/candidate/bin/python -r /tmp/candidate.txt
+ARG BORUTA_REVISION=b0f415ebed8f8fe6ab304bfde4ba9dff19c295bb
+RUN git init /opt/boruta \
+    && git -C /opt/boruta remote add origin https://github.com/breno-jesus-fernandes/bankai-boruta.git \
+    && git -C /opt/boruta fetch --depth 1 origin "$BORUTA_REVISION" \
+    && git -C /opt/boruta checkout --detach FETCH_HEAD
+COPY src/bankai_benchmark /opt/bankai-benchmark/src/bankai_benchmark
+COPY scripts/exact_session_pilot.py scripts/verify_exact_session_image.py /opt/
+RUN /opt/candidate/bin/python /opt/verify_exact_session_image.py
+
+FROM --platform=linux/amd64 python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
+ARG VCS_REF=unknown
+ARG BORUTA_REVISION=b0f415ebed8f8fe6ab304bfde4ba9dff19c295bb
+LABEL org.opencontainers.image.revision=$VCS_REF \
+      bankai.benchmark.protocol="exact-session-a7-v1" \
+      bankai.boruta.reference="0.1.0a6" \
+      bankai.boruta.candidate="0.1.0a7" \
+      bankai.rf.reference="0.1.0a15" \
+      bankai.rf.candidate="0.1.0a16" \
+      bankai.boruta.source=$BORUTA_REVISION
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home benchmark
+COPY --from=build /opt/reference /opt/reference
+COPY --from=build /opt/candidate /opt/candidate
+COPY --from=build /opt/boruta/benchmarks/compare_exact_session.py /opt/compare_exact_session.py
+COPY --from=build /opt/bankai-benchmark /opt/bankai-benchmark
+COPY --from=build /opt/exact_session_pilot.py /opt/exact_session_pilot.py
+COPY --from=build /opt/verify_exact_session_image.py /opt/verify_exact_session_image.py
+RUN chown -R benchmark:benchmark /opt
+USER benchmark
+ENV PYTHONUNBUFFERED=1
+ENTRYPOINT ["/opt/candidate/bin/python", "/opt/exact_session_pilot.py"]
