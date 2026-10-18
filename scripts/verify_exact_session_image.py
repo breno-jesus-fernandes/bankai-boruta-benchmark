@@ -6,6 +6,9 @@ import tempfile
 
 
 def main():
+    subprocess.run([
+        "/opt/candidate/bin/python", "/opt/borutapy_max40_pilot.py", "--smoke",
+    ], check=True)
     output = Path(tempfile.gettempdir()) / "exact-session-image-smoke.json"
     output.unlink(missing_ok=True)
     compare = ("/opt/compare_exact_session.py" if Path("/opt/compare_exact_session.py").is_file()
