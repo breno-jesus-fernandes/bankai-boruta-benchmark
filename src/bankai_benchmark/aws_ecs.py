@@ -79,8 +79,8 @@ def outputs_for(cf, name):
     return {item["OutputKey"]: item["OutputValue"] for item in cf.describe_stacks(StackName=name)["Stacks"][0]["Outputs"]}
 
 
-def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial", mode="full"):
-    from .budget import reserve, arm, stop, validate_policy
+def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial", mode="full", reuse_reservation_from=None):
+    from .budget import reserve, arm, stop, validate_policy, transfer_reservation
     validate_policy()
     if region != "us-east-1":
         raise ValueError("Budget policy permits us-east-1 only")
@@ -88,8 +88,11 @@ def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, 
         raise ValueError("Unknown pilot dataset")
     if state.get("tasks"):
         raise RuntimeError("Tasks already recorded; use a new experiment/state")
-    reserve(s3, bucket, outputs["Fleet"])
-    shutdown = arm(autoscaling, outputs["Fleet"])
+    if reuse_reservation_from:
+        shutdown = transfer_reservation(s3, autoscaling, bucket, reuse_reservation_from, outputs["Fleet"])
+    else:
+        reserve(s3, bucket, outputs["Fleet"])
+        shutdown = arm(autoscaling, outputs["Fleet"])
     state["budget"] = dict(reserved_brl="20", shutdown_at=shutdown.isoformat(), ledger_bucket=bucket)
     barrier = f"{experiment}/control/{time.time_ns()}.json"
     tasks = []
@@ -139,6 +142,7 @@ def main():
     parser.add_argument("--experiment", required=True); parser.add_argument("--subnets", nargs="+", required=True)
     parser.add_argument("--security-groups", nargs="+", required=True); parser.add_argument("--image")
     parser.add_argument("--state", default="aws-state.json")
+    parser.add_argument("--reuse-reservation-from", help="transfer an approved idle-fleet reservation without extending its shutdown deadline")
     parser.add_argument("--dataset", choices=list(PROFILES), default="industrial")
     parser.add_argument("--mode", choices=("full", "smoke"), default="full")
     args = parser.parse_args()
@@ -175,7 +179,7 @@ def main():
         require_public_release()
         if not state.get("task_definition"):
             raise ValueError("Register the immutable image first")
-        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset, mode=args.mode)
+        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset, mode=args.mode, reuse_reservation_from=args.reuse_reservation_from)
     else:
         tasks = ecs.describe_tasks(cluster=outputs["Cluster"], tasks=state["tasks"])["tasks"] if state.get("tasks") else []
         # AWS response dates are not JSON-native.

@@ -9,8 +9,8 @@
     "bankai_boruta-0.1.0a6-cp311-abi3-win_amd64.whl": "e904271bfeae70b565778ca35b8a5741e6f1849d69032aeb64ff94259d3c7897",
     "bankai_boruta-0.1.0a6.tar.gz": "91fe3066af5ceded8f7fc7a51fb696298548a1cd0616f114656a190bad0ea9a3"
   },
-  "reason": "All six public a6 artifacts were downloaded and SHA256 verified. Local a6 benchmark suite and smoke passed. GitHub Actions r5 Linux/container acceptance passed with 16 successful trials; the dedicated AMD ECS smoke remains pending.",
-  "linux_acceptance": "passed for paper-v2-a6-amd16-r5 in GitHub Actions; AMD host acceptance pending ECS smoke",
+  "reason": "All six public a6 artifacts were downloaded and SHA256 verified. Local tests and macOS smoke passed. GitHub Actions Linux/container acceptance and the four-profile AMD ECS smoke both passed; ECS capacity was returned to zero and the instance terminated.",
+  "linux_acceptance": "passed for paper-v2-a6-amd16-r5 in GitHub Actions and on c7a.4xlarge AMD host",
   "local_control_cases": 11,
   "r4_linux_acceptance_evidence": {
     "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39151871780",
@@ -46,6 +46,78 @@
       "bankai_native_extra_tree_binned"
     ],
     "vmhwm_and_affinity": "verified",
-    "image_published": false
+    "image_published": true,
+    "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:2d3eb6c35f4c4e9545ae2c615e5cfa990e656d4f0b8db27d4fe9af2c81cdb59f"
+  },
+  "r5_ecs_smoke_evidence": {
+    "protocol": "paper-v2-a6-amd16-r5",
+    "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39155450742",
+    "source_revision": "8a9a157617e993dfe707de5f3463c983a3ba2594",
+    "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:2d3eb6c35f4c4e9545ae2c615e5cfa990e656d4f0b8db27d4fe9af2c81cdb59f",
+    "result_bucket": "bankai-benchmark-bootstrap-results-ku2wdx1kzzqb",
+    "result_prefix": "paper-v2-a6-amd16-r5-ecs-smoke-quality/",
+    "expected_trials": 16,
+    "successful_trials": 16,
+    "issues": 0,
+    "methods": [
+      "bankai_native_extra_tree",
+      "bankai_native_extra_tree_binned",
+      "borutapy_lightgbm_rf",
+      "borutapy_sklearn_et"
+    ],
+    "native_methods_rust": true,
+    "memory_method": "polling_and_vmhwm",
+    "host": {
+      "instance_id": "i-09b6cb56552d5030c",
+      "instance_type": "c7a.4xlarge",
+      "cpu": "AMD EPYC 9R14",
+      "cpu_vendor": "AuthenticAMD",
+      "physical_cpus": 16,
+      "logical_cpus": 16,
+      "threads_per_core": 1
+    },
+    "tasks": [
+      {
+        "dataset": "industrial",
+        "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a6-amd16-r5-ecs-smoke/d6ad3610ec4d4cdd848be3247ba96679",
+        "exit_code": 0,
+        "started_at": "2026-10-18T15:49:03-03:00",
+        "stopped_at": "2026-10-18T15:49:20-03:00"
+      },
+      {
+        "dataset": "credito",
+        "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a6-amd16-r5-ecs-smoke/c0db6d25ba5b4b33b17b7a8eefc4cc1e",
+        "exit_code": 0,
+        "started_at": "2026-10-18T15:50:12-03:00",
+        "stopped_at": "2026-10-18T15:50:29-03:00"
+      },
+      {
+        "dataset": "bioinformatica",
+        "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a6-amd16-r5-ecs-smoke/bc65194b0e3c4eaea7b84b8e45bcbe3d",
+        "exit_code": 0,
+        "started_at": "2026-10-18T15:50:33-03:00",
+        "stopped_at": "2026-10-18T15:50:50-03:00"
+      },
+      {
+        "dataset": "ciberseguranca",
+        "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a6-amd16-r5-ecs-smoke/552a1316c1464895bcf7caf8989d48f6",
+        "exit_code": 0,
+        "started_at": "2026-10-18T15:50:55-03:00",
+        "stopped_at": "2026-10-18T15:51:11-03:00"
+      }
+    ],
+    "reservation": {
+      "reserved_brl": "20",
+      "transferred_from": "bankai-paper-v2-a5-amd16-r4-ecs-smoke-Fleet-m1Sd5723uXHk",
+      "shutdown_deadline_utc": "2026-10-18T19:05:55Z",
+      "additional_reservation": false
+    },
+    "capacity_after_run": {
+      "min": 0,
+      "max": 0,
+      "desired": 0,
+      "instances": []
+    },
+    "interpretation": "Functional smoke only; not performance or recall evidence."
   }
 }

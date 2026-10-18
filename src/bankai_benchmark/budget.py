@@ -58,6 +58,74 @@ def reserve(s3, bucket, launch_id):
     return ledger
 
 
+def transfer_reservation(s3, autoscaling, bucket, old_fleet, new_fleet, now=None):
+    """Move one approved pilot slot to an idle fleet without changing its deadline."""
+    now = now or datetime.now(timezone.utc)
+    validate_policy(now)
+    response = s3.get_object(Bucket=bucket, Key=LEDGER_KEY)
+    with response['Body'] as body:
+        ledger = json.load(body)
+    if ledger.get('schema_version') != 1 or Decimal(ledger.get('reserve_brl', '0')) != RESERVE_BRL:
+        raise RuntimeError('Incompatible budget ledger')
+    launches = ledger.get('launches', {})
+    reservation = launches.get(old_fleet)
+    if reservation is None or Decimal(reservation.get('reserved_brl', '0')) != PILOT_BRL:
+        raise RuntimeError('Source fleet has no transferable pilot reservation')
+    if new_fleet in launches:
+        raise RuntimeError('Destination fleet already has a reservation')
+
+    groups = autoscaling.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[old_fleet, new_fleet])['AutoScalingGroups']
+    by_name = {group['AutoScalingGroupName']: group for group in groups}
+    if set(by_name) != {old_fleet, new_fleet}:
+        raise RuntimeError('Source or destination budget fleet absent')
+    for name, group in by_name.items():
+        allowed_max = (0, 1) if name == old_fleet else (1,)
+        if (group['MinSize'] != 0 or group['MaxSize'] not in allowed_max or group['DesiredCapacity'] != 0
+                or group.get('Instances') or group.get('SuspendedProcesses')
+                or group.get('NewInstancesProtectedFromScaleIn')):
+            raise RuntimeError(f'{name} is not an idle, unsuspended, single-instance fleet')
+
+    old_actions = autoscaling.describe_scheduled_actions(
+        AutoScalingGroupName=old_fleet)['ScheduledUpdateGroupActions']
+    old_actions = [a for a in old_actions if a.get('ScheduledActionName') == ACTION]
+    if len(old_actions) != 1:
+        raise RuntimeError('Source fleet must have one verified shutdown action')
+    action = old_actions[0]
+    deadline = action.get('StartTime')
+    if not isinstance(deadline, datetime):
+        deadline = datetime.fromisoformat(str(deadline).replace('Z', '+00:00'))
+    if (deadline.tzinfo is None or now >= deadline or action.get('Recurrence')
+            or any(action.get(key) != 0 for key in ('MinSize', 'MaxSize', 'DesiredCapacity'))):
+        raise RuntimeError('Source shutdown deadline is invalid or expired')
+    if autoscaling.describe_scheduled_actions(
+            AutoScalingGroupName=new_fleet)['ScheduledUpdateGroupActions']:
+        raise RuntimeError('Destination fleet already has scheduled actions')
+
+    autoscaling.put_scheduled_update_group_action(
+        AutoScalingGroupName=new_fleet, ScheduledActionName=ACTION, StartTime=deadline,
+        MinSize=0, MaxSize=0, DesiredCapacity=0)
+    copied = autoscaling.describe_scheduled_actions(
+        AutoScalingGroupName=new_fleet,
+        ScheduledActionNames=[ACTION])['ScheduledUpdateGroupActions']
+    if (len(copied) != 1 or copied[0].get('StartTime') != deadline
+            or any(copied[0].get(key) != 0 for key in ('MinSize', 'MaxSize', 'DesiredCapacity'))
+            or copied[0].get('Recurrence')):
+        raise RuntimeError('Destination shutdown verification failed; capacity remains zero')
+
+    moved = dict(reservation, transferred_from=old_fleet, shutdown_deadline=deadline.isoformat())
+    del launches[old_fleet]
+    launches[new_fleet] = moved
+    try:
+        s3.put_object(Bucket=bucket, Key=LEDGER_KEY, Body=json.dumps(ledger).encode(),
+                      ContentType='application/json', IfMatch=response['ETag'])
+    except Exception:
+        autoscaling.delete_scheduled_action(
+            AutoScalingGroupName=new_fleet, ScheduledActionName=ACTION)
+        raise
+    return deadline
+
+
 def arm(autoscaling, fleet, now=None):
     """Arm and read back a shutdown BEFORE allowing any paid capacity."""
     now = now or datetime.now(timezone.utc)

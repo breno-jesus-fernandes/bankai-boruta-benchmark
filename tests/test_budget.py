@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 import json
 import pytest
-from bankai_benchmark.budget import reserve, arm, PILOT_SECONDS, TOTAL_BRL
+from bankai_benchmark.budget import reserve, arm, transfer_reservation, PILOT_SECONDS, TOTAL_BRL
 
 
 class S3:
@@ -111,3 +111,50 @@ def test_approved_budget_increase_migrates_and_reserves_atomically():
     reserve(s3, 'bucket', 'r4-smoke-fleet')
     updated = json.loads(s3.data)
     assert updated['total_brl'] == '260' and len(updated['launches']) == 11
+
+
+def test_reservation_transfer_preserves_budget_and_shutdown_deadline():
+    s3 = S3(); reserve(s3, 'bucket', 'old-fleet')
+    ledger = json.loads(s3.data); reserved_at = ledger['launches']['old-fleet']['reserved_at']
+    class Fleets:
+        def __init__(self):
+            self.groups = {
+                'old-fleet': dict(AutoScalingGroupName='old-fleet', MinSize=0, MaxSize=0, DesiredCapacity=0, Instances=[]),
+                'new-fleet': dict(AutoScalingGroupName='new-fleet', MinSize=0, MaxSize=1, DesiredCapacity=0, Instances=[]),
+            }
+            self.actions = {'old-fleet': [dict(ScheduledActionName='bankai-budget-shutdown',
+                StartTime=datetime(2026,10,18,19,5,55,tzinfo=timezone.utc), MinSize=0, MaxSize=0,
+                DesiredCapacity=0)]}
+        def describe_auto_scaling_groups(self, **kwargs):
+            return dict(AutoScalingGroups=[self.groups[n] for n in kwargs['AutoScalingGroupNames']])
+        def describe_scheduled_actions(self, **kwargs):
+            return dict(ScheduledUpdateGroupActions=self.actions.get(kwargs['AutoScalingGroupName'], []))
+        def put_scheduled_update_group_action(self, **kwargs):
+            self.actions[kwargs['AutoScalingGroupName']] = [dict(kwargs)]
+        def delete_scheduled_action(self, **kwargs):
+            self.actions.pop(kwargs['AutoScalingGroupName'], None)
+    asg=Fleets(); now=datetime(2026,10,18,18,40,tzinfo=timezone.utc)
+    deadline=transfer_reservation(s3,asg,'bucket','old-fleet','new-fleet',now=now)
+    moved=json.loads(s3.data)['launches']
+    assert set(moved)=={'new-fleet'}
+    assert moved['new-fleet']['reserved_at']==reserved_at
+    assert moved['new-fleet']['transferred_from']=='old-fleet'
+    assert moved['new-fleet']['shutdown_deadline']==deadline.isoformat()
+    assert asg.actions['new-fleet'][0]['StartTime']==deadline
+    assert moved['new-fleet']['reserved_brl']=='20'
+
+
+def test_reservation_transfer_rejects_expired_shutdown_deadline():
+    s3 = S3(); reserve(s3, 'bucket', 'old-fleet')
+    class Fleets:
+        def describe_auto_scaling_groups(self, **kwargs):
+            return dict(AutoScalingGroups=[dict(AutoScalingGroupName=name, MinSize=0,
+                MaxSize=0 if name=='old-fleet' else 1, DesiredCapacity=0, Instances=[])
+                for name in kwargs['AutoScalingGroupNames']])
+        def describe_scheduled_actions(self, **kwargs):
+            return dict(ScheduledUpdateGroupActions=[dict(ScheduledActionName='bankai-budget-shutdown',
+                StartTime=datetime(2026,10,18,18,39,tzinfo=timezone.utc), MinSize=0,MaxSize=0,DesiredCapacity=0)]
+                if kwargs['AutoScalingGroupName']=='old-fleet' else [])
+    with pytest.raises(RuntimeError,match='invalid or expired'):
+        transfer_reservation(s3,Fleets(),'bucket','old-fleet','new-fleet',
+            now=datetime(2026,10,18,18,40,tzinfo=timezone.utc))
