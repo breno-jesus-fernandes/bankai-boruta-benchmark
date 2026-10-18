@@ -5,9 +5,9 @@ refer to the Boruta repository; the local and Linux observation JSONs are copied
 alongside this file and checked by this directory's manifest.
 
 
-Status: implementation and local parity pass; default activation and release
-acceptance remain pending. Reference: published Boruta 0.1.0a6 / RF 0.1.0a15.
-Candidate: Boruta a7, RF a16 source pinned to
+Status: implementation and local parity pass; packages are published, while
+default activation and AMD acceptance remain pending. Reference: published
+Boruta 0.1.0a6 / RF 0.1.0a15. Candidate: Boruta a7, RF a16 source pinned to
 `da52a5bc0e2358911131d3b06d9cea65fc360505`.
 
 ## Checks completed locally
@@ -98,7 +98,8 @@ automatic shutdown; otherwise the unfinished cells need further authorization.
 The session stays opt-in. Local ABI3 wheels for both packages and the Boruta source distribution were
 built. A clean environment using those local wheels passed installed-package
 binned dtype and exact-session smokes; wheel/sdist metadata requires a7/RF a16,
-and the sdist includes the tests and comparison script. This does not substitute
-for resolving RF a16 from PyPI after its release. No PyPI publication was performed. Publish RF a16
-first, then verify clean public installation of Boruta a7 and review all
-platform artifacts before an explicitly authorized publishing dispatch.
+and the sdist includes the tests and comparison script. RF a16 and Boruta a7
+were subsequently published in order; a clean public installation resolved
+both versions and passed the installed-wheel smoke. AMD full Industrial
+acceptance remains pending; its current account and ledger status is in
+[`../exact-session-a7-amd-pending-20261018.md`](../exact-session-a7-amd-pending-20261018.md).

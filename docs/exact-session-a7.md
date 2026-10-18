@@ -3,8 +3,9 @@
 O protocolo publicado `paper-v2-a6-amd16-r5`, seus pins a6/a15, gerador, imagens,
 locks e artefatos históricos permanecem congelados. A otimização tem identidade
 própria `exact-session-a7-v1`; seus JSONs não entram no agregador de resultados r5.
-A a7 e o RF a16 ainda são candidatos de release. Não instalar uma versão inexistente
-do PyPI nem substituir o lock r5 para executar o candidato.
+BankaiRF a16 e Bankai Boruta a7 já foram publicados no PyPI. O candidato exato
+continua opt-in até concluir a validação AMD; não substituir o lock ou os resultados
+históricos r5.
 
 ## Implementação e interpretação
 
@@ -37,9 +38,8 @@ A documentação completa e os limites dos diagnósticos estão em
 
 Use dois ambientes: referência congelada a6/a15 e candidato a7/a16. A fonte Rust
 e o override de desenvolvimento Python da a7 apontam para a revisão imutável
-RF `da52a5bc0e2358911131d3b06d9cea65fc360505`. O pin de distribuição será
-`bankai-random-forest==0.1.0a16`, a publicar antes da a7. O benchmark não altera
-seu próprio ambiente r5.
+RF `da52a5bc0e2358911131d3b06d9cea65fc360505`. O benchmark não altera seu
+próprio ambiente r5.
 
 O script versionado `benchmarks/compare_exact_session.py` do checkout Boruta
 executa dois processos novos sequencialmente, alterna a ordem por repetição,
@@ -83,7 +83,10 @@ ilimitada nem consumir a reserva protegida. Antes do lançamento, reconciliar o
 ledger existente, estimar a duração a partir de pilotos, reservar somente saldo
 autorizado e verificar deadline e desligamento automático. Se o lote exceder o
 saldo/tempo autorizado, registrar a parte pendente e pedir autorização adicional.
-Nesta entrega não houve alocação de AWS nem alteração do ledger.
+O estado atual da conta e do ledger está registrado em
+[`verification/exact-session-a7-amd-pending-20261018.md`](../verification/exact-session-a7-amd-pending-20261018.md).
+Não iniciar a campanha antes de confirmar que o saldo livre cobre o lote e seu
+shutdown; não transferir as reservas da calibração r5 para a campanha a7.
 
 O [workflow Boruta passou na paridade e nos workloads Linux controlados](../verification/exact-session-a7-local/README.md).
 O caso de rodadas fixas reduziu tempo/RSS; o fit completo pequeno teve RSS
@@ -95,8 +98,8 @@ indireta regredir, ajustar os buffers e repetir os experimentos antes de ativar.
 
 ## Release
 
-Revisar e publicar RF a16 primeiro, depois testar a instalação pública limpa e
-publicar Boruta a7. Os dois workflows exigem dispatch explícito `publish=true`
+RF a16 foi publicado antes de Boruta a7, e a instalação pública limpa confirmou
+essa dependência. Os dois workflows exigem dispatch explícito `publish=true`
 para PyPI; criar PR não publica os pacotes. Não trocar a imagem/lock r5 pelo
 candidato antes de criar e validar um novo manifest, digest e orçamento próprios.
 Os [relatórios e observações locais](../verification/exact-session-a7-local/README.md)
@@ -106,9 +109,9 @@ e o pico RSS mediano em 11,2% (um worker); com quatro workers, 27,7% e 7,0%.
 O caso pequeno de rodadas fixas com um worker não reduziu RSS absoluto. Todos
 passaram em paridade. Esses números macOS não substituem Industrial/AMD.
 
-PRs: [BankaiRF #21](https://github.com/breno-jesus-fernandes/bankai-random-forest/pull/21)
+As mudanças foram mescladas em [BankaiRF #21](https://github.com/breno-jesus-fernandes/bankai-random-forest/pull/21)
 e [Bankai Boruta #20](https://github.com/breno-jesus-fernandes/bankai-boruta/pull/20).
-Ambas permanecem draft até a revisão dos gates pendentes.
+
 ## BorutaPy ExtraTrees comparison
 
 The max-40 pilot now includes `BorutaPy` 0.4.3 with scikit-learn `ExtraTreesClassifier` as a third, process-isolated method. It uses the same Industrial `full` training data, seed, 100 trees, depth 6, square-root feature sampling, bootstrap, and 16 workers as the Bankai runs. Each method is measured sequentially, with fit time and process RSS recorded separately. BorutaPy uses `max_iter=41` internally because its loop condition is exclusive; this produces the same 40-round ceiling as the Bankai fixed-40 comparison. Its early-stopping patience is 100 to match the capped-40 protocol.
