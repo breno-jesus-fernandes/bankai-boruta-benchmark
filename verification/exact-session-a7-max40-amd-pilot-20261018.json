@@ -1,0 +1,44 @@
+{
+  "protocol": "exact-session-a7-max40-v1",
+  "stack": "bankai-exact-session-a7-max40-pilot",
+  "outputs": {
+    "Fleet": "bankai-exact-session-a7-max40-pilot-Fleet-To0uYqLT5ce0",
+    "CapacityProvider": "exact-session-a7-max40-v1",
+    "Cluster": "exact-session-a7-max40-v1",
+    "Logs": "/bankai/exact-session-a7-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-exact-session-a7-max40-pilot-TaskRole-UbBq9Ybsxhso",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-exact-session-a7-max40-pilot-ExecutionRole-0uoXja9fHNG8"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:54c65e6443aca452ecb02be59b634e5771400d2da2f465f6b66e9d542c663fa1",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/exact-session-a7-max40-v1:1",
+  "seed": 42,
+  "threads": 16,
+  "trees": 100,
+  "repeats": 3,
+  "reserved_brl": "20",
+  "shutdown_at": "2026-10-18T23:02:16+00:00",
+  "status": "completed",
+  "host": "i-0d637ff6c0aae15c8",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/exact-session-a7-max40-v1/04a0b82425524de5b4569bfb21f6becd",
+  "exit_code": 0,
+  "stopped_at": "2026-10-18T22:13:14.151223+00:00",
+  "result_objects": [
+    {
+      "key": "exact-session-a7-max40-v1/pilot/20261018T220322Z/industrial-seed42-t16-capped-40.json",
+      "bytes": 2605733
+    },
+    {
+      "key": "exact-session-a7-max40-v1/pilot/20261018T220322Z/industrial-seed42-t16-fixed-40.json",
+      "bytes": 2654737
+    },
+    {
+      "key": "exact-session-a7-max40-v1/pilot/20261018T220322Z/industrial-seed42-t16-borutapy-fixed-40.json",
+      "bytes": 403142
+    },
+    {
+      "key": "exact-session-a7-max40-v1/pilot/20261018T220322Z/industrial-seed42-t16-borutapy-capped-40.json",
+      "bytes": 403143
+    }
+  ],
+  "borutapy_addon_state": "verification/exact-session-a7-max40-borutapy-aws-20261018.json"
+}
