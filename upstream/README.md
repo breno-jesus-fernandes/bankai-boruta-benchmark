@@ -26,3 +26,8 @@ The original artifact hashes remain in `artifacts/build-provenance.json` and
 Git history; development binaries were removed after migrating to PyPI.
 `test_native_controls.py` records the original upstream parity tests. The suite
 also checks native/adapter parity and path diagnostics in `tests/test_native.py`.
+
+
+## Candidato exato a7 (separado da referência a6)
+
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](../docs/exact-session-a7.md). O caminho novo permanece optativo, sem substituir pins, imagens, observações ou resultados históricos a6/a15. A validação AMD 1/4/16 workers e Industrial completo está pendente; esta atualização não alocou AWS nem alterou reservas.
