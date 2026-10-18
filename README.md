@@ -62,6 +62,11 @@ Full campaigns discard two warmups with seeds 900001/900002. Warmups run in fres
 processes and warm system caches; measured workers are still fresh processes.
 Quality and scaling receive separate experiment IDs (`NAME-quality`/`NAME-scaling`).
 
+The currently approved reduced scaling campaign measures **4 and 8 threads**
+only and reuses the original Industrial quality results at 16 threads. It uses
+five seeds per configuration, paired speedups relative to four threads, and a
+separate BRL60/three-hour guard. See [the reduced scaling plan](deployment/SCALING48.md).
+
 ## Data generation and frozen implementation choices
 
 `generate_dataset(dataset_id, seed, mode)` returns C-contiguous float32 matrices,

@@ -7,7 +7,7 @@ halts the campaign; restarting this controller never repeats a paid launch.
 """
 import argparse
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import fcntl
 import json
 from pathlib import Path
@@ -119,7 +119,9 @@ class Controller:
         if any(r.get("Instances") for page in pages for r in page["Reservations"]):
             raise RuntimeError("Previous campaign EC2 host still exists; refusing overlap")
 
-    def start(self, dataset, source):
+    def start(self, dataset, source, *, suite="quality", target_dataset=None, reservation_units=1):
+        if reservation_units not in (1, 3) or suite not in ("quality", "scaling"):
+            raise ValueError("Unsupported bounded campaign plan")
         self.assert_idle_cluster()
         validate_policy()
         name = f"{self.args.experiment}-{dataset}"
@@ -132,9 +134,21 @@ class Controller:
             VPCZoneIdentifier=source["VPCZoneIdentifier"],
             NewInstancesProtectedFromScaleIn=False,
             Tags=[{"Key": "Name", "Value": name, "PropagateAtLaunch": True}])
-        reserve(self.s3, self.args.bucket, name)
+        for unit in range(reservation_units):
+            reserve(self.s3, self.args.bucket, name if unit == 0 else f"{name}-hour{unit+1}")
         shutdown = arm(self.asg, name)
-        stage.update(status="starting", shutdown_at=shutdown.isoformat(), reserved_brl="20")
+        if reservation_units > 1:
+            shutdown += timedelta(hours=reservation_units-1)
+            self.asg.put_scheduled_update_group_action(AutoScalingGroupName=name,
+                ScheduledActionName="bankai-budget-shutdown", StartTime=shutdown,
+                MinSize=0, MaxSize=0, DesiredCapacity=0)
+            actions = self.asg.describe_scheduled_actions(AutoScalingGroupName=name,
+                ScheduledActionNames=["bankai-budget-shutdown"])["ScheduledUpdateGroupActions"]
+            if (len(actions) != 1 or actions[0]["StartTime"] != shutdown
+                    or any(actions[0].get(k) != 0 for k in ("MinSize", "MaxSize", "DesiredCapacity"))):
+                raise RuntimeError("Extended campaign AWS shutdown verification failed")
+        reserved_brl = str(20 * reservation_units)
+        stage.update(status="starting", shutdown_at=shutdown.isoformat(), reserved_brl=reserved_brl)
         self.save()
         self.asg.update_auto_scaling_group(AutoScalingGroupName=name, DesiredCapacity=1)
         deadline = time.monotonic() + 600
@@ -158,7 +172,7 @@ class Controller:
             placementConstraints=[{"type": "distinctInstance"}, {"type": "memberOf",
                 "expression": "attribute:ecs.instance-type == c7i.4xlarge"}],
             overrides={"containerOverrides": [{"name": "benchmark", "command": [
-                "full", "--suite", "quality", "--dataset", dataset,
+                "full", "--suite", suite, "--dataset", target_dataset or dataset,
                 "--experiment", self.args.experiment, "--bucket", self.args.bucket,
                 "--region", "us-east-1"], "environment": [
                     {"name": "BENCHMARK_BARRIER_BUCKET", "value": self.args.bucket},
@@ -182,10 +196,10 @@ class Controller:
         stage.update(status="running", instances={ready[0]["containerInstanceArn"]: ready[0]["ec2InstanceId"]},
             task_instances={stage["tasks"][0]: ready[0]["ec2InstanceId"]},
             image=self.args.image, logs=f"/bankai/{self.args.cluster}", barrier=barrier,
-            budget={"reserved_brl": "20", "shutdown_at": shutdown.isoformat(), "ledger_bucket": self.args.bucket})
+            budget={"reserved_brl": reserved_brl, "shutdown_at": shutdown.isoformat(), "ledger_bucket": self.args.bucket})
         self.save()
         self.s3.put_object(Bucket=self.args.bucket, Key=barrier, Body=json.dumps(stage).encode())
-        self.summary(f"{dataset}: iniciado; reserva R$20; corte {shutdown:%H:%M UTC}", notify=True)
+        self.summary(f"{dataset}: iniciado; reserva R${reserved_brl}; corte {shutdown:%H:%M UTC}", notify=True)
         return stage
 
     def monitor(self, dataset, stage):
