@@ -1,5 +1,34 @@
 # R$200 campaign guard
 
+## Current authorization: R$400 (2026-10-18 UTC)
+
+The user explicitly increased the campaign's total ceiling to BRL400. The active
+successor allocation policy is implemented in `scripts/budget400.py` and stored
+in the same bucket at `bankai-budget/campaign-400-brl.json`. It retains BRL80
+as a safety margin and limits launch allocations to BRL320. All eight historical
+BRL20 reservations (BRL160 total) are copied into the successor ledger; they are
+not refunded or reset. At migration, another BRL160 is available for future
+authorized launch reservations. These figures are allocations, not AWS charges.
+
+The legacy BRL200 ledger is unchanged and fully exhausted, so older controllers
+cannot spend more against it. The new ledger records its predecessor's key and
+ETag; conditional writes prevent concurrent reservations. Future additional
+launches must use the successor guard. Already reserved running tasks retain
+their existing AWS shutdown times and require no restart. The price/FX policy's
+2026-10-24 expiry remains in effect.
+
+The existing monthly AWS monitoring budget was updated to USD40 while retaining
+its 10/50/80/100-percent actual-cost notifications and cost filters. This is an
+alert, not a hard spending cap. Deployment readback is recorded in
+`verification/budget400-applied.json`. A request for 32 standard On-Demand vCPUs
+in us-east-1 is pending (support case `179228777700736`); no second benchmark
+instance was launched by this budget change. Raising a quota itself starts no
+billable capacity. Additional tasks must use disjoint pending trials and preserve
+the original scaling manifest; a budget increase alone does not authorize
+duplicating measurements.
+
+## Historical BRL200 policy
+
 The launch command is restricted to an idle, unsuspended, single-instance
 c7i.4xlarge fleet in us-east-1. Provisioning leaves desired capacity zero.
 The original five-host launch is disabled. The current launch is a quality

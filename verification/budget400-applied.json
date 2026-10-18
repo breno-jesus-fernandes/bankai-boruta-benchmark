@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-10-18T01:45:33.108899+00:00",
+  "authorized_total_brl": "400",
+  "safety_reserve_brl": "80",
+  "historical_allocation_brl": "160",
+  "additional_launch_allowance_brl": "160",
+  "ledger_key": "bankai-budget/campaign-400-brl.json",
+  "legacy_ledger_preserved": true,
+  "aws_monthly_alert_budget_usd": "40.0",
+  "vcpu_quota_requested": 32,
+  "quota_request_status": "CASE_OPENED",
+  "quota_request_id": "ae63e041899a4836b378151559a5ec95hkaC1jh0",
+  "support_case": "179228777700736",
+  "additional_instance_started": false
+}
