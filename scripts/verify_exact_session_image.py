@@ -9,7 +9,7 @@ def main():
     output = Path(tempfile.gettempdir()) / "exact-session-image-smoke.json"
     output.unlink(missing_ok=True)
     subprocess.run([
-        "/opt/candidate/bin/python", "/opt/compare_exact_session.py",
+        "/opt/candidate/bin/python", "/opt/boruta/benchmarks/compare_exact_session.py",
         "--reference-python", "/opt/reference/bin/python",
         "--candidate-python", "/opt/candidate/bin/python",
         "--rows", "2000", "--columns", "40", "--trees", "10",
