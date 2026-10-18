@@ -24,6 +24,7 @@ def test_digest_and_cpu_reservations():
     assert definition['runtimePlatform']['cpuArchitecture'] == 'X86_64'
     assert definition['containerDefinitions'][0]['cpu'] == 16384
     assert len(commands('example','bucket','us-east-1')) == 5
+    assert all(command[0] == 'smoke' for command in commands('example','bucket','us-east-1','smoke'))
 
 
 def test_mocked_single_host_launch(monkeypatch):
@@ -46,8 +47,9 @@ def test_mocked_single_host_launch(monkeypatch):
     class S3:
         def put_object(self,**kwargs):self.request=kwargs
     ecs,s3=ECS(),S3();outputs=dict(Cluster='cluster',CapacityProvider='capacity',Logs='logs',Fleet='fleet')
-    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG())
+    result=launch(ecs,s3,outputs,dict(task_definition='definition'),'example','bucket','us-east-1',autoscaling=ASG(),mode='smoke')
     assert len(set(result['instances'])) == 1 and len(result['tasks']) == 1
+    assert ecs.requests[0]['overrides']['containerOverrides'][0]['command'][0] == 'smoke'
     for request in ecs.requests:
         assert request['placementConstraints'] == [dict(type='distinctInstance'),dict(type='memberOf',expression='attribute:ecs.instance-type == c7a.4xlarge')]
     assert json.loads(s3.request['Body'])['tasks'] == result['tasks']

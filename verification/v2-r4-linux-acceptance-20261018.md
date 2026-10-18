@@ -4,4 +4,4 @@ A aceitação do container r4 passou no GitHub Actions em [39151871780](https://
 
 A imagem imutável publicada é `642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:838231861df859a45936f531e8880fd212049ac00a775091721f948efa01c693`. O digest e a evidência estão registrados em `src/bankai_benchmark/release-verification.json`.
 
-Esta etapa valida o smoke funcional no container Linux; ele usa quatro iterações e não exercita o early stopping. O smoke ECS anterior e a calibração interrompida pertencem ao protocolo r2. O ledger de R$240 tem dez reservas alocadas e nenhuma livre; não foi iniciado host ECS nem teste pago r4. O próximo teste deve usar este digest, um manifesto `paper-v2-a5-amd16-r4` e uma nova reserva aprovada.
+Esta etapa valida o smoke funcional no container Linux; ele usa quatro iterações e não exercita o early stopping. O smoke ECS anterior e a calibração interrompida pertencem ao protocolo r2. Após a aprovação de mais R$20, o teto do ledger será R$260, com uma nova reserva para o smoke ECS r4. O teste usa um manifesto `paper-v2-a5-amd16-r4` e este digest imutável.

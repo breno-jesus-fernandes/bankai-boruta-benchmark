@@ -21,11 +21,11 @@ class S3:
 
 def test_cumulative_campaign_limit_and_no_refunds():
     s3 = S3()
-    assert TOTAL_BRL == 240
-    for index in range(10): reserve(s3, 'bucket', f'fleet{index}')
-    assert len(json.loads(s3.data)['launches']) == 10
-    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet10')
-    assert s3.version == 10
+    assert TOTAL_BRL == 260
+    for index in range(11): reserve(s3, 'bucket', f'fleet{index}')
+    assert len(json.loads(s3.data)['launches']) == 11
+    with pytest.raises(RuntimeError, match='exhausted'): reserve(s3, 'bucket', 'fleet11')
+    assert s3.version == 11
     with pytest.raises(RuntimeError, match='already reserved'): reserve(s3, 'bucket', 'fleet0')
 
 
@@ -101,3 +101,13 @@ def test_corrupt_reservation_blocks_budget_reuse():
     ledger['launches']['fleet']['reserved_brl'] = '-20'
     s3.data = json.dumps(ledger).encode()
     with pytest.raises(RuntimeError, match='Corrupt'): reserve(s3, 'bucket', 'new-fleet')
+
+
+def test_approved_budget_increase_migrates_and_reserves_atomically():
+    s3 = S3()
+    ledger = {'schema_version': 1, 'total_brl': '240', 'reserve_brl': '40',
+              'launches': {f'old-{i}': {'reserved_brl': '20', 'reserved_at': 'old'} for i in range(10)}}
+    s3.data = json.dumps(ledger).encode()
+    reserve(s3, 'bucket', 'r4-smoke-fleet')
+    updated = json.loads(s3.data)
+    assert updated['total_brl'] == '260' and len(updated['launches']) == 11

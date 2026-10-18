@@ -7,7 +7,8 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import json
 
-TOTAL_BRL = Decimal('240')
+TOTAL_BRL = Decimal('260')
+PREVIOUS_TOTAL_BRL = Decimal('240')
 RESERVE_BRL = Decimal('40')
 PILOT_BRL = Decimal('20')
 PILOT_SECONDS = 3600
@@ -33,15 +34,21 @@ def reserve(s3, bucket, launch_id):
         with response['Body'] as body:
             ledger = json.load(body)
         condition = {'IfMatch': response['ETag']}
-    if (ledger['schema_version'] != 1 or Decimal(ledger['total_brl']) != TOTAL_BRL
-            or Decimal(ledger['reserve_brl']) != RESERVE_BRL):
+    if ledger['schema_version'] != 1 or Decimal(ledger['reserve_brl']) != RESERVE_BRL:
         raise RuntimeError('Incompatible budget ledger')
     launches = ledger['launches']
     if any(Decimal(item['reserved_brl']) != PILOT_BRL for item in launches.values()):
         raise RuntimeError('Corrupt budget reservation')
+    allocated = sum((Decimal(item['reserved_brl']) for item in launches.values()), Decimal(0))
+    total = Decimal(ledger['total_brl'])
+    if total == PREVIOUS_TOTAL_BRL:
+        if allocated != PREVIOUS_TOTAL_BRL - RESERVE_BRL:
+            raise RuntimeError('Previous budget ledger is not eligible for the approved increase')
+        ledger['total_brl'] = str(TOTAL_BRL)
+    elif total != TOTAL_BRL:
+        raise RuntimeError('Incompatible budget ledger')
     if launch_id in launches:
         raise RuntimeError('Launch already reserved; deadline cannot be extended')
-    allocated = sum((Decimal(item['reserved_brl']) for item in launches.values()), Decimal(0))
     if allocated + PILOT_BRL > TOTAL_BRL - RESERVE_BRL:
         raise RuntimeError('Budget exhausted: launch blocked')
     launches[launch_id] = {'reserved_brl': str(PILOT_BRL),

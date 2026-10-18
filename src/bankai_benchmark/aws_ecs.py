@@ -59,9 +59,11 @@ def task_definition(experiment, image, region, outputs):
             logConfiguration=dict(logDriver="awslogs", options={"awslogs-group": outputs["Logs"], "awslogs-region": region, "awslogs-stream-prefix": "benchmark"}))])
 
 
-def commands(experiment, bucket, region):
-    return [["full", "--suite", "quality", "--dataset", dataset, "--experiment", experiment, "--bucket", bucket, "--region", region] for dataset in PROFILES] + [
-        ["full", "--suite", "scaling", "--dataset", "industrial", "--experiment", experiment, "--bucket", bucket, "--region", region]]
+def commands(experiment, bucket, region, mode="full"):
+    if mode not in ("full", "smoke"):
+        raise ValueError("Unsupported ECS run mode")
+    return [[mode, "--suite", "quality", "--dataset", dataset, "--experiment", experiment, "--bucket", bucket, "--region", region] for dataset in PROFILES] + [
+        [mode, "--suite", "scaling", "--dataset", "industrial", "--experiment", experiment, "--bucket", bucket, "--region", region]]
 
 
 def verify_hosts(tasks):
@@ -77,7 +79,7 @@ def outputs_for(cf, name):
     return {item["OutputKey"]: item["OutputValue"] for item in cf.describe_stacks(StackName=name)["Stacks"][0]["Outputs"]}
 
 
-def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial"):
+def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, dataset="industrial", mode="full"):
     from .budget import reserve, arm, stop, validate_policy
     validate_policy()
     if region != "us-east-1":
@@ -98,7 +100,7 @@ def launch(ecs, s3, outputs, state, experiment, bucket, region, *, autoscaling, 
             if time.monotonic() >= readiness:
                 raise TimeoutError("Budget pilot instance registration timeout")
             time.sleep(5)
-        command = next(command for command in commands(experiment, bucket, region) if command[2] == "quality" and command[4] == dataset)
+        command = next(command for command in commands(experiment, bucket, region, mode) if command[2] == "quality" and command[4] == dataset)
         response = ecs.run_task(cluster=outputs["Cluster"], taskDefinition=state["task_definition"], count=1,
             capacityProviderStrategy=[dict(capacityProvider=outputs["CapacityProvider"], weight=1)],
             placementConstraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])],
@@ -138,6 +140,7 @@ def main():
     parser.add_argument("--security-groups", nargs="+", required=True); parser.add_argument("--image")
     parser.add_argument("--state", default="aws-state.json")
     parser.add_argument("--dataset", choices=list(PROFILES), default="industrial")
+    parser.add_argument("--mode", choices=("full", "smoke"), default="full")
     args = parser.parse_args()
     if args.action in ("provision", "launch") and args.region != "us-east-1":
         raise ValueError("Budget policy permits us-east-1 only")
@@ -145,7 +148,7 @@ def main():
     if args.action == "plan":
         fake_outputs = dict(ExecutionRole="${ExecutionRole}", TaskRole="${TaskRole}", Logs=f"/bankai/{args.experiment}")
         definition = task_definition(args.experiment, args.image, args.region, fake_outputs) if args.image else None
-        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=240, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
+        print(json.dumps(dict(template=template, task_definition=definition, commands=[command for command in commands(args.experiment, args.bucket, args.region, args.mode) if command[2] == "quality" and command[4] == args.dataset], budget=dict(total_brl=260, reserve_brl=40, pilot_reserved_brl=20, max_instances=1, shutdown_seconds=3600), reservations=dict(cpu=16384, memory_mib=28672),
             constraints=[dict(type="distinctInstance"), dict(type="memberOf", expression="attribute:ecs.instance-type == "+MACHINE["instance_type"])]), indent=2)); return
     import boto3
     session = boto3.Session(region_name=args.region); cf, ecs = session.client("cloudformation"), session.client("ecs")
@@ -172,7 +175,7 @@ def main():
         require_public_release()
         if not state.get("task_definition"):
             raise ValueError("Register the immutable image first")
-        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset)
+        state = launch(ecs, session.client("s3"), outputs, state, args.experiment, args.bucket, args.region, autoscaling=session.client("autoscaling"), dataset=args.dataset, mode=args.mode)
     else:
         tasks = ecs.describe_tasks(cluster=outputs["Cluster"], tasks=state["tasks"])["tasks"] if state.get("tasks") else []
         # AWS response dates are not JSON-native.
