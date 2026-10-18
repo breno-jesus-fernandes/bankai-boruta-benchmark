@@ -9,7 +9,15 @@
     "bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl": "00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259",
     "bankai_boruta-0.1.0a5.tar.gz": "318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a"
   },
-  "reason": "Six public a5 distributions downloaded and SHA256 verified. Eleven classic native/adapter parity cases passed locally on macOS. Linux/container acceptance pending.",
-  "linux_acceptance": "pending",
-  "local_control_cases": 11
+  "reason": "Six public a5 distributions downloaded and SHA256 verified. Eleven classic native/adapter parity cases passed locally on macOS. GitHub Actions Linux/container acceptance and the AMD ECS smoke both passed.",
+  "linux_acceptance": "passed",
+  "local_control_cases": 11,
+  "linux_acceptance_evidence": {
+    "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39148248429",
+    "workflow_head_sha": "7f32aa84deb5f275fccf8ace8fc1389f878f7bd2",
+    "workflow_conclusion": "success",
+    "ecs_task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a5-ecs-smoke/18bf90436d654fe382695ec1a0fe8989",
+    "ecs_exit_code": 0,
+    "protocol": "paper-v2-a5-amd16"
+  }
 }
