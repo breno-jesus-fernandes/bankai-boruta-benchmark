@@ -5,6 +5,10 @@ datasets, one fresh OS process per trial, and manifest-validated paper reports.
 New benchmark code is MIT-licensed. Bankai artifacts and the upstream patch retain
 their GPL license; see [DEPENDENCIES.md](DEPENDENCIES.md).
 
+The [completed October 2026 campaign](verification/campaign-20261017/README.md)
+includes 210 successful measurements, source-verified raw data, quality/scaling
+comparisons, paper tables, vector figures and a read-only AWS cost/resource audit.
+
 ```sh
 uv sync --locked
 make test

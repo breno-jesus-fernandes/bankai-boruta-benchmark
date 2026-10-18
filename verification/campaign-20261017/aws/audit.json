@@ -1,0 +1,95 @@
+{
+  "verified_at": "2026-10-18T02:45:18.044689+00:00",
+  "resource_scope": [
+    "us-east-1",
+    "sa-east-1"
+  ],
+  "regions": {
+    "us-east-1": {
+      "nonterminated_instances": [],
+      "unattached_volumes": [],
+      "elastic_ip_count": 0,
+      "active_nat_gateways": []
+    },
+    "sa-east-1": {
+      "nonterminated_instances": [],
+      "unattached_volumes": [],
+      "elastic_ip_count": 0,
+      "active_nat_gateways": []
+    }
+  },
+  "archive_objects": 237,
+  "s3_integrity": "All downloaded single-part objects match S3 ETags",
+  "fleets": [
+    {
+      "name": "bankai-pilot-20261017-Fleet-UEWu3HaoKGNb",
+      "desired": 0,
+      "max": 0,
+      "instance_ids": []
+    },
+    {
+      "name": "pilot-20261017-bioinformatica",
+      "desired": 0,
+      "max": 0,
+      "instance_ids": []
+    },
+    {
+      "name": "pilot-20261017-ciberseguranca",
+      "desired": 0,
+      "max": 0,
+      "instance_ids": []
+    },
+    {
+      "name": "pilot-20261017-credito",
+      "desired": 0,
+      "max": 0,
+      "instance_ids": []
+    },
+    {
+      "name": "pilot-20261017-scaling48",
+      "desired": 0,
+      "max": 0,
+      "instance_ids": []
+    }
+  ],
+  "compute_estimate": {
+    "method": "ASG launch-start to successful termination-end; operational interval, not billing meter",
+    "episodes": 6,
+    "operational_instance_hours": "4.801233333333333333333333333",
+    "on_demand_usd_per_hour": "0.7140000000",
+    "compute_only_estimated_usd": "3.428080600000000000000000000",
+    "fx_assumption_brl_per_usd": "6.50",
+    "planning_margin": "30%",
+    "compute_only_planning_brl": "28.96728107000000000000000000",
+    "excludes": "EBS, IPv4, S3, ECR, CloudWatch, requests, taxes and final exchange rate"
+  },
+  "billing": {
+    "status": "available_partial",
+    "gross_reported_usd": "0.0169761688",
+    "start": "2026-10-17",
+    "end_exclusive": "2026-10-18",
+    "current_utc_day_excluded": true,
+    "delayed": true,
+    "cached_response": true,
+    "note": "Account-wide posted data; excludes credits/refunds. Not a final campaign bill."
+  },
+  "retained_log_groups": [
+    {
+      "name": "/bankai/pilot-20261017",
+      "stored_bytes": 0,
+      "retention_days": 1
+    }
+  ],
+  "retained_ecr_images": [
+    {
+      "digest": "sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+      "bytes": 149233073,
+      "pushed_at": "2026-10-17 15:47:30.585000-03:00"
+    }
+  ],
+  "retained_bucket": {
+    "name": "bankai-benchmark-bootstrap-results-ku2wdx1kzzqb",
+    "versioning": "Enabled"
+  },
+  "retained_resources_note": "Results bucket, ECR image and log objects retained; storage/requests can continue to cost. Zero-capacity ASGs/IAM/task definitions retained for audit."
+}

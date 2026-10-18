@@ -1,0 +1,19 @@
+{
+  "affinity_contract_passed": true,
+  "bankai_execution_paths_passed": true,
+  "native_adapter_confirmed_parity": {
+    "bioinformatica": 5,
+    "ciberseguranca": 5,
+    "credito": 5,
+    "industrial": 5
+  },
+  "new_scaling": 70,
+  "observed_distinct_task_pid_pairs": 210,
+  "quality": 140,
+  "quality_seeds_per_cell": 5,
+  "reused_scaling": 35,
+  "scaling_baseline_threads": 4,
+  "scaling_seeds_per_cell": 5,
+  "statistical_scope": "Descriptive seed-paired comparisons; quartiles are not confidence intervals; no significance claim.",
+  "unique_measured_trials": 210
+}

@@ -1,0 +1,1052 @@
+[
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "87cef8c811dd363d9c42fff3bbde7ea663ee6fd68e1a356ab8abaaee172c7463",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_native_s42_t16"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "87cef8c811dd363d9c42fff3bbde7ea663ee6fd68e1a356ab8abaaee172c7463",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_native_s43_t16"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "87cef8c811dd363d9c42fff3bbde7ea663ee6fd68e1a356ab8abaaee172c7463",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_native_s44_t16"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "87cef8c811dd363d9c42fff3bbde7ea663ee6fd68e1a356ab8abaaee172c7463",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_native_s45_t16"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "87cef8c811dd363d9c42fff3bbde7ea663ee6fd68e1a356ab8abaaee172c7463",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_native_s46_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "011cf49072f0f0e7353e994d874fd69cc2ae8144e02260f14bd93619a05d29e8",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_adapter_s42_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "011cf49072f0f0e7353e994d874fd69cc2ae8144e02260f14bd93619a05d29e8",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_adapter_s43_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "011cf49072f0f0e7353e994d874fd69cc2ae8144e02260f14bd93619a05d29e8",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_adapter_s44_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "011cf49072f0f0e7353e994d874fd69cc2ae8144e02260f14bd93619a05d29e8",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_adapter_s45_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "011cf49072f0f0e7353e994d874fd69cc2ae8144e02260f14bd93619a05d29e8",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_classic_adapter_s46_t16"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "32b3f9a610bbd5005e885a70b2317398de8adea17a471531b1928eadf4fe0261",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_greedy_native_s42_t16"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "32b3f9a610bbd5005e885a70b2317398de8adea17a471531b1928eadf4fe0261",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_greedy_native_s43_t16"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "32b3f9a610bbd5005e885a70b2317398de8adea17a471531b1928eadf4fe0261",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_greedy_native_s44_t16"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "32b3f9a610bbd5005e885a70b2317398de8adea17a471531b1928eadf4fe0261",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_greedy_native_s45_t16"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "32b3f9a610bbd5005e885a70b2317398de8adea17a471531b1928eadf4fe0261",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "bankai_greedy_native_s46_t16"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "03da9007561727cc505efbf29e25379eb3ea1ef81b4602d9be4167c807aa318c",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_lightgbm_rf_s42_t16"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "03da9007561727cc505efbf29e25379eb3ea1ef81b4602d9be4167c807aa318c",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_lightgbm_rf_s43_t16"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "03da9007561727cc505efbf29e25379eb3ea1ef81b4602d9be4167c807aa318c",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_lightgbm_rf_s44_t16"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "03da9007561727cc505efbf29e25379eb3ea1ef81b4602d9be4167c807aa318c",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_lightgbm_rf_s45_t16"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "03da9007561727cc505efbf29e25379eb3ea1ef81b4602d9be4167c807aa318c",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_lightgbm_rf_s46_t16"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "4aee907e62941f3be0b3c2990768c6ac5f5eb57c4f42aacace8f354ea04f890b",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_sklearn_et_s42_t16"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "4aee907e62941f3be0b3c2990768c6ac5f5eb57c4f42aacace8f354ea04f890b",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_sklearn_et_s43_t16"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "4aee907e62941f3be0b3c2990768c6ac5f5eb57c4f42aacace8f354ea04f890b",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_sklearn_et_s44_t16"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "4aee907e62941f3be0b3c2990768c6ac5f5eb57c4f42aacace8f354ea04f890b",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_sklearn_et_s45_t16"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "4aee907e62941f3be0b3c2990768c6ac5f5eb57c4f42aacace8f354ea04f890b",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "borutapy_sklearn_et_s46_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "c25984dbb0d46106b0a6905ecac2a3cc8249c0383f5c0940ffa184836c096de6",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_bankai_s42_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "c25984dbb0d46106b0a6905ecac2a3cc8249c0383f5c0940ffa184836c096de6",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_bankai_s43_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "c25984dbb0d46106b0a6905ecac2a3cc8249c0383f5c0940ffa184836c096de6",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_bankai_s44_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "c25984dbb0d46106b0a6905ecac2a3cc8249c0383f5c0940ffa184836c096de6",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_bankai_s45_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "c25984dbb0d46106b0a6905ecac2a3cc8249c0383f5c0940ffa184836c096de6",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_bankai_s46_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "3138aa42f43ea6c9373f46d6aa608753eec26df93db725eae7049aee07042749",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 42,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_lightgbm_s42_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "3138aa42f43ea6c9373f46d6aa608753eec26df93db725eae7049aee07042749",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 43,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_lightgbm_s43_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "3138aa42f43ea6c9373f46d6aa608753eec26df93db725eae7049aee07042749",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 44,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_lightgbm_s44_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "3138aa42f43ea6c9373f46d6aa608753eec26df93db725eae7049aee07042749",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 45,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_lightgbm_s45_t16"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "3138aa42f43ea6c9373f46d6aa608753eec26df93db725eae7049aee07042749",
+    "experiment_id": "pilot-20261017-quality",
+    "reused_quality": true,
+    "seed": 46,
+    "suite": "quality",
+    "threads": 16,
+    "trial_id": "greedy_borutapy_lightgbm_s46_t16"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "eb1412dcc48bac2cdb9c0b0aacbd3751ed02b1930701c8f5e31e4196e6957849",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_adapter_s42_t8"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "eb1412dcc48bac2cdb9c0b0aacbd3751ed02b1930701c8f5e31e4196e6957849",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_adapter_s43_t8"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "eb1412dcc48bac2cdb9c0b0aacbd3751ed02b1930701c8f5e31e4196e6957849",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_adapter_s44_t8"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "eb1412dcc48bac2cdb9c0b0aacbd3751ed02b1930701c8f5e31e4196e6957849",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_adapter_s45_t8"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "eb1412dcc48bac2cdb9c0b0aacbd3751ed02b1930701c8f5e31e4196e6957849",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_adapter_s46_t8"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "19ec7d31f9f48321bf3b92bd066be0afe28942172002a256f32ecec23c8e2b0f",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_native_s42_t8"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "19ec7d31f9f48321bf3b92bd066be0afe28942172002a256f32ecec23c8e2b0f",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_native_s43_t8"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "19ec7d31f9f48321bf3b92bd066be0afe28942172002a256f32ecec23c8e2b0f",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_native_s44_t8"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "19ec7d31f9f48321bf3b92bd066be0afe28942172002a256f32ecec23c8e2b0f",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_native_s45_t8"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "19ec7d31f9f48321bf3b92bd066be0afe28942172002a256f32ecec23c8e2b0f",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_classic_native_s46_t8"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "4fefd8e3dcf30f6e3e4c3306ae6377c08fb59cbf06ccb34d67640862e3956256",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_greedy_native_s42_t8"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "4fefd8e3dcf30f6e3e4c3306ae6377c08fb59cbf06ccb34d67640862e3956256",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_greedy_native_s43_t8"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "4fefd8e3dcf30f6e3e4c3306ae6377c08fb59cbf06ccb34d67640862e3956256",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_greedy_native_s44_t8"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "4fefd8e3dcf30f6e3e4c3306ae6377c08fb59cbf06ccb34d67640862e3956256",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_greedy_native_s45_t8"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "4fefd8e3dcf30f6e3e4c3306ae6377c08fb59cbf06ccb34d67640862e3956256",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "bankai_greedy_native_s46_t8"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "3cb6e38fe329ca8df5539f7d88694f44d8c1eea7ffaa64f000c96193a3e484a0",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_lightgbm_rf_s42_t8"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "3cb6e38fe329ca8df5539f7d88694f44d8c1eea7ffaa64f000c96193a3e484a0",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_lightgbm_rf_s43_t8"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "3cb6e38fe329ca8df5539f7d88694f44d8c1eea7ffaa64f000c96193a3e484a0",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_lightgbm_rf_s44_t8"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "3cb6e38fe329ca8df5539f7d88694f44d8c1eea7ffaa64f000c96193a3e484a0",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_lightgbm_rf_s45_t8"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "3cb6e38fe329ca8df5539f7d88694f44d8c1eea7ffaa64f000c96193a3e484a0",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_lightgbm_rf_s46_t8"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "2b517dd4f1e9e4faacfcd38764c97ca017995057bfb064f0d0513245ff3326c8",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_sklearn_et_s42_t8"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "2b517dd4f1e9e4faacfcd38764c97ca017995057bfb064f0d0513245ff3326c8",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_sklearn_et_s43_t8"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "2b517dd4f1e9e4faacfcd38764c97ca017995057bfb064f0d0513245ff3326c8",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_sklearn_et_s44_t8"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "2b517dd4f1e9e4faacfcd38764c97ca017995057bfb064f0d0513245ff3326c8",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_sklearn_et_s45_t8"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "2b517dd4f1e9e4faacfcd38764c97ca017995057bfb064f0d0513245ff3326c8",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "borutapy_sklearn_et_s46_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "830c4d2725b2679138bcdc633ad14ab607e2191c9a2e96652184fec4bf2e5df9",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_bankai_s42_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "830c4d2725b2679138bcdc633ad14ab607e2191c9a2e96652184fec4bf2e5df9",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_bankai_s43_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "830c4d2725b2679138bcdc633ad14ab607e2191c9a2e96652184fec4bf2e5df9",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_bankai_s44_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "830c4d2725b2679138bcdc633ad14ab607e2191c9a2e96652184fec4bf2e5df9",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_bankai_s45_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "830c4d2725b2679138bcdc633ad14ab607e2191c9a2e96652184fec4bf2e5df9",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_bankai_s46_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "1af3fe4a6649ed768079b8180a544fd91641fb21783f3641254a49a5b8fc8f63",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_lightgbm_s42_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "1af3fe4a6649ed768079b8180a544fd91641fb21783f3641254a49a5b8fc8f63",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_lightgbm_s43_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "1af3fe4a6649ed768079b8180a544fd91641fb21783f3641254a49a5b8fc8f63",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_lightgbm_s44_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "1af3fe4a6649ed768079b8180a544fd91641fb21783f3641254a49a5b8fc8f63",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_lightgbm_s45_t8"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "1af3fe4a6649ed768079b8180a544fd91641fb21783f3641254a49a5b8fc8f63",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 8,
+    "trial_id": "greedy_borutapy_lightgbm_s46_t8"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "7fd21e7a081deefb1990eb9a13f64900bde30d6cc27f946911d673b0faf2afa3",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_adapter_s42_t4"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "7fd21e7a081deefb1990eb9a13f64900bde30d6cc27f946911d673b0faf2afa3",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_adapter_s43_t4"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "7fd21e7a081deefb1990eb9a13f64900bde30d6cc27f946911d673b0faf2afa3",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_adapter_s44_t4"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "7fd21e7a081deefb1990eb9a13f64900bde30d6cc27f946911d673b0faf2afa3",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_adapter_s45_t4"
+  },
+  {
+    "competitor": "bankai_classic_adapter",
+    "configuration_hash": "7fd21e7a081deefb1990eb9a13f64900bde30d6cc27f946911d673b0faf2afa3",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_adapter_s46_t4"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "6ffea64afe271240e9eccaf73a8849f5043ae0d2f9036120dd7887bb0269f08a",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_native_s42_t4"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "6ffea64afe271240e9eccaf73a8849f5043ae0d2f9036120dd7887bb0269f08a",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_native_s43_t4"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "6ffea64afe271240e9eccaf73a8849f5043ae0d2f9036120dd7887bb0269f08a",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_native_s44_t4"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "6ffea64afe271240e9eccaf73a8849f5043ae0d2f9036120dd7887bb0269f08a",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_native_s45_t4"
+  },
+  {
+    "competitor": "bankai_classic_native",
+    "configuration_hash": "6ffea64afe271240e9eccaf73a8849f5043ae0d2f9036120dd7887bb0269f08a",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_classic_native_s46_t4"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "8677c0539580febd98ef7d68c2d8c4edfc1bb60ed10cb32710d71d502a0a8f96",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_greedy_native_s42_t4"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "8677c0539580febd98ef7d68c2d8c4edfc1bb60ed10cb32710d71d502a0a8f96",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_greedy_native_s43_t4"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "8677c0539580febd98ef7d68c2d8c4edfc1bb60ed10cb32710d71d502a0a8f96",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_greedy_native_s44_t4"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "8677c0539580febd98ef7d68c2d8c4edfc1bb60ed10cb32710d71d502a0a8f96",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_greedy_native_s45_t4"
+  },
+  {
+    "competitor": "bankai_greedy_native",
+    "configuration_hash": "8677c0539580febd98ef7d68c2d8c4edfc1bb60ed10cb32710d71d502a0a8f96",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "bankai_greedy_native_s46_t4"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "bc22af4f7de61d8bc9606ae12c060549460ca843b9df2a89f8f96f8ab38a5875",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_lightgbm_rf_s42_t4"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "bc22af4f7de61d8bc9606ae12c060549460ca843b9df2a89f8f96f8ab38a5875",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_lightgbm_rf_s43_t4"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "bc22af4f7de61d8bc9606ae12c060549460ca843b9df2a89f8f96f8ab38a5875",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_lightgbm_rf_s44_t4"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "bc22af4f7de61d8bc9606ae12c060549460ca843b9df2a89f8f96f8ab38a5875",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_lightgbm_rf_s45_t4"
+  },
+  {
+    "competitor": "borutapy_lightgbm_rf",
+    "configuration_hash": "bc22af4f7de61d8bc9606ae12c060549460ca843b9df2a89f8f96f8ab38a5875",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_lightgbm_rf_s46_t4"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "613aff593ec7b51e79fc296bb27c025d57722f8529dbd3ce0df0a032770513a5",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_sklearn_et_s42_t4"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "613aff593ec7b51e79fc296bb27c025d57722f8529dbd3ce0df0a032770513a5",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_sklearn_et_s43_t4"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "613aff593ec7b51e79fc296bb27c025d57722f8529dbd3ce0df0a032770513a5",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_sklearn_et_s44_t4"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "613aff593ec7b51e79fc296bb27c025d57722f8529dbd3ce0df0a032770513a5",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_sklearn_et_s45_t4"
+  },
+  {
+    "competitor": "borutapy_sklearn_et",
+    "configuration_hash": "613aff593ec7b51e79fc296bb27c025d57722f8529dbd3ce0df0a032770513a5",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "borutapy_sklearn_et_s46_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "acee0cb396e522a63d4bd9a57fa398bda0497951f03b9b5da6cb1cf95227e124",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_bankai_s42_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "acee0cb396e522a63d4bd9a57fa398bda0497951f03b9b5da6cb1cf95227e124",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_bankai_s43_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "acee0cb396e522a63d4bd9a57fa398bda0497951f03b9b5da6cb1cf95227e124",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_bankai_s44_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "acee0cb396e522a63d4bd9a57fa398bda0497951f03b9b5da6cb1cf95227e124",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_bankai_s45_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_bankai",
+    "configuration_hash": "acee0cb396e522a63d4bd9a57fa398bda0497951f03b9b5da6cb1cf95227e124",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_bankai_s46_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "71d315f8d52130ca4fb6e40d5c789e06e75202eb9376914621c125387300db00",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 42,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_lightgbm_s42_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "71d315f8d52130ca4fb6e40d5c789e06e75202eb9376914621c125387300db00",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 43,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_lightgbm_s43_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "71d315f8d52130ca4fb6e40d5c789e06e75202eb9376914621c125387300db00",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 44,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_lightgbm_s44_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "71d315f8d52130ca4fb6e40d5c789e06e75202eb9376914621c125387300db00",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 45,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_lightgbm_s45_t4"
+  },
+  {
+    "competitor": "greedy_borutapy_lightgbm",
+    "configuration_hash": "71d315f8d52130ca4fb6e40d5c789e06e75202eb9376914621c125387300db00",
+    "experiment_id": "pilot-20261017-scaling",
+    "reused_quality": false,
+    "seed": 46,
+    "suite": "scaling",
+    "threads": 4,
+    "trial_id": "greedy_borutapy_lightgbm_s46_t4"
+  }
+]
