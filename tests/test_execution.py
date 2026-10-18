@@ -8,11 +8,11 @@ from bankai_benchmark.datasets import cache_dataset
 from bankai_benchmark.orchestrator import ensure_manifest,execute,manifest_for,runnable,upload,restore,run_trial,require_public_release
 
 def test_grids_and_resume(tmp_path):
-    assert len(trial_grid('x','smoke','quality')) == 12
-    assert len(trial_grid('x','smoke-matrix','quality')) == 48
-    assert len(trial_grid('x','full','quality')) == 60
-    assert len(trial_grid('x','full','scaling')) == 75
-    assert {t.threads for t in trial_grid('x','full','scaling')} == {1, 2, 4, 8, 16}
+    assert len(trial_grid('x','smoke','quality')) == 16
+    assert len(trial_grid('x','smoke-matrix','quality')) == 64
+    assert len(trial_grid('x','full','quality')) == 80
+    assert len(trial_grid('x','full','scaling')) == 60
+    assert {t.threads for t in trial_grid('x','full','scaling')} == {4, 8, 16}
     trials=trial_grid('x','smoke','quality');m=manifest_for(trials);p=tmp_path/'manifest.json'
     ensure_manifest(p,m);ensure_manifest(p,m)
     with pytest.raises(ValueError):ensure_manifest(p,dict(m,mode='full'))

@@ -33,15 +33,15 @@ def test_every_placeholder_and_paired_ratios():
             rows.append(fake_result(t,time=(i+1),recall=.8 if c == 'bankai_native_extra_tree' else .7))
     tokens,complete=placeholder_values(rows,mapping)
     assert complete
-    assert set(tokens) == {'CR','BP','ET','mCR','mBP','mET','rCR','rBP','rET','infoC','ruidoC'}
+    assert set(tokens) == {'CR','CB','BP','ET','mCR','mCB','mBP','mET','rCR','rCB','rBP','rET','infoC','ruidoC'}
     assert tokens['CR'] == 3 and tokens['BP'] == 3 and tokens['ET'] == 3
-    assert all(tokens[k] == 2 for k in ('mCR','mBP','mET'))
+    assert all(tokens[k] == 2 for k in ('mCR','mCB','mBP','mET'))
     assert tokens['infoC'] == 10 and tokens['ruidoC'] == 5
     assert not placeholder_values(rows[1:],mapping)[1]
 
 
 def test_manifest_reports_and_failures(tmp_path):
-    trials=tuple(Trial('test-scaling','scaling','full','industrial','bankai_native_extra_tree',s,t) for t in [1,2] for s in [42,43])
+    trials=tuple(Trial('test-scaling','scaling','full','industrial','bankai_native_extra_tree',s,t) for t in [4,8] for s in [42,43])
     root=tmp_path/'results';atomic_json(root/'test-scaling/manifest.json',manifest_for(trials))
     times=[2,100,1,100]
     for t,time in zip(trials,times):atomic_json(root/t.key,fake_result(t,time))

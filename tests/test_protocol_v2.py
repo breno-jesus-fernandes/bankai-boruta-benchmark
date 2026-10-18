@@ -68,7 +68,7 @@ def test_v2_reports_exclude_greedy_and_use_new_scaling(tmp_path):
     from bankai_benchmark.config import atomic_json
     from bankai_benchmark.reporting_v2 import report
     roots=[]
-    for suite, threads in [('quality',[16]), ('scaling',[1,2])]:
+    for suite, threads in [('quality',[16]), ('scaling',[4,8])]:
         root=tmp_path/suite;roots.append(root)
         trials=[Trial(suite,suite,'smoke','industrial',c,42,t) for c in COMPETITORS for t in threads]
         atomic_json(root/suite/'manifest.json',manifest_for(trials))

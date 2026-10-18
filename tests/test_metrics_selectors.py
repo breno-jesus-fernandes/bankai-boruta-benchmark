@@ -31,7 +31,7 @@ def test_selectors(competitor):
     assert result.effective_parameters['n_estimators'] == 8
     assert result.rounds == (ceil(log2(40/.05)) if 'greedy' in competitor else 3)
     json.dumps(result.effective_parameters,allow_nan=False)
-    if competitor == 'bankai_native_extra_tree':assert result.diagnostics['path'] == 'rust'
+    if competitor.startswith('bankai_native_extra_tree'):assert result.diagnostics['path'] == 'rust'
 
 def test_lightgbm_width_and_cloning():
     model=clone(estimator(trial('borutapy_lightgbm_rf'),'lightgbm'))
@@ -43,8 +43,17 @@ def test_lightgbm_width_and_cloning():
     model.fit(X,y);assert model.colsample_bytree == .15
 
 def test_extra_trees_bootstrap_and_current_methods():
-    assert COMPETITORS == ('bankai_native_extra_tree','borutapy_lightgbm_rf','borutapy_sklearn_et')
+    assert COMPETITORS == ('bankai_native_extra_tree','bankai_native_extra_tree_binned','borutapy_lightgbm_rf','borutapy_sklearn_et')
     assert estimator(trial('borutapy_sklearn_et'),'et').bootstrap is True
+
+@pytest.mark.parametrize(('method','backend','bins'),[
+    ('bankai_native_extra_tree','exact',None),
+    ('bankai_native_extra_tree_binned','binned',63),
+])
+def test_native_extra_trees_have_explicit_backends(method,backend,bins):
+    model=estimator(trial(method),'bankai_binned' if backend == 'binned' else 'bankai')
+    assert model.extra_trees is True and model.bootstrap is True
+    assert model.extra_trees_backend == backend and model.max_bins == bins
 
 @pytest.mark.parametrize('competitor',COMPETITORS)
 def test_both_selectors_use_the_same_early_stopping_policy(competitor):

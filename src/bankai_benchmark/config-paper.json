@@ -4,13 +4,15 @@
   "threads": 16,
   "methods": {
     "CR": "bankai_native_extra_tree",
+    "CB": "bankai_native_extra_tree_binned",
     "BP": "borutapy_lightgbm_rf",
     "ET": "borutapy_sklearn_et"
   },
   "time_tokens": {
     "CR": "CR",
+    "CB": "CB",
     "BP": "BP",
     "ET": "ET"
   },
-  "protocol": "paper-v2-a5-amd16-r4"
+  "protocol": "paper-v2-a6-amd16-r5"
 }

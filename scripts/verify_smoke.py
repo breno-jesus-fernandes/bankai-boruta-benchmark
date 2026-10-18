@@ -12,8 +12,8 @@ from bankai_benchmark.config import PROFILES, PROTOCOL
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', choices=list(PROFILES))
-    parser.add_argument('--results', default='verification/v2-local/results')
-    parser.add_argument('--output', default='verification/v2-local/reports')
+    parser.add_argument('--results', default='verification/v2-a6-r5-local/results')
+    parser.add_argument('--output', default='verification/v2-a6-r5-local/reports')
     args = parser.parse_args()
     command = [sys.executable, '-m', 'bankai_benchmark.orchestrator', 'smoke', '--experiment', PROTOCOL+'-smoke', '--results', args.results]
     if args.dataset: command += ['--dataset', args.dataset]
@@ -21,7 +21,7 @@ def main():
     subprocess.run(command, check=True)
     elapsed = time.perf_counter()-started
     paths = sorted((Path(args.results)/(PROTOCOL+'-smoke-quality')).glob('raw/**/*.json'))
-    assert len(paths) == (3 if args.dataset else 12)
+    assert len(paths) == (4 if args.dataset else 16)
     before = {str(p): (p.stat().st_mtime_ns, hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths}
     assert all(json.loads(p.read_text())['status'] == 'success' for p in paths)
     subprocess.run([sys.executable, '-m', 'bankai_benchmark.aggregate_latex', '--results', args.results, '--output', args.output, '--provisional'], check=True)

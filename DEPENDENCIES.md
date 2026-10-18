@@ -19,4 +19,4 @@ patches under `upstream/` retain upstream GPL terms, not the benchmark MIT
 license. Transitive and system libraries carry their distribution notices;
 consult installed `.dist-info` metadata for exact version-specific terms.
 
-Protocolo v2 fixa bankai-boruta==0.1.0a5 e bankai-random-forest==0.1.0a15 em pyproject/uv.lock. Os seis artefatos PyPI a5 tiveram SHA256 verificado localmente; isso não equivale a executar todos os wheels. Docker e CI usam uv sync --locked. Aceitação Linux/container a5 permanece pendente.
+O protocolo `paper-v2-a6-amd16-r5` requer bankai-boruta==0.1.0a6 e bankai-random-forest==0.1.0a15. A a6 está publicada no PyPI; `uv.lock` fixa essa versão e os SHA256 de todos os seis artefatos foram verificados por download. As versões resolvidas dos outros pacotes permaneceram iguais às do lock anterior. Aceitação Linux/container r5 permanece pendente.

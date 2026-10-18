@@ -29,9 +29,11 @@ class WidthAwareLGBM(LGBMClassifier):
 def estimator(trial, backend):
     cfg = profile(trial.dataset, trial.mode)
     common = dict(n_estimators=cfg.trees, max_depth=cfg.depth, n_jobs=trial.threads, random_state=trial.seed)
-    if backend == "bankai":
-        return BankaiRandomForestClassifier(**common, max_features=cfg.max_features, max_bins=cfg.bins,
-                   extra_trees=True, extra_trees_backend="binned", importance_type="gain", bootstrap=True)
+    if backend in ("bankai", "bankai_binned"):
+        binned = backend == "bankai_binned"
+        return BankaiRandomForestClassifier(**common, max_features=cfg.max_features,
+                   extra_trees=True, extra_trees_backend="binned" if binned else "exact",
+                   max_bins=cfg.bins if binned else None, importance_type="gain", bootstrap=True)
     if backend == "et":
         return ExtraTreesClassifier(**common, max_features=cfg.max_features, bootstrap=True)
     return WidthAwareLGBM(**common, boosting_type="rf", num_leaves=2**cfg.depth, max_bin=cfg.bins,
@@ -56,7 +58,8 @@ class PreparedSelector:
             raise ValueError(trial.competitor)
         cfg = profile(trial.dataset, trial.mode)
         name = trial.competitor
-        backend = "lightgbm" if "lightgbm" in name else ("et" if name == "borutapy_sklearn_et" else "bankai")
+        backend = ("lightgbm" if "lightgbm" in name else "et" if name == "borutapy_sklearn_et"
+                   else "bankai_binned" if name == "bankai_native_extra_tree_binned" else "bankai")
         model = estimator(trial, backend)
         common = dict(n_estimators=cfg.trees, perc=100, alpha=cfg.alpha, two_step=True,
                       max_iter=cfg.max_iter, random_state=trial.seed, early_stopping=True,
@@ -75,6 +78,7 @@ class PreparedSelector:
         selector = self.selector
         diagnostics = getattr(selector, "diagnostics_", {"path": "python"})
         if name.startswith("bankai"):
+            # a6 accelerates both exact and binned BankaiRF ExtraTrees.
             expected = "rust"
             if diagnostics["path"] != expected:
                 raise RuntimeError(f"Required {expected} path, got {diagnostics}")

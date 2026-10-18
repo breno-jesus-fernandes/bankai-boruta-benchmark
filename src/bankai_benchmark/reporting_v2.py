@@ -1,4 +1,4 @@
-"""Reports for v2; scaling uses its own one-core baseline and no quality reuse."""
+"""Reports for v2; scaling uses its own four-core baseline and no quality reuse."""
 import csv
 import json
 from pathlib import Path
@@ -25,7 +25,8 @@ def report(quality_root, scaling_root, output):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    labels = {'bankai_native_extra_tree': 'Bankai native ExtraTrees',
+    labels = {'bankai_native_extra_tree': 'BankaiRF ExtraTrees (exact)',
+              'bankai_native_extra_tree_binned': 'Bankai Boruta + BankaiRF (binned)',
               'borutapy_lightgbm_rf': 'BorutaPy LightGBM RF',
               'borutapy_sklearn_et': 'BorutaPy ExtraTrees'}
     rows = list(csv.DictReader((output/'quality/summary_by_dataset.csv').open()))
@@ -42,5 +43,5 @@ def report(quality_root, scaling_root, output):
     for method in COMPETITORS:
         cells = sorted([r for r in rows if r['competitor'] == method], key=lambda r: int(r['threads']))
         ax.plot([int(r['threads']) for r in cells], [float(r['speedup_median']) if r['speedup_median'] else float('nan') for r in cells], marker='o', label=labels[method])
-    ax.set(xlabel='Physical cores', ylabel='Paired speedup relative to one core', xticks=[1,2,4,8,16]); ax.legend()
+    ax.set(xlabel='Physical cores', ylabel='Paired speedup relative to four cores', xticks=[4,8,16]); ax.legend()
     fig.savefig(output/'scaling.svg'); plt.close(fig)

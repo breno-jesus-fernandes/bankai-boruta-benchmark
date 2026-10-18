@@ -13,7 +13,7 @@ smoke-matrix:
 	uv run bankai-benchmark smoke-matrix --experiment smoke-matrix
 
 aggregate:
-	uv run bankai-aggregate --results verification/v2-local/results --output verification/v2-local/reports --provisional
+	uv run bankai-aggregate --results verification/v2-a6-r5-local/results --output verification/v2-a6-r5-local/reports --provisional
 
 docker-build:
 	$(CONTAINER_ENGINE) build --platform linux/amd64 --build-arg VCS_REF=$$(git rev-parse HEAD) -t bankai-benchmark:dev .

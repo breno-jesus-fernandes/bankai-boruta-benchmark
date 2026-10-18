@@ -32,7 +32,9 @@ def validated_results(root):
         manifest = json.loads(path.read_text())
         if digest({k: v for k, v in manifest.items() if k != "configuration_hash"}) != manifest["configuration_hash"]:
             raise ValueError(f"Manifest checksum mismatch: {path}")
-        if manifest.get("protocol") not in (None, PROTOCOL, "paper-v2-a5-amd16"):
+        # The a5 protocol is accepted only for its historical reader path. Fingerprints
+        # below still prevent combining results across versions or protocol revisions.
+        if manifest.get("protocol") not in (None, PROTOCOL, "paper-v2-a5-amd16", "paper-v2-a5-amd16-r5"):
             raise ValueError("Unsupported benchmark protocol")
         fingerprints.add(digest(dict(source=manifest["source_hash"], packages=manifest["package_versions"], protocol=manifest.get("protocol", "paper-v1-a4"))))
         for spec in manifest["trials"]:
@@ -138,12 +140,12 @@ def aggregate(root, output, provisional=False, mapping_path=None):
         if row["suite"] != "scaling":
             continue
         same = [r for r in results if r["status"] == "success" and r["suite"] == "scaling" and r["dataset"] == row["dataset"] and r["competitor"] == row["competitor"]]
-        baseline = {r["seed"]: r for r in same if r["threads"] == 1}
+        baseline = {r["seed"]: r for r in same if r["threads"] == 4}
         values = [baseline[r["seed"]]["execution_metrics"]["fit_seconds"]/r["execution_metrics"]["fit_seconds"]
                   for r in same if r["threads"] == row["threads"] and r["seed"] in baseline]
         scaling.append(dict(dataset=row["dataset"], competitor=row["competitor"], threads=row["threads"], paired_seeds=len(values),
             **{f"speedup_{k}": v for k, v in distribution(values).items()},
-            **{f"efficiency_{k}": v for k, v in distribution([v/row["threads"] for v in values]).items()}))
+            **{f"efficiency_{k}": v for k, v in distribution([v/(row["threads"]/4) for v in values]).items()}))
     write_csv(output/"thread_scaling.csv", scaling)
     manifests = [json.loads(p.read_text()) for p in Path(root).rglob("manifest.json")]
     current = all(m.get("protocol") == PROTOCOL for m in manifests)
@@ -167,7 +169,7 @@ def aggregate(root, output, provisional=False, mapping_path=None):
             lines.append(f"{row['dataset']} & {method} & {row['threads']} & {fmt('fit_seconds')} & {fmt('peak_rss_gib')} & {fmt('recall')} \\\\")
         return "\n".join(lines+["\\end{tabular}"])+"\n"
     quality = [r for r in summary if r["suite"] == "quality"]
-    (output/"wmecai_table1.tex").write_text(table([r for r in quality if r["competitor"] != "greedy_borutapy_lightgbm"]))
+    (output/"wmecai_table1.tex").write_text(table(quality))
     if current:
         (output/"wmecai_lightgbm_greedy.tex").unlink(missing_ok=True)
     if not current: (output/"wmecai_lightgbm_greedy.tex").write_text(table([r for r in quality if r["competitor"] == "greedy_borutapy_lightgbm"]))

@@ -1,18 +1,18 @@
 {
-  "verified_version": "0.1.0a5",
+  "verified_version": "0.1.0a6",
   "native_control_tests_passed": true,
   "artifact_sha256_verified": {
-    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_10_12_x86_64.whl": "9ffcad64d682c956505553aebb4491397cbc9eac76a84876c5975c8de6bf0221",
-    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_11_0_arm64.whl": "ce4f795f8818b921a5818685d519bd5f65ddc03a00ec1be97cfd136252db1b67",
-    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_aarch64.whl": "84e28d3d8b9036a572449610bf7f086c94b0928f37d2c1cb4244c76fdc40f914",
-    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_x86_64.whl": "4be1601509f1424c8b49eac9b33b50ca57a67b4254012cc5321429ff5a9f8d09",
-    "bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl": "00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259",
-    "bankai_boruta-0.1.0a5.tar.gz": "318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a"
+    "bankai_boruta-0.1.0a6-cp311-abi3-macosx_10_12_x86_64.whl": "c4f646d0d22ea89ffea28b0886b0055e5b6b0533cb4048f64e9b5fd87cc54c02",
+    "bankai_boruta-0.1.0a6-cp311-abi3-macosx_11_0_arm64.whl": "47c9f9110d20e821276b8dc07a36cd0f589ccacd645c72a2d1b0ead2fbb908b6",
+    "bankai_boruta-0.1.0a6-cp311-abi3-manylinux_2_28_aarch64.whl": "00faa4927f0bdcd7bd71346e205b4fbb6917db6f94775face39bacd916bae3ed",
+    "bankai_boruta-0.1.0a6-cp311-abi3-manylinux_2_28_x86_64.whl": "9c6f3174725cfd9671dd7c90a0d8e98418345786cef93b2f2516fb13bf1515e2",
+    "bankai_boruta-0.1.0a6-cp311-abi3-win_amd64.whl": "e904271bfeae70b565778ca35b8a5741e6f1849d69032aeb64ff94259d3c7897",
+    "bankai_boruta-0.1.0a6.tar.gz": "91fe3066af5ceded8f7fc7a51fb696298548a1cd0616f114656a190bad0ea9a3"
   },
-  "reason": "Six public a5 distributions downloaded and SHA256 verified. Eleven classic native/adapter parity cases passed locally on macOS. Protocol r4 passed GitHub Actions Linux/container acceptance and its immutable image was published; the earlier AMD ECS smoke was protocol r2 and does not validate r4.",
-  "linux_acceptance": "passed for paper-v2-a5-amd16-r4",
+  "reason": "All six public a6 artifacts were downloaded and SHA256 verified. Local a6 benchmark suite and smoke passed. Linux/container acceptance and published image remain pending; prior r4 acceptance is historical only.",
+  "linux_acceptance": "pending for paper-v2-a6-amd16-r5",
   "local_control_cases": 11,
-  "linux_acceptance_evidence": {
+  "r4_linux_acceptance_evidence": {
     "workflow_run": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39151871780",
     "workflow_head_sha": "b84fc4054efe026dc92f806ef02f4fdb9ff938ea",
     "workflow_conclusion": "success",
@@ -20,10 +20,18 @@
     "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:838231861df859a45936f531e8880fd212049ac00a775091721f948efa01c693",
     "image_tag": "b84fc4054efe026dc92f806ef02f4fdb9ff938ea-39151871780-1"
   },
-  "ecs_smoke_evidence": {
+  "r4_ecs_smoke_evidence": {
     "workflow_protocol": "paper-v2-a5-amd16",
     "task_arn": "arn:aws:ecs:us-east-1:642504869083:task/paper-v2-a5-ecs-smoke/18bf90436d654fe382695ec1a0fe8989",
     "exit_code": 0,
     "status": "historical; does not validate r4"
+  },
+  "a5_artifact_sha256_verified_historical": {
+    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_10_12_x86_64.whl": "9ffcad64d682c956505553aebb4491397cbc9eac76a84876c5975c8de6bf0221",
+    "bankai_boruta-0.1.0a5-cp311-abi3-macosx_11_0_arm64.whl": "ce4f795f8818b921a5818685d519bd5f65ddc03a00ec1be97cfd136252db1b67",
+    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_aarch64.whl": "84e28d3d8b9036a572449610bf7f086c94b0928f37d2c1cb4244c76fdc40f914",
+    "bankai_boruta-0.1.0a5-cp311-abi3-manylinux_2_28_x86_64.whl": "4be1601509f1424c8b49eac9b33b50ca57a67b4254012cc5321429ff5a9f8d09",
+    "bankai_boruta-0.1.0a5-cp311-abi3-win_amd64.whl": "00e4dbf79e24bac563680b1dd27d3a07085c685d9b5846ce07ae83e8e6b09259",
+    "bankai_boruta-0.1.0a5.tar.gz": "318cf62a13c308ce38e5a2de60481164bb5154c257c20432145728c8dd634f8a"
   }
 }

@@ -5,12 +5,12 @@ from pathlib import Path
 
 SCHEMA_VERSION = 1
 GENERATOR_VERSION = "2.0.0"
-PROTOCOL = "paper-v2-a5-amd16-r4"
+PROTOCOL = "paper-v2-a6-amd16-r5"
 MACHINE = dict(instance_type="c7a.4xlarge", physical_cores=16, threads_per_core=1, memory_gib=32)
 SEEDS = (42, 43, 44, 45, 46)
 HISTORICAL_COMPETITORS = ("bankai_classic_native", "bankai_classic_adapter", "bankai_greedy_native",
                "borutapy_lightgbm_rf", "borutapy_sklearn_et", "greedy_borutapy_bankai", "greedy_borutapy_lightgbm")
-COMPETITORS = ("bankai_native_extra_tree", "borutapy_lightgbm_rf", "borutapy_sklearn_et")
+COMPETITORS = ("bankai_native_extra_tree", "bankai_native_extra_tree_binned", "borutapy_lightgbm_rf", "borutapy_sklearn_et")
 EFFECT_WEIGHTS = {
     "industrial": [1, 1, .25, .25, .02, .02],
     "credito": [1.]*7 + [.25]*4 + [.02]*3,
@@ -98,7 +98,7 @@ class Trial:
 def trial_grid(experiment_id, mode, suite, dataset=None):
     datasets = [dataset] if dataset else (["industrial"] if suite == "scaling" else list(PROFILES))
     seeds = (42,) if mode == "smoke" else ((42, 43) if mode == "smoke-matrix" else SEEDS)
-    threads = (1,) if mode == "smoke" else ((1, 4) if mode == "smoke-matrix" else ((1, 2, 4, 8, 16) if suite == "scaling" else (16,)))
+    threads = (1,) if mode == "smoke" else ((4, 8) if mode == "smoke-matrix" else ((4, 8, 16) if suite == "scaling" else (16,)))
     return tuple(Trial(experiment_id, suite, mode, d, c, s, t) for d in datasets for c in COMPETITORS for t in threads for s in seeds)
 
 

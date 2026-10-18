@@ -1,8 +1,8 @@
 # Bankai Boruta benchmark v2
 
-Protocolo `paper-v2-a5-amd16-r4`, gerador `2.0.0`, Bankai Boruta **0.1.0a5** e BankaiRF **0.1.0a15**. Esta revisão entrega implementação e validação local. Ainda não há resultados de desempenho v2 ou evidência de melhora de recall em escala real.
+Protocolo `paper-v2-a6-amd16-r5`, gerador `2.0.0`, Bankai Boruta **0.1.0a6** e BankaiRF **0.1.0a15**. A a6 está publicada no PyPI; o lock foi regenerado e os seis artefatos públicos tiveram SHA256 conferido. A aceitação Linux/container do benchmark ainda está pendente. Ainda não há resultados de desempenho r5 ou evidência de melhora de recall em escala real.
 
-Três métodos: `bankai_native_extra_tree`, `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. `bankai_native_extra_tree` identifica explicitamente o caminho nativo do BankaiBoruta com BankaiRF em modo Extra Trees. Os dois métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. BankaiBoruta e BorutaPy usam `early_stopping=True`, paciência de 100 iterações (`n_iter_no_change=100`) e limite máximo de 120 iterações. No smoke, o limite é reduzido para quatro, então a parada antecipada não é alcançável. Greedy pertence somente ao histórico. `bankai_classic_adapter` continua disponível apenas na leitura dos resultados históricos.
+Quatro métodos: `bankai_native_extra_tree` usa BankaiRF ExtraTrees exato; `bankai_native_extra_tree_binned` usa BankaiRF ExtraTrees com bins e o caminho acelerado de sombras virtuais do BankaiBoruta; os outros são `borutapy_sklearn_et` e `borutapy_lightgbm_rf`. Na a6, ambos os métodos Bankai usam Rust no seletor e na floresta; o caminho exato nativo exige entrada float32, como nos geradores deste benchmark. Os três métodos ExtraTrees usam bootstrap; LightGBM RF usa subsample 0,8. BankaiBoruta e BorutaPy usam `early_stopping=True`, paciência de 100 iterações (`n_iter_no_change=100`) e limite máximo de 120 iterações. No smoke, o limite é reduzido para quatro, então a parada antecipada não é alcançável. Greedy e o adaptador pertencem somente aos leitores históricos.
 
 | Perfil | Treino N | Teste N | P | Árvores | Profundidade | Iterações máximas | Prevalência | SNR |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -29,13 +29,13 @@ uv run python scripts/verify_smoke.py
 uv run python scripts/verify_smoke.py --dataset bioinformatica --results /tmp/bio-v2/results --output /tmp/bio-v2/report
 ```
 
-O smoke usa diretórios exclusivos sob `verification/v2-local`. O comando verifica sucesso, relatórios provisórios e retomada byte a byte. A identidade do protocolo, dependências, fonte e configuração fazem parte dos manifests; manifest incompatível exige outro ID. Agregação recusa mistura de protocolos/fontes/dependências.
+O smoke usa diretórios exclusivos sob `verification/v2-a6-r5-local`. O comando verifica sucesso, relatórios provisórios e retomada byte a byte. A identidade do protocolo, dependências, fonte e configuração fazem parte dos manifests; manifest incompatível exige outro ID. Agregação recusa mistura de protocolos/fontes/dependências.
 
 ## Medição e métricas
 
-Cada fit roda em processo novo. Carregamento, preparação e avaliação downstream ficam fora do cronômetro e da coleta de memória do seletor. RSS é amostrado a cada 5 ms; Linux também registra VmHWM e tentativa de reset antes do fit. Quando o reset falha, o high-water mark é explicitamente de toda a vida do processo. Delta de pico subtrai o baseline. Buffers explícitos e bytes copiados da a5 são diagnósticos separados de RSS; valores numéricos recebem mediana/IQR nos resumos.
+Cada fit roda em processo novo. Carregamento, preparação e avaliação downstream ficam fora do cronômetro e da coleta de memória do seletor. RSS é amostrado a cada 5 ms; Linux também registra VmHWM e tentativa de reset antes do fit. Quando o reset falha, o high-water mark é explicitamente de toda a vida do processo. Delta de pico subtrai o baseline. Buffers explícitos e bytes copiados são diagnósticos separados de RSS; valores numéricos recebem mediana/IQR nos resumos.
 
-Linux lê package/core IDs no sysfs e cruza com a afinidade permitida. Seleciona um processador lógico por núcleo, em conjuntos aninhados de 1/2/4/8/16. Recusa topologia ausente ou núcleos insuficientes e confere afinidade efetiva. Registra fabricante, modelo, topologia permitida, CPUs selecionadas e afinidade. macOS smoke declara essas verificações indisponíveis. OpenMP, Rayon e `n_jobs` seguem o número solicitado; BLAS, NumExpr e Accelerate usam uma thread.
+Linux lê package/core IDs no sysfs e cruza com a afinidade permitida. Seleciona um processador lógico por núcleo, em conjuntos aninhados de 1/2/4/8/16. Recusa topologia ausente ou núcleos insuficientes e confere afinidade efetiva. Registra fabricante, modelo, topologia permitida, CPUs selecionadas e afinidade. macOS smoke declara essas verificações indisponíveis. OpenMP, Rayon e `n_jobs` seguem o número solicitado; BLAS, NumExpr e Accelerate usam uma thread. A campanha de escala mede somente 4, 8 e 16 núcleos, com baseline próprio de 4 núcleos.
 
 Precisão, recall, F1, FDR, falsos positivos trap e seleções tentativas são reportados. Downstream usa ExtraTrees com 200 árvores, max_features sqrt, class_weight balanced, somente features confirmadas; registra AUC, accuracy, balanced accuracy e F1. Oracle e todas as features são referências em processos próprios. Medianas e quartis usam quantile linear; falhas nunca viram observações zero. Smoke ou campanhas incompletas não geram placeholders finais.
 
@@ -43,14 +43,14 @@ Precisão, recall, F1, FDR, falsos positivos trap e seleções tentativas são r
 
 Alvo: `c7a.4xlarge`, AMD EPYC, 16 núcleos físicos, uma thread por núcleo, 32 GiB ([especificação AWS](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html)). ECS sobre EC2, uma tarefa por host, reserva 16 CPUs e 28 GiB. `MACHINE` em `config.py` centraliza a identidade; templates e placement usam esse alvo, capacidade desejada zero nos planos offline.
 
-Qualidade: quatro perfis × três métodos × cinco seeds (42–46) × 16 núcleos = 60 fits. Escala: Industrial × três métodos × cinco seeds × 1/2/4/8/16 núcleos = 75 fits independentes. Dois warmups por célula usam seeds 900001/900002. Não reutilizar observações anteriores ou da a4 na escala r2.
+Qualidade: quatro perfis × quatro métodos × cinco seeds (42–46) × 16 núcleos = 80 fits. Escala: Industrial × quatro métodos × cinco seeds × 4/8/16 núcleos = 60 fits independentes. Dois warmups por célula usam seeds 900001/900002. Não reutilizar observações anteriores ou da a4.
 
 ```sh
 # Executar somente depois da aceitação Linux/container e aprovação da campanha futura.
-uv run bankai-benchmark full --suite quality --experiment paper-v2-a5-amd16-r4 --results results-v2
-uv run bankai-benchmark full --suite scaling --experiment paper-v2-a5-amd16-r4 --results results-v2
+uv run bankai-benchmark full --suite quality --experiment paper-v2-a6-amd16-r5 --results results-v2
+uv run bankai-benchmark full --suite scaling --experiment paper-v2-a6-amd16-r5 --results results-v2
 uv run bankai-aggregate --results results-v2 --output reports-v2
-uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a5-amd16-r4-quality --scaling results-v2/paper-v2-a5-amd16-r4-scaling --output reports-v2/analysis
+uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a6-amd16-r5-quality --scaling results-v2/paper-v2-a6-amd16-r5-scaling --output reports-v2/analysis
 ```
 
 O gerador de relatórios v2 usa baseline de uma CPU e apenas observações novas. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
