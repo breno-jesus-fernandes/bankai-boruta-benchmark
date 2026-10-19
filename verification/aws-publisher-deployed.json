@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "stack_name": "bankai-image-publisher",
+  "stack_status": "UPDATE_COMPLETE",
+  "region": "us-east-1",
+  "account": "642504869083",
+  "role_arn": "arn:aws:iam::642504869083:role/bankai-image-publisher-Publisher-UiA3IL8kWojx",
+  "repository_name": "bankai-image-publisher-images",
+  "repository_uri": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images",
+  "encryption": "AES256",
+  "tag_mutability": "IMMUTABLE",
+  "image_scanning_on_push": true,
+  "verified_trust_subject": "repo:breno-jesus-fernandes@32203685/bankai-boruta-benchmark@1423557673:ref:refs/heads/main",
+  "observed_at_utc": "2026-10-17T18:48:10Z"
+}
