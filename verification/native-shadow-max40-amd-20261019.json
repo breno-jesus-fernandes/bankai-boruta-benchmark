@@ -1,0 +1,54 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-native-shadow-max40",
+  "outputs": {
+    "Fleet": "bankai-native-shadow-max40-Fleet-ZlTStNKZwVco",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-max40-TaskRole-PiTwGjwleAVx",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-max40-ExecutionRole-zNW5Jwv9dg0T"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:6dc15f2831326d7f03d22462b0f46ae01e59ab512c76415479d995bf4229293f",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:1",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 16,
+  "trees": 100,
+  "repeats": 3,
+  "reserved_usd": "3.0",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-19T08:33:07+00:00",
+  "status": "completed",
+  "host": "i-0fb0a8a0c301bb9df",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/0a165ea7fb014159b04e463ed273eb02",
+  "exit_code": 0,
+  "stopped_at": "2026-10-19T06:55:22.529526+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed42-t16.json",
+      "bytes": 10135
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed43-t16.json",
+      "bytes": 10147
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed44-t16.json",
+      "bytes": 10193
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed45-t16.json",
+      "bytes": 10244
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed46-t16.json",
+      "bytes": 10200
+    }
+  ]
+}
