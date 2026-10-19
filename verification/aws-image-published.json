@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "workflow": "publish-image.yml",
+  "workflow_run_id": "39059529475",
+  "workflow_run_url": "https://github.com/breno-jesus-fernandes/bankai-boruta-benchmark/actions/runs/39059529475",
+  "status": "success",
+  "source_revision": "e11befc25ceb16e0367b965df8f17c6f7a6890ed",
+  "image_tag": "e11befc25ceb16e0367b965df8f17c6f7a6890ed-39059529475-1",
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+  "ecr_digest_readback": "sha256:e1153cdb5d95fe72b42ae23c491bf30217055593d2de84a5ba6f65e23b19c4e4",
+  "aws_region": "us-east-1",
+  "aws_account": "642504869083",
+  "publisher_role": "arn:aws:iam::642504869083:role/bankai-image-publisher-Publisher-UiA3IL8kWojx",
+  "workflow_caller_arn": "arn:aws:sts::642504869083:assumed-role/bankai-image-publisher-Publisher-UiA3IL8kWojx/bankai-image-39059529475",
+  "runtime_instances_started": 0,
+  "observed_at_utc": "2026-10-17T18:48:10Z"
+}
