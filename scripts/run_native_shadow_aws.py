@@ -9,16 +9,15 @@ import boto3
 from botocore.exceptions import ClientError
 
 from bankai_benchmark.aws_ecs import infrastructure
-from bankai_benchmark.budget import ACTION, PILOT_SECONDS, arm, reserve_many, stop, validate_policy
+from bankai_benchmark.budget import ACTION, PILOT_SECONDS, arm, reserve_supplemental, stop, validate_policy
 
 
 REGION = "us-east-1"
 BUCKET = "bankai-benchmark-bootstrap-results-ku2wdx1kzzqb"
 EXPERIMENT = "native-shadow-max40-v1"
-HOURS = 2
 
 
-def task_definition(outputs, image, seeds, threads, repeats, trees):
+def task_definition(outputs, image, datasets, seeds, threads, repeats):
     return dict(family=EXPERIMENT, requiresCompatibilities=["EC2"], networkMode="bridge",
         cpu="16384", memory="28672", executionRoleArn=outputs["ExecutionRole"],
         taskRoleArn=outputs["TaskRole"],
@@ -27,8 +26,8 @@ def task_definition(outputs, image, seeds, threads, repeats, trees):
             cpu=16384, memory=28672,
             entryPoint=["/opt/candidate/bin/python", "/opt/native_shadow_pilot.py"],
             command=["--bucket", BUCKET, "--experiment", EXPERIMENT,
-                "--seeds", *map(str, seeds), "--threads", str(threads), "--repeats", str(repeats),
-                "--trees", str(trees), "--timeout-seconds", "900", "--max-iter", "40"],
+                "--datasets", *datasets, "--seeds", *map(str, seeds), "--threads", str(threads),
+                "--repeats", str(repeats), "--timeout-seconds", "1800", "--max-iter", "40"],
             environment=[dict(name="AWS_REGION", value=REGION)],
             logConfiguration=dict(logDriver="awslogs", options={
                 "awslogs-group": outputs["Logs"], "awslogs-region": REGION,
@@ -96,11 +95,11 @@ def run(args):
     running = ec2.describe_instances(Filters=[{"Name": "instance-state-name", "Values": ["pending", "running"]}])
     if any(instance for reservation in running["Reservations"] for instance in reservation["Instances"]):
         raise RuntimeError("An EC2 instance is already active; refusing overlapping benchmark capacity")
-    stack_name = "bankai-native-shadow-max40"
+    stack_name = args.stack
     if stack_exists(cf, stack_name):
         raise RuntimeError(f"Stack {stack_name} already exists; inspect it instead of creating a duplicate")
     outputs = create_stack(cf, stack_name, args.subnets, args.security_groups)
-    definition = task_definition(outputs, args.image, args.seeds, args.threads, args.repeats, args.trees)
+    definition = task_definition(outputs, args.image, args.datasets, args.seeds, args.threads, args.repeats)
     registered = ecs.register_task_definition(**definition)["taskDefinition"]
     group_name = outputs["Fleet"]
     current = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[group_name])["AutoScalingGroups"][0]
@@ -108,17 +107,17 @@ def run(args):
         raise RuntimeError("New native-shadow fleet is not idle with max capacity one")
 
     # Install and verify the AWS shutdown before committing the budget reservation.
-    shutdown = arm(autoscaling, group_name, duration_seconds=HOURS * PILOT_SECONDS)
+    shutdown = arm(autoscaling, group_name, duration_seconds=args.hours * PILOT_SECONDS)
     try:
-        # One ledger slot per armed hour.
-        reserve_many(s3, BUCKET, [group_name] + [f"{group_name}#h{hour}" for hour in range(2, HOURS + 1)])
+        # The BRL 400 ledger is fully allocated; this run uses the USD 150 extension.
+        reserve_supplemental(s3, BUCKET, group_name, args.hours)
     except Exception:
         autoscaling.delete_scheduled_action(AutoScalingGroupName=group_name, ScheduledActionName=ACTION)
         raise
     state = dict(protocol=EXPERIMENT, stack=stack_name, outputs=outputs,
-        image=args.image, task_definition=registered["taskDefinitionArn"], seeds=args.seeds,
-        threads=args.threads, trees=args.trees, repeats=args.repeats,
-        reserved_brl=str(20 * HOURS), shutdown_at=shutdown.isoformat(), status="reserved")
+        image=args.image, task_definition=registered["taskDefinitionArn"], datasets=args.datasets, seeds=args.seeds,
+        threads=args.threads, repeats=args.repeats,
+        reserved_usd=str(1.5 * args.hours), budget="supplemental-150-usd", shutdown_at=shutdown.isoformat(), status="reserved")
     Path(args.state).write_text(json.dumps(state, indent=2) + "\n")
     task_arn = None
     try:
@@ -149,7 +148,7 @@ def run(args):
             raise TimeoutError("Pilot reached its five-minute shutdown safety margin")
         keys = s3.list_objects_v2(Bucket=BUCKET, Prefix=f"{EXPERIMENT}/pilot/").get("Contents", [])
         state["result_objects"] = [{"key": item["Key"], "bytes": item["Size"]} for item in keys]
-        if len(state["result_objects"]) < len(args.seeds):
+        if len(state["result_objects"]) < len(args.seeds) * len(args.datasets):
             raise RuntimeError("Task completed without one result artifact per seed")
         Path(args.state).write_text(json.dumps(state, indent=2) + "\n")
     finally:
@@ -172,7 +171,9 @@ def main():
     parser.add_argument("--security-groups", nargs="+", required=True)
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     parser.add_argument("--threads", type=int, default=16)
-    parser.add_argument("--trees", type=int, default=100)
+    parser.add_argument("--datasets", nargs="+", default=["industrial"])
+    parser.add_argument("--hours", type=int, default=2)
+    parser.add_argument("--stack", default="bankai-native-shadow-max40")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--state", default="verification/native-shadow-max40-amd-20261019.json")
     run(parser.parse_args())

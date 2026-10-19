@@ -1,9 +1,10 @@
-"""Process-isolated Industrial comparison: Bankai exact, Bankai binned and BorutaPy.
+"""Process-isolated comparison of Bankai exact, Bankai binned and BorutaPy.
 
 Every fit runs in a fresh worker process that generates the dataset, signals
 readiness and waits; the parent then samples external RSS until the fit ends.
-All methods share the nominal configuration (100 trees, depth 6, sqrt features,
-bootstrap, perc=100, alpha=0.05, two_step, at most 40 rounds, natural stop).
+All methods share the profile's nominal configuration (trees, depth, feature
+fraction; 63 bins for the binned backend) plus bootstrap, perc=100, alpha=0.05,
+two_step and at most 40 rounds with the natural stop.
 Methods are interleaved within each repeat, and one JSON per seed is uploaded.
 """
 import argparse
@@ -26,41 +27,48 @@ METHODS = ("bankai_exact", "bankai_binned", "borutapy")
 BENCHMARK_SRC = os.environ.get("BANKAI_BENCHMARK_SRC", "/opt/bankai-benchmark/src")
 
 
-def dataset(seed, rows=None):
+def config(name):
+    sys.path.insert(0, BENCHMARK_SRC)
+    from bankai_benchmark.config import profile
+    return profile(name, "full")
+
+
+def dataset(name, seed, rows=None):
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.datasets import generate_dataset
-    bundle = generate_dataset("industrial", seed, "full")
+    bundle = generate_dataset(name, seed, "full")
     X, y = bundle.X_train, bundle.y_train
     if rows:
         X, y = X[:rows], y[:rows]
     return X, y, [int(i) for i in bundle.relevant_features]
 
 
-def selector(method, seed, threads, trees, max_iter):
+def selector(method, seed, threads, cfg, max_iter):
     # BorutaPy's loop starts at 1 with ``_iter < max_iter``; max_iter + 1 gives
     # at most ``max_iter`` rounds. BankaiBoruta mirrors that contract.
+    trees = cfg.trees
     common = dict(n_estimators=trees, perc=100, alpha=.05, two_step=True,
         max_iter=max_iter + 1, random_state=seed)
     if method == "borutapy":
         from boruta import BorutaPy
         from sklearn.ensemble import ExtraTreesClassifier
-        model = ExtraTreesClassifier(n_estimators=trees, max_depth=6, max_features="sqrt",
+        model = ExtraTreesClassifier(n_estimators=trees, max_depth=cfg.depth, max_features=cfg.max_features,
             bootstrap=True, n_jobs=threads, random_state=seed)
         return BorutaPy(model, early_stopping=False, **common)
     from bankai_boruta import BankaiBoruta
     from bankai_random_forest import BankaiRandomForestClassifier
     binned = method == "bankai_binned"
-    model = BankaiRandomForestClassifier(n_estimators=trees, max_depth=6, max_features="sqrt",
+    model = BankaiRandomForestClassifier(n_estimators=trees, max_depth=cfg.depth, max_features=cfg.max_features,
         bootstrap=True, n_jobs=threads, random_state=seed, extra_trees=True,
-        extra_trees_backend="binned" if binned else "exact", max_bins=63 if binned else None)
+        extra_trees_backend="binned" if binned else "exact", max_bins=cfg.bins if binned else None)
     return BankaiBoruta(estimator=model, **common)
 
 
 def worker(args):
     import numpy as np
-    X, y, relevant = dataset(args.seed, args.rows)
+    X, y, relevant = dataset(args.dataset, args.seed, args.rows)
     data_hash = hashlib.sha256(np.ascontiguousarray(X).tobytes() + y.tobytes()).hexdigest()
-    model = selector(args.method, args.seed, args.threads, args.trees, args.max_iter)
+    model = selector(args.method, args.seed, args.threads, config(args.dataset), args.max_iter)
     target = Path(args.worker_output)
     target.with_suffix(".ready").touch()
     while not target.with_suffix(".go").exists():
@@ -77,7 +85,7 @@ def worker(args):
         mode = model.diagnostics_.get("storage_mode")
     relevant = set(relevant)
     support = np.flatnonzero(model.support_).tolist()
-    result = dict(method=args.method, storage_mode=mode, seed=args.seed,
+    result = dict(dataset=args.dataset, method=args.method, storage_mode=mode, seed=args.seed,
         elapsed_seconds=elapsed, rounds=rounds, max_iter=args.max_iter,
         support=support, tentative=np.flatnonzero(model.support_weak_).tolist(),
         data_sha256=data_hash, n_rows=int(X.shape[0]), n_features=int(X.shape[1]),
@@ -91,12 +99,12 @@ def worker(args):
     target.write_text(json.dumps(result, allow_nan=False))
 
 
-def run_one(args, method, seed, repeat):
+def run_one(args, name, method, seed, repeat):
     with tempfile.TemporaryDirectory(prefix="native-shadow-") as temporary:
         target = Path(temporary) / "result.json"
         command = [sys.executable, str(Path(__file__).resolve()), "--worker-output", str(target),
-            "--method", method, "--seed", str(seed), "--threads", str(args.threads),
-            "--trees", str(args.trees), "--max-iter", str(args.max_iter)]
+            "--dataset", name, "--method", method, "--seed", str(seed),
+            "--threads", str(args.threads), "--max-iter", str(args.max_iter)]
         if args.rows:
             command += ["--rows", str(args.rows)]
         environment = os.environ.copy()
@@ -113,7 +121,7 @@ def run_one(args, method, seed, repeat):
                 if time.monotonic() > deadline:
                     process.kill()
                     process.wait()
-                    raise TimeoutError(f"{method} seed {seed} exceeded its process deadline")
+                    raise TimeoutError(f"{name} {method} seed {seed} exceeded its process deadline")
                 if baseline is None and target.with_suffix(".ready").exists():
                     baseline = peak = monitored.memory_info().rss
                     target.with_suffix(".go").touch()
@@ -148,10 +156,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bucket")
     parser.add_argument("--experiment", default="native-shadow-max40-v1")
+    parser.add_argument("--datasets", nargs="+", default=["industrial"],
+        choices=["industrial", "credito", "bioinformatica", "ciberseguranca"])
+    parser.add_argument("--dataset", default="industrial")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     parser.add_argument("--methods", nargs="+", default=list(METHODS), choices=METHODS)
     parser.add_argument("--threads", type=int, default=16)
-    parser.add_argument("--trees", type=int, default=100)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--max-iter", type=int, default=40)
     parser.add_argument("--rows", type=int, help="Truncate the training split (smoke only)")
@@ -172,34 +182,35 @@ def main():
         s3 = boto3.client("s3", region_name=os.environ.get("AWS_REGION", "us-east-1"))
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     host = dict(platform=platform.platform(), machine=platform.machine(), logical_cpus=os.cpu_count())
-    for seed in args.seeds:
+    for name, seed in [(name, seed) for name in args.datasets for seed in args.seeds]:
+        cfg = config(name)
         results = []
         for repeat in range(args.repeats):
             # Rotate the method order so no method always runs first or last.
             order = args.methods[repeat % len(args.methods):] + args.methods[:repeat % len(args.methods)]
             for method in order:
-                result = run_one(args, method, seed, repeat)
+                result = run_one(args, name, method, seed, repeat)
                 results.append(result)
-                print(json.dumps({k: result[k] for k in ("method", "seed", "repeat", "rounds",
+                print(json.dumps({k: result[k] for k in ("dataset", "method", "seed", "repeat", "rounds",
                     "elapsed_seconds", "peak_rss_delta_bytes", "support")}), flush=True)
         payload = dict(protocol=args.experiment, run_id=run_id, host=host,
-            configuration=dict(seed=seed, threads=args.threads, trees=args.trees, max_iter=args.max_iter,
-                repeats=args.repeats, rows=args.rows, dtype="float32", depth=6, max_features="sqrt",
+            configuration=dict(dataset=name, seed=seed, threads=args.threads, trees=cfg.trees, max_iter=args.max_iter,
+                repeats=args.repeats, rows=args.rows, dtype="float32", depth=cfg.depth, max_features=cfg.max_features, bins=cfg.bins,
                 bootstrap=True, perc=100, alpha=.05, two_step=True),
             dataset_hash_consistency="passed" if len({r["data_sha256"] for r in results}) == 1 else "failed",
             summary=summarize(results), results=results)
         data = json.dumps(payload, allow_nan=False, indent=1).encode()
-        name = f"industrial-seed{seed}-t{args.threads}.json"
+        artifact = f"{name}-seed{seed}-t{args.threads}.json"
         if args.output_dir:
             Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-            (Path(args.output_dir) / name).write_bytes(data)
+            (Path(args.output_dir) / artifact).write_bytes(data)
         if s3:
-            key = f"{args.experiment}/pilot/{run_id}/{name}"
+            key = f"{args.experiment}/pilot/{run_id}/{artifact}"
             digest = hashlib.sha256(data).hexdigest()
             s3.put_object(Bucket=args.bucket, Key=key, Body=data, ContentType="application/json",
                 Metadata={"sha256": digest})
             print(json.dumps({"s3_uri": f"s3://{args.bucket}/{key}", "sha256": digest, "bytes": len(data)}), flush=True)
-    print(json.dumps({"status": "success", "run_id": run_id, "seeds": args.seeds}), flush=True)
+    print(json.dumps({"status": "success", "run_id": run_id, "datasets": args.datasets, "seeds": args.seeds}), flush=True)
 
 
 if __name__ == "__main__":

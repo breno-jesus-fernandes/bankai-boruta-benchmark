@@ -157,3 +157,42 @@ def arm(autoscaling, fleet, now=None, *, duration_seconds=PILOT_SECONDS):
 def stop(autoscaling, fleet):
     autoscaling.update_auto_scaling_group(AutoScalingGroupName=fleet,
                                         MinSize=0, MaxSize=0, DesiredCapacity=0)
+
+
+SUPPLEMENTAL_KEY = 'bankai-budget/supplemental-150-usd.json'
+SUPPLEMENTAL_TOTAL_USD = Decimal('150')
+# Conservative c7a.4xlarge hour: on-demand price plus EBS, IPv4 and contingency.
+SUPPLEMENTAL_HOUR_USD = Decimal('1.50')
+
+
+def reserve_supplemental(s3, bucket, launch_id, hours):
+    """Reserve armed hours against the separately approved USD 150 extension.
+
+    The BRL 400 ledger is left untouched; this ledger is created on first use
+    and, like it, never refunds a reservation.
+    """
+    from botocore.exceptions import ClientError
+    try:
+        response = s3.get_object(Bucket=bucket, Key=SUPPLEMENTAL_KEY)
+        with response['Body'] as body:
+            ledger = json.load(body)
+        condition = dict(IfMatch=response['ETag'])
+    except ClientError as error:
+        if error.response.get('Error', {}).get('Code') != 'NoSuchKey':
+            raise
+        ledger = dict(schema_version=1, total_usd=str(SUPPLEMENTAL_TOTAL_USD), launches={})
+        condition = dict(IfNoneMatch='*')
+    if ledger.get('schema_version') != 1 or Decimal(ledger.get('total_usd', '0')) != SUPPLEMENTAL_TOTAL_USD:
+        raise RuntimeError('Incompatible supplemental budget ledger')
+    launches = ledger['launches']
+    if launch_id in launches:
+        raise RuntimeError('Launch already reserved; deadline cannot be extended')
+    amount = SUPPLEMENTAL_HOUR_USD * hours
+    allocated = sum((Decimal(item['reserved_usd']) for item in launches.values()), Decimal(0))
+    if allocated + amount > SUPPLEMENTAL_TOTAL_USD:
+        raise RuntimeError('Supplemental budget exhausted: launch blocked')
+    launches[launch_id] = dict(reserved_usd=str(amount), hours=hours,
+                               reserved_at=datetime.now(timezone.utc).isoformat())
+    s3.put_object(Bucket=bucket, Key=SUPPLEMENTAL_KEY, Body=json.dumps(ledger).encode(),
+                  ContentType='application/json', **condition)
+    return ledger
