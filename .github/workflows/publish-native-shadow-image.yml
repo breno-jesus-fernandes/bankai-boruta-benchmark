@@ -1,0 +1,60 @@
+name: publish native-shadow candidate image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-native-shadow-image
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY: bankai-image-publisher-images
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+      - name: Build and verify the native-shadow environment
+        run: |
+          docker buildx build --platform linux/amd64 --load \
+            --build-arg VCS_REF="$GITHUB_SHA" \
+            -f Dockerfile.native-shadow -t bankai-native-shadow:publish .
+          docker run --rm --platform linux/amd64 bankai-native-shadow:publish \
+            --seeds 43 --repeats 1 --threads 2 --rows 3000 --max-iter 3
+      - uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: ${{ vars.AWS_IMAGE_PUBLISH_ROLE }}
+          aws-region: us-east-1
+          role-session-name: native-shadow-image-${{ github.run_id }}
+          role-duration-seconds: 900
+          unset-current-credentials: true
+      - name: Verify image publisher identity
+        run: |
+          aws sts get-caller-identity > aws-caller.json
+          jq -e '.Account == "642504869083" and (.Arn | startswith("arn:aws:sts::642504869083:assumed-role/bankai-image-publisher-Publisher-"))' aws-caller.json
+      - uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2
+        id: login
+      - name: Publish candidate image by immutable digest
+        env:
+          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
+        run: |
+          set -euo pipefail
+          image_tag="native-shadow-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          image_uri="${ECR_REGISTRY}/${ECR_REPOSITORY}:${image_tag}"
+          docker tag bankai-native-shadow:publish "$image_uri"
+          docker push "$image_uri"
+          image_digest=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$image_tag" --query 'imageDetails[0].imageDigest' --output text)
+          [[ "$image_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          jq -n --arg revision "$GITHUB_SHA" --arg image "${ECR_REGISTRY}/${ECR_REPOSITORY}@${image_digest}" --arg tag "$image_tag" --arg run "$GITHUB_RUN_ID" --slurpfile caller aws-caller.json '{source_revision:$revision,image:$image,tag:$tag,workflow_run:$run,aws_caller:$caller[0]}' > published-native-shadow-image.json
+          cat published-native-shadow-image.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: published-native-shadow-image
+          path: published-native-shadow-image.json
+          retention-days: 30
