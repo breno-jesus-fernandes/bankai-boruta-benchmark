@@ -1,0 +1,162 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-native-shadow-scaling-t4",
+  "outputs": {
+    "Fleet": "bankai-native-shadow-scaling-t4-Fleet-KqmqN2vX7CgI",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-scaling-t4-TaskRole-DLQA4zEZlqWF",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-scaling-t4-ExecutionRole-Zegu0sEPyqEn"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:a8909f1fd6d3491f8acd8a6471e48cd5ce86d07de5e2a8e7c6b4c9f89c72823e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:4",
+  "datasets": [
+    "industrial"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 4,
+  "repeats": 1,
+  "reserved_usd": "3.0",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-19T11:26:35+00:00",
+  "status": "completed",
+  "host": "i-0af3a07ed8cc716e7",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/aca8fff863a343ed9767271a97203b0b",
+  "exit_code": 0,
+  "stopped_at": "2026-10-19T09:55:14.391796+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed42-t16.json",
+      "bytes": 10135
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed43-t16.json",
+      "bytes": 10147
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed44-t16.json",
+      "bytes": 10193
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed45-t16.json",
+      "bytes": 10244
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T063357Z/industrial-seed46-t16.json",
+      "bytes": 10200
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/bioinformatica-seed42-t16.json",
+      "bytes": 8072
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/bioinformatica-seed43-t16.json",
+      "bytes": 8013
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/bioinformatica-seed44-t16.json",
+      "bytes": 8090
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/bioinformatica-seed45-t16.json",
+      "bytes": 7960
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/bioinformatica-seed46-t16.json",
+      "bytes": 7858
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/ciberseguranca-seed42-t16.json",
+      "bytes": 9164
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/ciberseguranca-seed43-t16.json",
+      "bytes": 9333
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/ciberseguranca-seed44-t16.json",
+      "bytes": 9430
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/ciberseguranca-seed45-t16.json",
+      "bytes": 9317
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/ciberseguranca-seed46-t16.json",
+      "bytes": 9415
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/credito-seed42-t16.json",
+      "bytes": 6440
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/credito-seed43-t16.json",
+      "bytes": 6428
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/credito-seed44-t16.json",
+      "bytes": 6472
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/credito-seed45-t16.json",
+      "bytes": 6466
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T072031Z/credito-seed46-t16.json",
+      "bytes": 6444
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T084559Z/industrial-seed42-t16.json",
+      "bytes": 3846
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T084559Z/industrial-seed43-t16.json",
+      "bytes": 3862
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T084559Z/industrial-seed44-t16.json",
+      "bytes": 3861
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T084559Z/industrial-seed45-t16.json",
+      "bytes": 3865
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T084559Z/industrial-seed46-t16.json",
+      "bytes": 3874
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T092745Z/industrial-seed42-t4.json",
+      "bytes": 5568
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T092745Z/industrial-seed43-t4.json",
+      "bytes": 5596
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T092745Z/industrial-seed44-t4.json",
+      "bytes": 5604
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T092745Z/industrial-seed45-t4.json",
+      "bytes": 5636
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261019T092745Z/industrial-seed46-t4.json",
+      "bytes": 5628
+    }
+  ]
+}
