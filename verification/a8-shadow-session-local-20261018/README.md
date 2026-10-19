@@ -2,12 +2,12 @@
 
 Candidate: Bankai Boruta **0.1.0a8** (breno-jesus-fernandes/bankai-boruta#21,
 commit `d2ae35c`) with BankaiRF **0.1.0a17** (breno-jesus-fernandes/bankai-random-forest#22,
-commit `9a9a55a`). Both are unreleased at the time of writing. Comparator:
+commit `9a9a55a`), both published on PyPI on 2026-10-19. Comparator:
 BorutaPy 0.4.3 with scikit-learn 1.9.1 `ExtraTreesClassifier`.
 
 These are **local** measurements, not the AMD protocol: Apple M1 (4 performance
 + 4 efficiency cores), 8 GiB, macOS 26.6.2, Python 3.13.1, NumPy 2.5.4, 4 threads.
-The AMD c7a.4xlarge validation is still pending.
+The AMD c7a.4xlarge validation uses `scripts/native_shadow_pilot.py` (protocol `native-shadow-max40-v1`).
 
 ## Fairness settings
 
