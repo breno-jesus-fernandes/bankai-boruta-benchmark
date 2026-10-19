@@ -1,4 +1,4 @@
-"""Process-isolated comparison of Bankai exact, Bankai binned and BorutaPy.
+"""Process-isolated comparison of Bankai (exact, binned) and BorutaPy (ExtraTrees, LightGBM RF).
 
 Every fit runs in a fresh worker process that generates the dataset, signals
 readiness and waits; the parent then samples external RSS until the fit ends.
@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 
 import psutil
 
-METHODS = ("bankai_exact", "bankai_binned", "borutapy")
+METHODS = ("bankai_exact", "bankai_binned", "borutapy", "borutapy_lgbm")
 BENCHMARK_SRC = os.environ.get("BANKAI_BENCHMARK_SRC", "/opt/bankai-benchmark/src")
 
 
@@ -49,6 +49,14 @@ def selector(method, seed, threads, cfg, max_iter):
     trees = cfg.trees
     common = dict(n_estimators=trees, perc=100, alpha=.05, two_step=True,
         max_iter=max_iter + 1, random_state=seed)
+    if method == "borutapy_lgbm":
+        # The suite's LightGBM random-forest backend, unchanged: 63 bins,
+        # row subsample 0.8 and per-tree columns at sqrt of the augmented width.
+        from types import SimpleNamespace
+        from boruta import BorutaPy
+        from bankai_benchmark.competitors import estimator
+        trial = SimpleNamespace(dataset=cfg.dataset, mode="full", threads=threads, seed=seed)
+        return BorutaPy(estimator(trial, "lightgbm"), early_stopping=False, **common)
     if method == "borutapy":
         from boruta import BorutaPy
         from sklearn.ensemble import ExtraTreesClassifier
@@ -77,7 +85,7 @@ def worker(args):
     model.fit(X, y)
     elapsed = time.perf_counter() - start
     target.with_suffix(".done").touch()
-    if args.method == "borutapy":
+    if args.method.startswith("borutapy"):
         rounds = len(model.importance_history_) - 1
         mode = "python"
     else:
