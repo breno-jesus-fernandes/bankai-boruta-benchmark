@@ -16,9 +16,16 @@ RUN uv export --locked --no-dev --no-emit-project --no-hashes --format requireme
     && uv pip install --python /opt/candidate/bin/python -r /tmp/candidate.txt
 COPY src/bankai_benchmark /opt/bankai-benchmark/src/bankai_benchmark
 COPY scripts/native_shadow_pilot.py /opt/native_shadow_pilot.py
+COPY scripts/prepare_cicids2017.py /opt/prepare_cicids2017.py
+# CIC-IDS2017 from its pinned mirror revision; every CSV is checked by SHA256.
+RUN /opt/candidate/bin/python /opt/prepare_cicids2017.py /opt/data/cicids2017 --downloads /tmp/cicids2017-csv \
+    && rm -rf /tmp/cicids2017-csv
 RUN /opt/candidate/bin/python /opt/native_shadow_pilot.py --seeds 42 --repeats 1 --threads 2 \
         --rows 3000 --max-iter 3 --output-dir /tmp/native-shadow-smoke \
-    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a8'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a17'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; print('native-shadow image verified')"
+    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a8'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a17'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; print('native-shadow image verified')" \
+    && BANKAI_CICIDS2017_DIR=/opt/data/cicids2017 /opt/candidate/bin/python /opt/native_shadow_pilot.py --datasets cicids2017 \
+        --seeds 42 --repeats 1 --threads 2 --rows 3000 --max-iter 3 --output-dir /tmp/native-shadow-smoke \
+    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/cicids2017-seed42-t2.json')); assert len(d['results']) == 4 and set(d['auc']['by_method']) == {r['method'] for r in d['results']}; print('cicids2017 smoke verified')"
 
 FROM --platform=linux/amd64 python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
 ARG VCS_REF=unknown
@@ -33,6 +40,8 @@ COPY --from=build /opt/candidate /opt/candidate
 COPY --from=build /opt/bankai-benchmark /opt/bankai-benchmark
 COPY --from=build /opt/native_shadow_pilot.py /opt/native_shadow_pilot.py
 RUN chown -R benchmark:benchmark /opt
+# Read-only data, copied after the chown so it is not stored twice.
+COPY --from=build /opt/data /opt/data
 USER benchmark
 ENV PYTHONUNBUFFERED=1
 ENTRYPOINT ["/opt/candidate/bin/python", "/opt/native_shadow_pilot.py"]

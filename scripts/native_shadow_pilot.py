@@ -6,6 +6,9 @@ All methods share the profile's nominal configuration (trees, depth, feature
 fraction; 63 bins for the binned backend) plus bootstrap, perc=100, alpha=0.05,
 two_step and at most 40 rounds with the natural stop.
 Methods are interleaved within each repeat, and one JSON per seed is uploaded.
+The real dataset ``cicids2017`` (scripts/prepare_cicids2017.py) uses the
+Cybersecurity profile's configuration; it has no known relevant features, so
+each seed also records the downstream ROC AUC on its held-out split.
 """
 import argparse
 import hashlib
@@ -25,15 +28,27 @@ import psutil
 
 METHODS = ("bankai_exact", "bankai_binned", "borutapy", "borutapy_lgbm")
 BENCHMARK_SRC = os.environ.get("BANKAI_BENCHMARK_SRC", "/opt/bankai-benchmark/src")
+REAL_DATA = os.environ.get("BANKAI_CICIDS2017_DIR", "/opt/data/cicids2017")
+DATASETS = ("industrial", "credito", "bioinformatica", "ciberseguranca", "cicids2017")
 
 
 def config(name):
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.config import profile
-    return profile(name, "full")
+    return profile("ciberseguranca" if name == "cicids2017" else name, "full")
+
+
+def real_split(split):
+    import numpy as np
+    rows, cols = json.loads((Path(REAL_DATA) / "manifest.json").read_text())[split]["shape"]
+    X = np.fromfile(Path(REAL_DATA) / f"{split}-X.f32", dtype="<f4").reshape(rows, cols)
+    return X, np.fromfile(Path(REAL_DATA) / f"{split}-y.i32", dtype="<i4")
 
 
 def dataset(name, seed, rows=None):
+    if name == "cicids2017":
+        X, y = real_split("train")
+        return (X[:rows], y[:rows], []) if rows else (X, y, [])
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.datasets import generate_dataset
     bundle = generate_dataset(name, seed, "full")
@@ -148,6 +163,26 @@ def run_one(args, name, method, seed, repeat):
         return result
 
 
+def held_out_auc(results, seed, threads, rows):
+    # The suite's downstream ExtraTrees on each distinct confirmed set and on all
+    # features, after every timed fit of the seed.
+    from types import SimpleNamespace
+    import numpy as np
+    sys.path.insert(0, BENCHMARK_SRC)
+    from bankai_benchmark.metrics import downstream
+    X_train, y_train = real_split("train")
+    X_test, y_test = real_split("test")
+    if rows:
+        X_train, y_train, X_test, y_test = X_train[:rows], y_train[:rows], X_test[:rows], y_test[:rows]
+    bundle = SimpleNamespace(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
+    sets = {"all": list(range(X_train.shape[1]))}
+    for result in results:
+        sets.setdefault(",".join(map(str, result["support"])), result["support"])
+    scores = {label: downstream(bundle, np.asarray(indices, dtype=int), seed, threads)["roc_auc"]
+              for label, indices in sets.items()}
+    return dict(all=scores["all"], by_method={r["method"]: scores[",".join(map(str, r["support"]))] for r in results})
+
+
 def summarize(results):
     summary = {}
     for method in METHODS:
@@ -164,8 +199,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bucket")
     parser.add_argument("--experiment", default="native-shadow-max40-v1")
-    parser.add_argument("--datasets", nargs="+", default=["industrial"],
-        choices=["industrial", "credito", "bioinformatica", "ciberseguranca"])
+    parser.add_argument("--datasets", nargs="+", default=["industrial"], choices=DATASETS)
     parser.add_argument("--dataset", default="industrial")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     parser.add_argument("--methods", nargs="+", default=list(METHODS), choices=METHODS)
@@ -207,6 +241,8 @@ def main():
                 bootstrap=True, perc=100, alpha=.05, two_step=True),
             dataset_hash_consistency="passed" if len({r["data_sha256"] for r in results}) == 1 else "failed",
             summary=summarize(results), results=results)
+        if name == "cicids2017":
+            payload["auc"] = held_out_auc(results, seed, args.threads, args.rows)
         data = json.dumps(payload, allow_nan=False, indent=1).encode()
         artifact = f"{name}-seed{seed}-t{args.threads}.json"
         if args.output_dir:
