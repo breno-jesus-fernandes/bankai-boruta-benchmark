@@ -1,0 +1,83 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "probe": "candidate-wheels",
+  "stack": "bankai-synthetic-a12-r5",
+  "outputs": {
+    "Fleet": "bankai-synthetic-a12-r5-Fleet-ptEWKQD3OZkR",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-synthetic-a12-r5-TaskRole-tNuGWegc4uMw",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-synthetic-a12-r5-ExecutionRole-27rfhrNMnOE1"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b9209d5ab3d550e9c434c7b478f53f1a26e8fc918bb1adc4e08f6dd4a1470d74",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:12",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 16,
+  "repeats": 5,
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "datasets": [
+    "industrial",
+    "credito",
+    "bioinformatica",
+    "ciberseguranca"
+  ],
+  "wheels": [
+    {
+      "name": "a12",
+      "file": "bankai_boruta-0.1.0a12-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "2b1e6f795ed79e2af7b8d020e0724a06d5ce8575e5db65bf87ca4653d162cb02",
+      "key": "native-shadow-max40-v1/wheels/2b1e6f795ed79e2a/bankai_boruta-0.1.0a12-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "methods": null
+    }
+  ],
+  "extra_wheels": [
+    {
+      "name": "bankai_random_forest-0.1.0a20-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "file": "bankai_random_forest-0.1.0a20-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "78473a485f12e9ca3badc5e25aaeb567f8426b72e1fb39affaca8f87398de8f9",
+      "key": "native-shadow-max40-v1/wheels/78473a485f12e9ca/bankai_random_forest-0.1.0a20-cp311-abi3-manylinux_2_28_x86_64.whl"
+    }
+  ],
+  "reserved_usd": "13.5",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-24T01:01:43+00:00",
+  "status": "completed",
+  "host": "i-0c07276590ffd9f8f",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/ad836886dc964ae2ac3e43c690a4ab90",
+  "exit_code": 0,
+  "stopped_at": "2026-10-23T22:56:28.963935+00:00",
+  "result_objects": [
+    "native-shadow-max40-v1/pilot/20261023T160300Z/bioinformatica-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/bioinformatica-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/bioinformatica-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/bioinformatica-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/bioinformatica-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/ciberseguranca-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/ciberseguranca-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/ciberseguranca-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/ciberseguranca-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/ciberseguranca-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/credito-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/credito-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/credito-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/credito-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/credito-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/industrial-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/industrial-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/industrial-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/industrial-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T160300Z/industrial-seed46-t16.json"
+  ]
+}

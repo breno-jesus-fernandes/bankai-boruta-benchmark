@@ -1,0 +1,73 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "probe": "candidate-wheels",
+  "stack": "bankai-candidate-final",
+  "outputs": {
+    "Fleet": "bankai-candidate-final-Fleet-jiiAiOSzHkDW",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-candidate-final-TaskRole-HhV485Sh2BLS",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-candidate-final-ExecutionRole-elniaXjAv5FR"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b9209d5ab3d550e9c434c7b478f53f1a26e8fc918bb1adc4e08f6dd4a1470d74",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:9",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 16,
+  "methods": [
+    "bankai_exact",
+    "borutapy"
+  ],
+  "wheels": [
+    {
+      "name": "o10",
+      "file": "bankai_boruta-0.1.0a11-cp311-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "538cdd9bb56a3a432213533c51d73856525b8027546fe038e61777087633a934",
+      "key": "native-shadow-max40-v1/wheels/538cdd9bb56a3a43/bankai_boruta-0.1.0a11-cp311-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "methods": null
+    },
+    {
+      "name": "a11",
+      "file": "bankai_boruta-0.1.0a11-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "850934652ecb07a8d40063ee98e386c7a54eaccd915a989cf9b66669d5fa4a05",
+      "key": "native-shadow-max40-v1/wheels/850934652ecb07a8/bankai_boruta-0.1.0a11-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "methods": [
+        "bankai_exact"
+      ]
+    }
+  ],
+  "extra_wheels": [
+    {
+      "name": "bankai_random_forest-0.1.0a18-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "file": "bankai_random_forest-0.1.0a18-cp311-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "902a904ea86e07f75d0ecaee235245ddba9a856ba3e969dc43f6e530dafe34be",
+      "key": "native-shadow-max40-v1/wheels/902a904ea86e07f7/bankai_random_forest-0.1.0a18-cp311-abi3-manylinux_2_28_x86_64.whl"
+    }
+  ],
+  "reserved_usd": "3.0",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-23T13:47:20+00:00",
+  "status": "completed",
+  "host": "i-0ca65fe9100d346cc",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/d833fd67947f458998e9b76cf5cac73e",
+  "exit_code": 0,
+  "stopped_at": "2026-10-23T12:25:06.268734+00:00",
+  "result_objects": [
+    "native-shadow-max40-v1/pilot/20261023T114823Z/cicids2017-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T114823Z/cicids2017-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T114823Z/cicids2017-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T114823Z/cicids2017-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T114823Z/cicids2017-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T120904Z/cicids2017-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T120904Z/cicids2017-seed43-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T120904Z/cicids2017-seed44-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T120904Z/cicids2017-seed45-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T120904Z/cicids2017-seed46-t16.json"
+  ]
+}

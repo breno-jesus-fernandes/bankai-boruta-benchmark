@@ -1,0 +1,315 @@
+{
+ "protocol": "native-shadow-max40-v1",
+ "run_id": "20261023T142330Z",
+ "host": {
+  "platform": "Linux-6.1.188-233.393.amzn2023.x86_64-x86_64-with-glibc2.36",
+  "machine": "x86_64",
+  "logical_cpus": 16
+ },
+ "configuration": {
+  "dataset": "industrial",
+  "seed": 46,
+  "threads": 16,
+  "trees": 100,
+  "max_iter": 40,
+  "repeats": 1,
+  "rows": null,
+  "dtype": "float32",
+  "depth": 6,
+  "max_features": "sqrt",
+  "bins": 63,
+  "bootstrap": true,
+  "perc": 100,
+  "alpha": 0.05,
+  "two_step": true
+ },
+ "dataset_hash_consistency": "passed",
+ "summary": {
+  "bankai_exact": {
+   "median_seconds": 7.141682944999957,
+   "median_peak_rss_delta_bytes": 970895360,
+   "rounds": [
+    12
+   ],
+   "supports": [
+    [
+     10,
+     183,
+     202,
+     222,
+     376,
+     378,
+     440,
+     479
+    ]
+   ]
+  },
+  "bankai_binned": {
+   "median_seconds": 7.366626649000068,
+   "median_peak_rss_delta_bytes": 479047680,
+   "rounds": [
+    12
+   ],
+   "supports": [
+    [
+     10,
+     183,
+     202,
+     222,
+     376,
+     378,
+     440,
+     479
+    ]
+   ]
+  },
+  "borutapy": {
+   "median_seconds": 33.506318858999975,
+   "median_peak_rss_delta_bytes": 1903058944,
+   "rounds": [
+    12
+   ],
+   "supports": [
+    [
+     10,
+     183,
+     202,
+     222,
+     376,
+     378,
+     440,
+     479
+    ]
+   ]
+  },
+  "borutapy_lgbm": {
+   "median_seconds": 72.71684302699998,
+   "median_peak_rss_delta_bytes": 5109248000,
+   "rounds": [
+    19
+   ],
+   "supports": [
+    [
+     10,
+     183,
+     202,
+     222,
+     376,
+     378,
+     440,
+     479
+    ]
+   ]
+  }
+ },
+ "results": [
+  {
+   "dataset": "industrial",
+   "method": "bankai_exact",
+   "storage_mode": "shadow_session",
+   "seed": 46,
+   "elapsed_seconds": 7.141682944999957,
+   "rounds": 12,
+   "max_iter": 40,
+   "support": [
+    10,
+    183,
+    202,
+    222,
+    376,
+    378,
+    440,
+    479
+   ],
+   "tentative": [],
+   "data_sha256": "0231ef0dc95f91e7dd711d129604302c578bf56a73cb1c4b63bd92744a482cbb",
+   "n_rows": 200000,
+   "n_features": 500,
+   "packages": {
+    "bankai-boruta": "0.1.0a12",
+    "bankai-random-forest": "0.1.0a20",
+    "Boruta": "0.4.3",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.4.6"
+   },
+   "python_version": "3.11.17 (main, Oct  6 2026, 02:01:58) [GCC 12.2.0]",
+   "precision": 1.0,
+   "recall": 0.6666666666666666,
+   "relevant": [
+    10,
+    183,
+    194,
+    202,
+    222,
+    268,
+    376,
+    378,
+    386,
+    440,
+    458,
+    479
+   ],
+   "repeat": 0,
+   "baseline_rss_bytes": 566837248,
+   "external_peak_rss_bytes": 1537732608,
+   "peak_rss_delta_bytes": 970895360,
+   "rss_scope": "fit"
+  },
+  {
+   "dataset": "industrial",
+   "method": "bankai_binned",
+   "storage_mode": "shadow_session",
+   "seed": 46,
+   "elapsed_seconds": 7.366626649000068,
+   "rounds": 12,
+   "max_iter": 40,
+   "support": [
+    10,
+    183,
+    202,
+    222,
+    376,
+    378,
+    440,
+    479
+   ],
+   "tentative": [],
+   "data_sha256": "0231ef0dc95f91e7dd711d129604302c578bf56a73cb1c4b63bd92744a482cbb",
+   "n_rows": 200000,
+   "n_features": 500,
+   "packages": {
+    "bankai-boruta": "0.1.0a12",
+    "bankai-random-forest": "0.1.0a20",
+    "Boruta": "0.4.3",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.4.6"
+   },
+   "python_version": "3.11.17 (main, Oct  6 2026, 02:01:58) [GCC 12.2.0]",
+   "precision": 1.0,
+   "recall": 0.6666666666666666,
+   "relevant": [
+    10,
+    183,
+    194,
+    202,
+    222,
+    268,
+    376,
+    378,
+    386,
+    440,
+    458,
+    479
+   ],
+   "repeat": 0,
+   "baseline_rss_bytes": 566968320,
+   "external_peak_rss_bytes": 1046016000,
+   "peak_rss_delta_bytes": 479047680,
+   "rss_scope": "fit"
+  },
+  {
+   "dataset": "industrial",
+   "method": "borutapy",
+   "storage_mode": "python",
+   "seed": 46,
+   "elapsed_seconds": 33.506318858999975,
+   "rounds": 12,
+   "max_iter": 40,
+   "support": [
+    10,
+    183,
+    202,
+    222,
+    376,
+    378,
+    440,
+    479
+   ],
+   "tentative": [],
+   "data_sha256": "0231ef0dc95f91e7dd711d129604302c578bf56a73cb1c4b63bd92744a482cbb",
+   "n_rows": 200000,
+   "n_features": 500,
+   "packages": {
+    "bankai-boruta": "0.1.0a12",
+    "bankai-random-forest": "0.1.0a20",
+    "Boruta": "0.4.3",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.4.6"
+   },
+   "python_version": "3.11.17 (main, Oct  6 2026, 02:01:58) [GCC 12.2.0]",
+   "precision": 1.0,
+   "recall": 0.6666666666666666,
+   "relevant": [
+    10,
+    183,
+    194,
+    202,
+    222,
+    268,
+    376,
+    378,
+    386,
+    440,
+    458,
+    479
+   ],
+   "repeat": 0,
+   "baseline_rss_bytes": 565583872,
+   "external_peak_rss_bytes": 2468642816,
+   "peak_rss_delta_bytes": 1903058944,
+   "rss_scope": "fit"
+  },
+  {
+   "dataset": "industrial",
+   "method": "borutapy_lgbm",
+   "storage_mode": "python",
+   "seed": 46,
+   "elapsed_seconds": 72.71684302699998,
+   "rounds": 19,
+   "max_iter": 40,
+   "support": [
+    10,
+    183,
+    202,
+    222,
+    376,
+    378,
+    440,
+    479
+   ],
+   "tentative": [],
+   "data_sha256": "0231ef0dc95f91e7dd711d129604302c578bf56a73cb1c4b63bd92744a482cbb",
+   "n_rows": 200000,
+   "n_features": 500,
+   "packages": {
+    "bankai-boruta": "0.1.0a12",
+    "bankai-random-forest": "0.1.0a20",
+    "Boruta": "0.4.3",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.4.6"
+   },
+   "python_version": "3.11.17 (main, Oct  6 2026, 02:01:58) [GCC 12.2.0]",
+   "precision": 1.0,
+   "recall": 0.6666666666666666,
+   "relevant": [
+    10,
+    183,
+    194,
+    202,
+    222,
+    268,
+    376,
+    378,
+    386,
+    440,
+    458,
+    479
+   ],
+   "repeat": 0,
+   "baseline_rss_bytes": 570097664,
+   "external_peak_rss_bytes": 5679345664,
+   "peak_rss_delta_bytes": 5109248000,
+   "rss_scope": "fit"
+  }
+ ]
+}
