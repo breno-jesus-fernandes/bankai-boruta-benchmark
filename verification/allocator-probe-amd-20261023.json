@@ -1,0 +1,63 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "probe": "allocator",
+  "stack": "bankai-allocator-probe",
+  "outputs": {
+    "Fleet": "bankai-allocator-probe-Fleet-ZmZMGeH4TGzH",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-allocator-probe-TaskRole-Gt4JAsOGdoX3",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-allocator-probe-ExecutionRole-YC7CYUh8AFsz"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b9209d5ab3d550e9c434c7b478f53f1a26e8fc918bb1adc4e08f6dd4a1470d74",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:7",
+  "seeds": [
+    46,
+    42
+  ],
+  "variants": [
+    {
+      "name": "baseline",
+      "environment": {},
+      "threads": 16
+    },
+    {
+      "name": "arena2",
+      "environment": {
+        "MALLOC_ARENA_MAX": "2"
+      },
+      "threads": 16
+    },
+    {
+      "name": "mmap64k",
+      "environment": {
+        "GLIBC_TUNABLES": "glibc.malloc.mmap_threshold=65536"
+      },
+      "threads": 16
+    },
+    {
+      "name": "t8",
+      "environment": {},
+      "threads": 8
+    }
+  ],
+  "reserved_usd": "3.0",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-23T05:42:47+00:00",
+  "status": "completed",
+  "host": "i-0ea03c359b5957c73",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/5e2aea6835354fa2b6aaedee652d811a",
+  "exit_code": 0,
+  "stopped_at": "2026-10-23T04:10:16.033280+00:00",
+  "result_objects": [
+    "native-shadow-max40-v1/pilot/20261023T034352Z/cicids2017-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T034352Z/cicids2017-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T034936Z/cicids2017-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T034936Z/cicids2017-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T035523Z/cicids2017-seed42-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T035523Z/cicids2017-seed46-t16.json",
+    "native-shadow-max40-v1/pilot/20261023T040132Z/cicids2017-seed42-t8.json",
+    "native-shadow-max40-v1/pilot/20261023T040132Z/cicids2017-seed46-t8.json"
+  ]
+}
