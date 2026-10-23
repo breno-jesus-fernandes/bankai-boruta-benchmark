@@ -1,4 +1,85 @@
-# Bankai Boruta benchmark v2
+# Bankai Boruta benchmark
+
+Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernandes/bankai-boruta) contra o BorutaPy. Os resultados atuais usam o protocolo `native-shadow-max40-v1` com o **Bankai Boruta 0.1.0a12** e o **BankaiRF 0.1.0a20**, publicados no PyPI. O protocolo v2 (a6) e as campanhas anteriores continuam documentados mais abaixo.
+
+## Resultados atuais (0.1.0a12)
+
+- **Máquina:** uma EC2 c7a.4xlarge (16 núcleos AMD físicos, SMT desligado, 32 GiB) no ECS, 16 threads.
+- **Métodos:**
+  - Bankai exato: Extra Trees do BankaiRF com cortes nos valores originais;
+  - Bankai bins: Extra Trees do BankaiRF com 63 bins;
+  - BP/E: BorutaPy 0.4.3 + `ExtraTreesClassifier` do scikit-learn 1.9.1;
+  - BP/L: BorutaPy + LightGBM em modo random forest (63 bins, subamostragem 0,8).
+- **Configuração comum:** árvores, profundidade e fração de features de cada perfil, bootstrap, `perc=100`, `alpha=0.05`, `two_step=True`, no máximo 40 rodadas com parada natural, float32 e seeds 42–46.
+- **Medição:**
+  - cada fit roda num processo novo, depois de gerar os dados;
+  - o tempo cobre só o `fit`;
+  - a memória é o pico de RSS acima do que os dados já ocupam, amostrado de fora a cada 5 ms;
+  - a AUC vem de um ExtraTrees de 200 árvores treinado só com as features confirmadas e avaliado no teste.
+
+### Perfis sintéticos
+
+Mediana sobre cinco seeds, cada uma a mediana de cinco repetições ([detalhes](verification/native-shadow-synthetic-a12-r5-amd-20261023/README.md)).
+
+| Perfil (treino n × p, relevantes) | Método | Tempo (s) | RSS (MiB) | Precisão | Recall | AUC |
+|---|---|---:|---:|---:|---:|---:|
+| Industrial 200k × 500 (12) | Bankai exato | **9,2** | 931 | 1,00 | 0,67 | 0,837 |
+| | Bankai bins | 10,8 | **456** | 1,00 | 0,67 | 0,837 |
+| | BP/E | 37,1 | 1.816 | 1,00 | 0,67 | 0,837 |
+| | BP/L | 75,1 | 4.865 | 1,00 | 0,67 | 0,837 |
+| Crédito 300k × 300 (20) | Bankai exato | **9,5** | 929 | 1,00 | 0,85 | 0,852 |
+| | Bankai bins | 10,9 | **506** | 1,00 | 0,85 | 0,852 |
+| | BP/E | 46,2 | 1.805 | 1,00 | 0,85 | 0,852 |
+| | BP/L | 52,7 | 3.429 | 1,00 | 0,85 | 0,852 |
+| Cibersegurança 400k × 150 (60) | Bankai exato | 24,5 | 760 | 1,00 | 0,67 | 0,837 |
+| | Bankai bins | **23,5** | **476** | 1,00 | 0,62 | 0,838 |
+| | BP/E | 110,4 | 1.455 | 1,00 | 0,65 | 0,836 |
+| | BP/L | 79,9 | 1.877 | 1,00 | 0,55 | 0,837 |
+| Bioinformática 50k × 2000 (30) | Bankai exato | 85,7 | 853 | 1,00 | 1,00 | 0,750 |
+| | Bankai bins | **71,1** | **388** | 1,00 | 1,00 | 0,750 |
+| | BP/E | 145,1 | 1.608 | 1,00 | 1,00 | 0,750 |
+| | BP/L | 130,0 | 5.823 | 1,00 | 0,80 | 0,734 |
+
+- **Tempo e memória:** os dois modos do Bankai foram mais rápidos e usaram menos memória que BP/E e BP/L em todas as 20 combinações de perfil e seed.
+  - Frente ao BP/E, o Bankai exato gastou em mediana 76% menos tempo (de 41% a 87%) e 48% menos memória.
+  - Frente ao BP/E, o modo com bins gastou 76% menos tempo e 73% menos memória.
+- **Seleção:**
+  - Nenhum método confirmou feature irrelevante.
+  - Em Industrial, Crédito e Bioinformática, Bankai exato, Bankai bins e BP/E confirmaram os mesmos conjuntos em todas as seeds.
+  - Na Cibersegurança, todos chegaram às 40 rodadas, e os conjuntos diferem em uma a quatro features limítrofes por seed.
+  - O BP/L perdeu até 12 das 30 relevantes na Bioinformática.
+- **Contra o 0.1.0a8:** o Bankai exato ficou de 1,6 a 2,5 vezes mais rápido e usa de 13% a 46% menos memória, com seleções idênticas em todos os perfis, seeds e repetições.
+
+### CIC-IDS2017 (dados reais)
+
+Base de treino com 1.748.586 linhas e 78 colunas em float32 (`scripts/prepare_cicids2017.py`), com a configuração do perfil Cibersegurança e uma repetição por seed ([detalhes](verification/native-shadow-cicids2017-a12-amd-20261023/README.md)).
+
+| Método | Tempo (s) | RSS (MiB) | s/rodada | Rodadas | Confirmadas | AUC |
+|---|---:|---:|---:|---:|---:|---:|
+| Bankai exato | **39,8** | 2.140 | 3,29 | 12 | 68 | 0,99872 |
+| Bankai bins | 129,2 | **1.517** | 3,23 | 40 | 66 | 0,99874 |
+| BP/E | 130,8 | 4.146 | 11,0 | 12 | 68 | 0,99872 |
+| BP/L | 280,3 | 2.736 | 7,02 | 40 | 66 | 0,99874 |
+
+O Bankai exato confirmou as mesmas 68 features que o BP/E em todas as seeds, 3,3 vezes mais rápido e com cerca de metade da memória. Com todas as 78 features, a AUC é 0,99871.
+
+### Reproduzir
+
+```sh
+uv sync --locked
+# O lock fixa a a6 do protocolo v2; instale as versões medidas por cima dele.
+uv pip install bankai-boruta==0.1.0a12 bankai-random-forest==0.1.0a20
+# Um perfil e uma seed localmente (gera os dados, roda os quatro métodos e grava o JSON)
+BANKAI_BENCHMARK_SRC=src uv run --no-sync python scripts/native_shadow_pilot.py --datasets industrial --seeds 42 --repeats 1 --threads 8 --output-dir /tmp/ns
+uv run --no-sync python scripts/native_shadow_summary.py /tmp/ns
+uv run --no-sync python scripts/native_shadow_auc.py /tmp/ns /tmp/ns/auc.json
+# CIC-IDS2017: baixa e prepara os CSVs com hash conferido
+uv run --no-sync python scripts/prepare_cicids2017.py /tmp/cicids2017
+```
+
+Na AWS, `scripts/run_candidate_probe_aws.py` sobe a stack, roda wheels Linux escolhidas (`--wheel`, `--extra-wheel`) sobre a imagem publicada e apaga a stack no fim. O desligamento é armado antes de qualquer capacidade, e as horas são reservadas no ledger de [orçamento](BUDGET.md).
+
+## Protocolo v2 (a6, histórico)
 
 Protocolo `paper-v2-a6-amd16-r5`, gerador `2.0.0`, Bankai Boruta **0.1.0a6** e BankaiRF **0.1.0a15**. A a6 está publicada no PyPI; o lock foi regenerado e os seis artefatos públicos tiveram SHA256 conferido. A aceitação Linux/container passou no GitHub Actions, e o smoke ECS AMD passou com 16/16 trials. Ainda não há resultados de desempenho r5 ou evidência de melhora de recall em escala real.
 
@@ -19,7 +100,7 @@ A verdade conhecida conserva sinais e redundâncias: 12/20/30/60 features releva
 
 A calibração sintética é conjunta treino/teste, determinística por seed, com termos e ruído padronizados, seguida de split estratificado. Nenhum modelo é ajustado no teste. Cache inclui versão/hash do gerador e perfil. As mudanças são iguais para todos os métodos. Redução da saturação e recuperação de efeitos marginais são hipóteses para uma campanha futura.
 
-## Uso local
+### Uso local
 
 ```sh
 uv sync --locked
@@ -31,7 +112,7 @@ uv run python scripts/verify_smoke.py --dataset bioinformatica --results /tmp/bi
 
 O smoke usa diretórios exclusivos sob `verification/v2-a6-r5-local`. O comando verifica sucesso, relatórios provisórios e retomada byte a byte. A identidade do protocolo, dependências, fonte e configuração fazem parte dos manifests; manifest incompatível exige outro ID. Agregação recusa mistura de protocolos/fontes/dependências.
 
-## Medição e métricas
+### Medição e métricas
 
 Cada fit roda em processo novo. Carregamento, preparação e avaliação downstream ficam fora do cronômetro e da coleta de memória do seletor. RSS é amostrado a cada 5 ms; Linux também registra VmHWM e tentativa de reset antes do fit. Quando o reset falha, o high-water mark é explicitamente de toda a vida do processo. Delta de pico subtrai o baseline. Buffers explícitos e bytes copiados são diagnósticos separados de RSS; valores numéricos recebem mediana/IQR nos resumos.
 
@@ -39,7 +120,7 @@ Linux lê package/core IDs no sysfs e cruza com a afinidade permitida. Seleciona
 
 Precisão, recall, F1, FDR, falsos positivos trap e seleções tentativas são reportados. Downstream usa ExtraTrees com 200 árvores, max_features sqrt, class_weight balanced, somente features confirmadas; registra AUC, accuracy, balanced accuracy e F1. Oracle e todas as features são referências em processos próprios. Medianas e quartis usam quantile linear; falhas nunca viram observações zero. Smoke ou campanhas incompletas não geram placeholders finais.
 
-## Campanha futura AMD
+### Campanha AMD do protocolo v2
 
 Alvo: `c7a.4xlarge`, AMD EPYC, 16 núcleos físicos, uma thread por núcleo, 32 GiB ([especificação AWS](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html)). ECS sobre EC2, uma tarefa por host, reserva 16 CPUs e 28 GiB. `MACHINE` em `config.py` centraliza a identidade; templates e placement usam esse alvo, capacidade desejada zero nos planos offline.
 
@@ -57,11 +138,10 @@ uv run python scripts/analyze_campaign.py --quality results-v2/paper-v2-a6-amd16
 
 A campanha v2 de escala usa baseline de quatro CPUs e apenas observações novas. A campanha full não foi iniciada: o smoke comprova funcionamento, e a liberação dos lotes depende da reconciliação do ledger e da calibração autorizada descrita em BUDGET.md. Consulte [validação](VERIFICATION.md), [infraestrutura](deployment/README.md), [orçamento](BUDGET.md) e [dependências/licenças](DEPENDENCIES.md).
 
-## Histórico preservado
+### Histórico preservado
 
 [README a4 de 17/10/2026](docs/history/a4-20261017/README.md) contém resultados e instruções daquela campanha, não defaults v2. Resultados sob `verification/campaign-20261017`, `verification/pilot-20261017`, `results-public-a4*` e relatórios existentes não foram recalculados. Checksums históricos continuam válidos. `config-paper-v1.json` preserva o mapeamento antigo; leitores usam o manifest para escolher o protocolo. `scaling48.py` aceita somente arquivos históricos e recusa execução v2; o controlador antigo não é o caminho da nova escala.
 
+### Candidato exato a7
 
-## Candidato exato a7 (separado da referência a6)
-
-A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). O caminho novo permanece optativo, sem substituir pins, imagens, observações ou resultados históricos a6/a15. A validação AMD 1/4/16 workers e Industrial completo está pendente; esta atualização não alocou AWS nem alterou reservas.
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). Ela foi publicada e depois substituída pelas versões medidas em [Resultados atuais](#resultados-atuais-010a12).
