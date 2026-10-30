@@ -34,6 +34,12 @@ def test_reservations_accumulate_with_etag_and_never_exceed_cap():
     s3.put_object.assert_not_called()
 
 
+def test_hourly_rate_follows_the_instance():
+    s3 = stored(dict(schema_version=1, total_usd='150', launches={'a': {'reserved_usd': '49.50'}}))
+    ledger = budget.reserve_supplemental(s3, 'bucket', 'b', 2, budget.SUPPLEMENTAL_HOUR_USD_8XL)
+    assert ledger['launches']['b']['reserved_usd'] == '6.00' and ledger['launches']['b']['hours'] == 2
+
+
 def test_duplicate_launch_is_rejected():
     s3 = stored(dict(schema_version=1, total_usd='150', launches={'a': {'reserved_usd': '3.00'}}))
     with pytest.raises(RuntimeError, match='already reserved'):

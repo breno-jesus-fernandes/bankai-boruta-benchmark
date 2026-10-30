@@ -9,6 +9,8 @@ Methods are interleaved within each repeat, and one JSON per seed is uploaded.
 The real dataset ``cicids2017`` (scripts/prepare_cicids2017.py) uses the
 Cybersecurity profile's configuration; it has no known relevant features, so
 each seed also records the downstream ROC AUC on its held-out split.
+``--scale 2`` doubles the synthetic profiles' rows and columns (extra columns
+are noise); each seed's data is generated once and loaded whole by every worker.
 """
 import argparse
 import hashlib
@@ -27,15 +29,20 @@ from datetime import datetime, timezone
 import psutil
 
 METHODS = ("bankai_exact", "bankai_binned", "borutapy", "borutapy_lgbm")
-BENCHMARK_SRC = os.environ.get("BANKAI_BENCHMARK_SRC", "/opt/bankai-benchmark/src")
+# Absolute, because workers run from their own temporary directory.
+BENCHMARK_SRC = os.path.abspath(os.environ.get("BANKAI_BENCHMARK_SRC", "/opt/bankai-benchmark/src"))
 REAL_DATA = os.environ.get("BANKAI_CICIDS2017_DIR", "/opt/data/cicids2017")
 DATASETS = ("industrial", "credito", "bioinformatica", "ciberseguranca", "cicids2017")
 
 
-def config(name):
+def mode(name, scale):
+    return "full2x" if scale == 2 and name != "cicids2017" else "full"
+
+
+def config(name, scale=1):
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.config import profile
-    return profile("ciberseguranca" if name == "cicids2017" else name, "full")
+    return profile("ciberseguranca" if name == "cicids2017" else name, mode(name, scale))
 
 
 def real_split(split):
@@ -45,13 +52,18 @@ def real_split(split):
     return X, np.fromfile(Path(REAL_DATA) / f"{split}-y.i32", dtype="<i4")
 
 
-def dataset(name, seed, rows=None):
+def dataset(name, seed, rows=None, scale=1, cache=None):
     if name == "cicids2017":
         X, y = real_split("train")
         return (X[:rows], y[:rows], []) if rows else (X, y, [])
+    if cache:
+        import numpy as np
+        # Read whole arrays, not memory maps, so the data is resident before the RSS baseline.
+        X, y, relevant = (np.load(Path(cache) / f"{part}.npy") for part in ("X_train", "y_train", "relevant_features"))
+        return (X[:rows], y[:rows], [int(i) for i in relevant]) if rows else (X, y, [int(i) for i in relevant])
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.datasets import generate_dataset
-    bundle = generate_dataset(name, seed, "full")
+    bundle = generate_dataset(name, seed, mode(name, scale))
     X, y = bundle.X_train, bundle.y_train
     if rows:
         X, y = X[:rows], y[:rows]
@@ -89,9 +101,9 @@ def selector(method, seed, threads, cfg, max_iter):
 
 def worker(args):
     import numpy as np
-    X, y, relevant = dataset(args.dataset, args.seed, args.rows)
+    X, y, relevant = dataset(args.dataset, args.seed, args.rows, args.scale, args.cache)
     data_hash = hashlib.sha256(np.ascontiguousarray(X).tobytes() + y.tobytes()).hexdigest()
-    model = selector(args.method, args.seed, args.threads, config(args.dataset), args.max_iter)
+    model = selector(args.method, args.seed, args.threads, config(args.dataset, args.scale), args.max_iter)
     target = Path(args.worker_output)
     target.with_suffix(".ready").touch()
     while not target.with_suffix(".go").exists():
@@ -102,13 +114,13 @@ def worker(args):
     target.with_suffix(".done").touch()
     if args.method.startswith("borutapy"):
         rounds = len(model.importance_history_) - 1
-        mode = "python"
+        storage = "python"
     else:
         rounds = int(model.n_iter_)
-        mode = model.diagnostics_.get("storage_mode")
+        storage = model.diagnostics_.get("storage_mode")
     relevant = set(relevant)
     support = np.flatnonzero(model.support_).tolist()
-    result = dict(dataset=args.dataset, method=args.method, storage_mode=mode, seed=args.seed,
+    result = dict(dataset=args.dataset, method=args.method, storage_mode=storage, seed=args.seed, scale=args.scale,
         elapsed_seconds=elapsed, rounds=rounds, max_iter=args.max_iter,
         support=support, tentative=np.flatnonzero(model.support_weak_).tolist(),
         data_sha256=data_hash, n_rows=int(X.shape[0]), n_features=int(X.shape[1]),
@@ -122,15 +134,18 @@ def worker(args):
     target.write_text(json.dumps(result, allow_nan=False))
 
 
-def run_one(args, name, method, seed, repeat):
+def run_one(args, name, method, seed, repeat, cache=None):
     with tempfile.TemporaryDirectory(prefix="native-shadow-") as temporary:
         target = Path(temporary) / "result.json"
         command = [sys.executable, str(Path(__file__).resolve()), "--worker-output", str(target),
             "--dataset", name, "--method", method, "--seed", str(seed),
-            "--threads", str(args.threads), "--max-iter", str(args.max_iter)]
+            "--threads", str(args.threads), "--max-iter", str(args.max_iter), "--scale", str(args.scale)]
+        if cache:
+            command += ["--cache", str(cache)]
         if args.rows:
             command += ["--rows", str(args.rows)]
         environment = os.environ.copy()
+        environment["BANKAI_BENCHMARK_SRC"] = BENCHMARK_SRC
         for name in ("OMP_NUM_THREADS", "RAYON_NUM_THREADS"):
             environment[name] = str(args.threads)
         for name in ("OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
@@ -207,6 +222,8 @@ def main():
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--max-iter", type=int, default=40)
     parser.add_argument("--rows", type=int, help="Truncate the training split (smoke only)")
+    parser.add_argument("--scale", type=int, choices=(1, 2), default=1, help="2 doubles synthetic rows and columns")
+    parser.add_argument("--cache", help=argparse.SUPPRESS)
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--output-dir", help="Also write each seed JSON locally")
     parser.add_argument("--worker-output")
@@ -225,18 +242,27 @@ def main():
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     host = dict(platform=platform.platform(), machine=platform.machine(), logical_cpus=os.cpu_count())
     for name, seed in [(name, seed) for name in args.datasets for seed in args.seeds]:
-        cfg = config(name)
+        cfg = config(name, args.scale)
         results = []
+        cache_root = tempfile.TemporaryDirectory(prefix="native-shadow-data-")
+        cache = None
+        if name != "cicids2017":
+            # Generate once per seed outside every worker; the same bytes reach every fit.
+            sys.path.insert(0, BENCHMARK_SRC)
+            from bankai_benchmark.datasets import cache_dataset
+            cache = cache_dataset(cache_root.name, name, seed, mode(name, args.scale))
         for repeat in range(args.repeats):
             # Rotate the method order so no method always runs first or last.
             order = args.methods[repeat % len(args.methods):] + args.methods[:repeat % len(args.methods)]
             for method in order:
-                result = run_one(args, name, method, seed, repeat)
+                result = run_one(args, name, method, seed, repeat, cache)
                 results.append(result)
                 print(json.dumps({k: result[k] for k in ("dataset", "method", "seed", "repeat", "rounds",
                     "elapsed_seconds", "peak_rss_delta_bytes", "support")}), flush=True)
+        cache_root.cleanup()
         payload = dict(protocol=args.experiment, run_id=run_id, host=host,
-            configuration=dict(dataset=name, seed=seed, threads=args.threads, trees=cfg.trees, max_iter=args.max_iter,
+            configuration=dict(dataset=name, seed=seed, threads=args.threads, scale=args.scale, profile_mode=mode(name, args.scale),
+                n_rows=results[0]["n_rows"], n_features=results[0]["n_features"], trees=cfg.trees, max_iter=args.max_iter,
                 repeats=args.repeats, rows=args.rows, dtype="float32", depth=cfg.depth, max_features=cfg.max_features, bins=cfg.bins,
                 bootstrap=True, perc=100, alpha=.05, two_step=True),
             dataset_hash_consistency="passed" if len({r["data_sha256"] for r in results}) == 1 else "failed",
@@ -244,7 +270,7 @@ def main():
         if name == "cicids2017":
             payload["auc"] = held_out_auc(results, seed, args.threads, args.rows)
         data = json.dumps(payload, allow_nan=False, indent=1).encode()
-        artifact = f"{name}-seed{seed}-t{args.threads}.json"
+        artifact = f"{name}-seed{seed}-t{args.threads}{'-x2' if args.scale == 2 else ''}.json"
         if args.output_dir:
             Path(args.output_dir).mkdir(parents=True, exist_ok=True)
             (Path(args.output_dir) / artifact).write_bytes(data)

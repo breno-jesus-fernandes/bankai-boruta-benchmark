@@ -7,11 +7,11 @@ COPY pyproject.toml uv.lock ./
 # Same locked comparator stack as the paper image; only the Bankai pins move to
 # the public native-shadow releases.
 RUN uv export --locked --no-dev --no-emit-project --no-hashes --format requirements-txt --output-file /tmp/reference.txt \
-    && sed -e 's/bankai-boruta==0.1.0a6/bankai-boruta==0.1.0a8/' \
-           -e 's/bankai-random-forest==0.1.0a15/bankai-random-forest==0.1.0a17/' \
+    && sed -e 's/bankai-boruta==0.1.0a6/bankai-boruta==0.1.0a12/' \
+           -e 's/bankai-random-forest==0.1.0a15/bankai-random-forest==0.1.0a20/' \
            /tmp/reference.txt > /tmp/candidate.txt \
-    && grep -q '^bankai-boruta==0.1.0a8' /tmp/candidate.txt \
-    && grep -q '^bankai-random-forest==0.1.0a17' /tmp/candidate.txt \
+    && grep -q '^bankai-boruta==0.1.0a12' /tmp/candidate.txt \
+    && grep -q '^bankai-random-forest==0.1.0a20' /tmp/candidate.txt \
     && uv venv --python /usr/local/bin/python3 /opt/candidate \
     && uv pip install --python /opt/candidate/bin/python -r /tmp/candidate.txt
 COPY src/bankai_benchmark /opt/bankai-benchmark/src/bankai_benchmark
@@ -22,7 +22,10 @@ RUN /opt/candidate/bin/python /opt/prepare_cicids2017.py /opt/data/cicids2017 --
     && rm -rf /tmp/cicids2017-csv
 RUN /opt/candidate/bin/python /opt/native_shadow_pilot.py --seeds 42 --repeats 1 --threads 2 \
         --rows 3000 --max-iter 3 --output-dir /tmp/native-shadow-smoke \
-    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a8'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a17'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; print('native-shadow image verified')" \
+    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a12'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a20'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; print('native-shadow image verified')" \
+    && /opt/candidate/bin/python /opt/native_shadow_pilot.py --datasets bioinformatica --seeds 42 --repeats 1 --threads 2 \
+        --rows 3000 --max-iter 3 --scale 2 --output-dir /tmp/native-shadow-smoke \
+    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/bioinformatica-seed42-t2-x2.json')); c=d['configuration']; assert c['scale'] == 2 and c['n_features'] == 4000 and d['dataset_hash_consistency'] == 'passed'; assert all(len(r['relevant']) == 30 for r in d['results']); print('2x profile verified')" \
     && BANKAI_CICIDS2017_DIR=/opt/data/cicids2017 /opt/candidate/bin/python /opt/native_shadow_pilot.py --datasets cicids2017 \
         --seeds 42 --repeats 1 --threads 2 --rows 3000 --max-iter 3 --output-dir /tmp/native-shadow-smoke \
     && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/cicids2017-seed42-t2.json')); assert len(d['results']) == 4 and set(d['auc']['by_method']) == {r['method'] for r in d['results']}; print('cicids2017 smoke verified')"
@@ -31,8 +34,8 @@ FROM --platform=linux/amd64 python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a074
 ARG VCS_REF=unknown
 LABEL org.opencontainers.image.revision=$VCS_REF \
       bankai.benchmark.protocol="native-shadow-max40-v1" \
-      bankai.boruta.candidate="0.1.0a8" \
-      bankai.rf.candidate="0.1.0a17"
+      bankai.boruta.candidate="0.1.0a12" \
+      bankai.rf.candidate="0.1.0a20"
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home benchmark

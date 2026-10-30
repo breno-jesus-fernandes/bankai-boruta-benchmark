@@ -14,7 +14,8 @@ PILOT_SECONDS = 3600
 LEDGER_KEY = 'bankai-budget/campaign-400-brl.json'
 LEGACY_LEDGER_KEY = 'bankai-budget/campaign-200-brl.json'
 ACTION = 'bankai-budget-shutdown'
-POLICY_EXPIRES = datetime(2026, 10, 24, tzinfo=timezone.utc)
+# Prices and PTAX reviewed on 2026-10-30; see verification/native-shadow-x2-cost-policy-20261030.md.
+POLICY_EXPIRES = datetime(2026, 11, 6, tzinfo=timezone.utc)
 
 
 def validate_policy(now=None):
@@ -163,9 +164,11 @@ SUPPLEMENTAL_KEY = 'bankai-budget/supplemental-150-usd.json'
 SUPPLEMENTAL_TOTAL_USD = Decimal('150')
 # Conservative c7a.4xlarge hour: on-demand price plus EBS, IPv4 and contingency.
 SUPPLEMENTAL_HOUR_USD = Decimal('1.50')
+# c7a.8xlarge (about USD 1.99/h with contingency) reserves two 4xlarge slots per hour.
+SUPPLEMENTAL_HOUR_USD_8XL = Decimal('3.00')
 
 
-def reserve_supplemental(s3, bucket, launch_id, hours):
+def reserve_supplemental(s3, bucket, launch_id, hours, hour_usd=SUPPLEMENTAL_HOUR_USD):
     """Reserve armed hours against the separately approved USD 150 extension.
 
     The BRL 400 ledger is left untouched; this ledger is created on first use
@@ -187,7 +190,7 @@ def reserve_supplemental(s3, bucket, launch_id, hours):
     launches = ledger['launches']
     if launch_id in launches:
         raise RuntimeError('Launch already reserved; deadline cannot be extended')
-    amount = SUPPLEMENTAL_HOUR_USD * hours
+    amount = Decimal(hour_usd) * hours
     allocated = sum((Decimal(item['reserved_usd']) for item in launches.values()), Decimal(0))
     if allocated + amount > SUPPLEMENTAL_TOTAL_USD:
         raise RuntimeError('Supplemental budget exhausted: launch blocked')
