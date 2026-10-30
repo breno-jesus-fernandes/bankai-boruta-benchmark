@@ -8,8 +8,8 @@ Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernan
 - **Métodos:**
   - Bankai exato: Extra Trees do BankaiRF com cortes nos valores originais;
   - Bankai bins: Extra Trees do BankaiRF com 63 bins;
-  - BP/E: BorutaPy 0.4.3 + `ExtraTreesClassifier` do scikit-learn 1.9.1;
-  - BP/L: BorutaPy + LightGBM em modo random forest (63 bins, subamostragem 0,8).
+  - BorutaPy + ExtraTrees: BorutaPy 0.4.3 com o `ExtraTreesClassifier` do scikit-learn 1.9.1;
+  - BorutaPy + LightGBM: BorutaPy com LightGBM em modo random forest (63 bins, subamostragem 0,8).
 - **Configuração comum:** árvores, profundidade e fração de features de cada perfil, bootstrap, `perc=100`, `alpha=0.05`, `two_step=True`, no máximo 40 rodadas com parada natural, float32 e seeds 42–46.
 - **Medição:**
   - cada fit roda num processo novo, depois de gerar os dados;
@@ -25,29 +25,29 @@ Mediana sobre cinco seeds, cada uma a mediana de cinco repetições ([detalhes](
 |---|---|---:|---:|---:|---:|---:|
 | Industrial 200k × 500 (12) | Bankai exato | **9,2** | 931 | 1,00 | 0,67 | 0,837 |
 | | Bankai bins | 10,8 | **456** | 1,00 | 0,67 | 0,837 |
-| | BP/E | 37,1 | 1.816 | 1,00 | 0,67 | 0,837 |
-| | BP/L | 75,1 | 4.865 | 1,00 | 0,67 | 0,837 |
+| | BorutaPy + ExtraTrees | 37,1 | 1.816 | 1,00 | 0,67 | 0,837 |
+| | BorutaPy + LightGBM | 75,1 | 4.865 | 1,00 | 0,67 | 0,837 |
 | Crédito 300k × 300 (20) | Bankai exato | **9,5** | 929 | 1,00 | 0,85 | 0,852 |
 | | Bankai bins | 10,9 | **506** | 1,00 | 0,85 | 0,852 |
-| | BP/E | 46,2 | 1.805 | 1,00 | 0,85 | 0,852 |
-| | BP/L | 52,7 | 3.429 | 1,00 | 0,85 | 0,852 |
+| | BorutaPy + ExtraTrees | 46,2 | 1.805 | 1,00 | 0,85 | 0,852 |
+| | BorutaPy + LightGBM | 52,7 | 3.429 | 1,00 | 0,85 | 0,852 |
 | Cibersegurança 400k × 150 (60) | Bankai exato | 24,5 | 760 | 1,00 | 0,67 | 0,837 |
 | | Bankai bins | **23,5** | **476** | 1,00 | 0,62 | 0,838 |
-| | BP/E | 110,4 | 1.455 | 1,00 | 0,65 | 0,836 |
-| | BP/L | 79,9 | 1.877 | 1,00 | 0,55 | 0,837 |
+| | BorutaPy + ExtraTrees | 110,4 | 1.455 | 1,00 | 0,65 | 0,836 |
+| | BorutaPy + LightGBM | 79,9 | 1.877 | 1,00 | 0,55 | 0,837 |
 | Bioinformática 50k × 2000 (30) | Bankai exato | 85,7 | 853 | 1,00 | 1,00 | 0,750 |
 | | Bankai bins | **71,1** | **388** | 1,00 | 1,00 | 0,750 |
-| | BP/E | 145,1 | 1.608 | 1,00 | 1,00 | 0,750 |
-| | BP/L | 130,0 | 5.823 | 1,00 | 0,80 | 0,734 |
+| | BorutaPy + ExtraTrees | 145,1 | 1.608 | 1,00 | 1,00 | 0,750 |
+| | BorutaPy + LightGBM | 130,0 | 5.823 | 1,00 | 0,80 | 0,734 |
 
-- **Tempo e memória:** os dois modos do Bankai foram mais rápidos e usaram menos memória que BP/E e BP/L em todas as 20 combinações de perfil e seed.
-  - Frente ao BP/E, o Bankai exato gastou em mediana 76% menos tempo (de 41% a 87%) e 48% menos memória.
-  - Frente ao BP/E, o modo com bins gastou 76% menos tempo e 73% menos memória.
+- **Tempo e memória:** os dois modos do Bankai foram mais rápidos e usaram menos memória que BorutaPy + ExtraTrees e BorutaPy + LightGBM em todas as 20 combinações de perfil e seed.
+  - Frente ao BorutaPy + ExtraTrees, o Bankai exato gastou em mediana 76% menos tempo (de 41% a 87%) e 48% menos memória.
+  - Frente ao BorutaPy + ExtraTrees, o modo com bins gastou 76% menos tempo e 73% menos memória.
 - **Seleção:**
   - Nenhum método confirmou feature irrelevante.
-  - Em Industrial, Crédito e Bioinformática, Bankai exato, Bankai bins e BP/E confirmaram os mesmos conjuntos em todas as seeds.
+  - Em Industrial, Crédito e Bioinformática, Bankai exato, Bankai bins e BorutaPy + ExtraTrees confirmaram os mesmos conjuntos em todas as seeds.
   - Na Cibersegurança, todos chegaram às 40 rodadas, e os conjuntos diferem em uma a quatro features limítrofes por seed.
-  - O BP/L perdeu até 12 das 30 relevantes na Bioinformática.
+  - O BorutaPy + LightGBM perdeu até 12 das 30 relevantes na Bioinformática.
 - **Contra o 0.1.0a8:** o Bankai exato ficou de 1,6 a 2,5 vezes mais rápido e usa de 13% a 46% menos memória, com seleções idênticas em todos os perfis, seeds e repetições.
 
 ### CIC-IDS2017 (dados reais)
@@ -58,10 +58,10 @@ Base de treino com 1.748.586 linhas e 78 colunas em float32 (`scripts/prepare_ci
 |---|---:|---:|---:|---:|---:|---:|
 | Bankai exato | **39,8** | 2.140 | 3,29 | 12 | 68 | 0,99872 |
 | Bankai bins | 129,2 | **1.517** | 3,23 | 40 | 66 | 0,99874 |
-| BP/E | 130,8 | 4.146 | 11,0 | 12 | 68 | 0,99872 |
-| BP/L | 280,3 | 2.736 | 7,02 | 40 | 66 | 0,99874 |
+| BorutaPy + ExtraTrees | 130,8 | 4.146 | 11,0 | 12 | 68 | 0,99872 |
+| BorutaPy + LightGBM | 280,3 | 2.736 | 7,02 | 40 | 66 | 0,99874 |
 
-O Bankai exato confirmou as mesmas 68 features que o BP/E em todas as seeds, 3,3 vezes mais rápido e com cerca de metade da memória. Com todas as 78 features, a AUC é 0,99871.
+O Bankai exato confirmou as mesmas 68 features que o BorutaPy + ExtraTrees em todas as seeds, 3,3 vezes mais rápido e com cerca de metade da memória. Com todas as 78 features, a AUC é 0,99871.
 
 ### Reproduzir
 

@@ -16,11 +16,11 @@ AUC is the held-out ROC AUC of the suite's downstream ExtraTrees on each confirm
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Bankai exact | 39.8 | 2,140 | 3.29 | 12 | 68 | 0.99872 | 98.7 | 5,091 |
 | Bankai binned | 129.2 | 1,517 | 3.23 | 40 | 66 | 0.99874 | 304.5 | 3,372 |
-| BP/E | 130.8 | 4,146 | 11.0 | 12 | 68 | 0.99872 | 128.8 | 4,131 |
-| BP/L | 280.3 | 2,736 | 7.02 | 40 | 66 | 0.99874 | 278.1 | 2,739 |
+| BorutaPy + ExtraTrees | 130.8 | 4,146 | 11.0 | 12 | 68 | 0.99872 | 128.8 | 4,131 |
+| BorutaPy + LightGBM | 280.3 | 2,736 | 7.02 | 40 | 66 | 0.99874 | 278.1 | 2,739 |
 
-- **Same decisions:** Bankai exact confirmed the same 68 features as BP/E and as 0.1.0a8 in every seed.
-- **Against BP/E:** Bankai exact is 3.3× faster and uses about half the memory. With 0.1.0a8 it used 1 GiB more than BP/E.
+- **Same decisions:** Bankai exact confirmed the same 68 features as BorutaPy + ExtraTrees and as 0.1.0a8 in every seed.
+- **Against BorutaPy + ExtraTrees:** Bankai exact is 3.3× faster and uses about half the memory. With 0.1.0a8 it used 1 GiB more than BorutaPy + ExtraTrees.
 
 ## How the memory gap was closed
 
