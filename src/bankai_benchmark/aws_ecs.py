@@ -14,7 +14,7 @@ def attr(name, attribute): return {"Fn::GetAtt": [name, attribute]}
 def sub(value): return {"Fn::Sub": value}
 
 
-def infrastructure(experiment, bucket, subnets, security_groups):
+def infrastructure(experiment, bucket, subnets, security_groups, machine=MACHINE):
     if not re.fullmatch(r"[a-z][a-z0-9-]{2,40}", experiment):
         raise ValueError("experiment must match [a-z][a-z0-9-]{2,40}")
     resources = {}
@@ -31,12 +31,12 @@ def infrastructure(experiment, bucket, subnets, security_groups):
         dict(Effect="Allow", Action=["s3:ListBucket"], Resource=f"arn:aws:s3:::{bucket}", Condition={"StringLike": {"s3:prefix": [prefix+"*" for prefix in prefixes]}})]
     role("TaskRole", "ecs-tasks.amazonaws.com", policies=[dict(PolicyName="ExperimentResults", PolicyDocument=dict(Version="2012-10-17", Statement=statements))])
     resource("InstanceProfile", "IAM::InstanceProfile", Roles=[ref("InstanceRole")])
-    resource("LaunchTemplate", "EC2::LaunchTemplate", LaunchTemplateData=dict(ImageId=ref("EcsAmi"), InstanceType=MACHINE["instance_type"], CpuOptions=dict(CoreCount=MACHINE["physical_cores"], ThreadsPerCore=MACHINE["threads_per_core"]),
+    resource("LaunchTemplate", "EC2::LaunchTemplate", LaunchTemplateData=dict(ImageId=ref("EcsAmi"), InstanceType=machine["instance_type"], CpuOptions=dict(CoreCount=machine["physical_cores"], ThreadsPerCore=machine["threads_per_core"]),
         IamInstanceProfile={"Arn": attr("InstanceProfile", "Arn")}, SecurityGroupIds=security_groups,
         MetadataOptions=dict(HttpTokens="required", HttpPutResponseHopLimit=2),
         BlockDeviceMappings=[dict(DeviceName="/dev/xvda", Ebs=dict(VolumeSize=100, VolumeType="gp3", Encrypted=True, DeleteOnTermination=True))],
         UserData={"Fn::Base64": sub("#!/bin/bash\necho ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config\n")}))
-    resources["LaunchTemplate"]["Metadata"] = {"com.aws.cloudformation.Context": dict(why="AMD physical-core benchmark", must=["16 physical cores, one thread per core", "one task per host"])}
+    resources["LaunchTemplate"]["Metadata"] = {"com.aws.cloudformation.Context": dict(why="AMD physical-core benchmark", must=[f"{machine['physical_cores']} physical cores, one thread per core", "one task per host"])}
     resource("Fleet", "AutoScaling::AutoScalingGroup", MinSize="0", MaxSize="1", DesiredCapacity="0", NewInstancesProtectedFromScaleIn=False, VPCZoneIdentifier=subnets,
         LaunchTemplate=dict(LaunchTemplateId=ref("LaunchTemplate"), Version=attr("LaunchTemplate", "LatestVersionNumber")),
         Tags=[dict(Key="Name", Value=experiment, PropagateAtLaunch=True)])

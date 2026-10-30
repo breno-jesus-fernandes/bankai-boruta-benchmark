@@ -9,33 +9,45 @@ import boto3
 from botocore.exceptions import ClientError
 
 from bankai_benchmark.aws_ecs import infrastructure
-from bankai_benchmark.budget import ACTION, PILOT_SECONDS, arm, reserve_supplemental, stop, validate_policy
+from bankai_benchmark.budget import (ACTION, PILOT_SECONDS, SUPPLEMENTAL_HOUR_USD, SUPPLEMENTAL_HOUR_USD_8XL, arm,
+    reserve_supplemental, stop, validate_policy)
 
 
 REGION = "us-east-1"
 BUCKET = "bankai-benchmark-bootstrap-results-ku2wdx1kzzqb"
 EXPERIMENT = "native-shadow-max40-v1"
+# AMD hosts without SMT; ECS memory leaves headroom for the OS and agent.
+INSTANCES = {
+    "c7a.4xlarge": dict(cores=16, cpu=16384, memory=28672, memory_gib=32, hour_usd=SUPPLEMENTAL_HOUR_USD),
+    "c7a.8xlarge": dict(cores=32, cpu=32768, memory=59392, memory_gib=64, hour_usd=SUPPLEMENTAL_HOUR_USD_8XL),
+}
 
 
-def task_definition(outputs, image, datasets, methods, seeds, threads, repeats):
+def machine(instance):
+    spec = INSTANCES[instance]
+    return dict(instance_type=instance, physical_cores=spec["cores"], threads_per_core=1, memory_gib=spec["memory_gib"])
+
+
+def task_definition(outputs, image, datasets, methods, seeds, threads, repeats, instance="c7a.4xlarge", scale=1):
+    spec = INSTANCES[instance]
     return dict(family=EXPERIMENT, requiresCompatibilities=["EC2"], networkMode="bridge",
-        cpu="16384", memory="28672", executionRoleArn=outputs["ExecutionRole"],
+        cpu=str(spec["cpu"]), memory=str(spec["memory"]), executionRoleArn=outputs["ExecutionRole"],
         taskRoleArn=outputs["TaskRole"],
         runtimePlatform=dict(cpuArchitecture="X86_64", operatingSystemFamily="LINUX"),
         containerDefinitions=[dict(name="native-shadow", image=image, essential=True,
-            cpu=16384, memory=28672,
+            cpu=spec["cpu"], memory=spec["memory"],
             entryPoint=["/opt/candidate/bin/python", "/opt/native_shadow_pilot.py"],
             command=["--bucket", BUCKET, "--experiment", EXPERIMENT,
                 "--datasets", *datasets, "--methods", *methods, "--seeds", *map(str, seeds), "--threads", str(threads),
-                "--repeats", str(repeats), "--timeout-seconds", "3600", "--max-iter", "40"],
+                "--repeats", str(repeats), "--timeout-seconds", "3600", "--max-iter", "40", "--scale", str(scale)],
             environment=[dict(name="AWS_REGION", value=REGION)],
             logConfiguration=dict(logDriver="awslogs", options={
                 "awslogs-group": outputs["Logs"], "awslogs-region": REGION,
                 "awslogs-stream-prefix": "native-shadow-max40"}))])
 
 
-def create_stack(cf, stack_name, subnets, security_groups):
-    template = infrastructure(EXPERIMENT, BUCKET, subnets, security_groups)
+def create_stack(cf, stack_name, subnets, security_groups, instance="c7a.4xlarge"):
+    template = infrastructure(EXPERIMENT, BUCKET, subnets, security_groups, machine(instance))
     cf.create_stack(StackName=stack_name, TemplateBody=json.dumps(template), Capabilities=["CAPABILITY_IAM"])
     cf.get_waiter("stack_create_complete").wait(StackName=stack_name, WaiterConfig={"Delay": 10, "MaxAttempts": 60})
     stack = cf.describe_stacks(StackName=stack_name)["Stacks"][0]
@@ -52,7 +64,7 @@ def stack_exists(cf, stack_name):
     return bool(stacks)
 
 
-def wait_for_container(ec2, ecs, cluster, deadline):
+def wait_for_container(ec2, ecs, cluster, deadline, instance="c7a.4xlarge"):
     while datetime.now(timezone.utc) < deadline:
         arns = ecs.list_container_instances(cluster=cluster, status="ACTIVE")["containerInstanceArns"]
         if arns:
@@ -60,11 +72,11 @@ def wait_for_container(ec2, ecs, cluster, deadline):
             for item in instances:
                 host = ec2.describe_instances(InstanceIds=[item["ec2InstanceId"]])["Reservations"][0]["Instances"][0]
                 cpu = host.get("CpuOptions", {})
-                if (host["InstanceType"] == "c7a.4xlarge"
-                        and cpu.get("CoreCount") == 16 and cpu.get("ThreadsPerCore") == 1
+                if (host["InstanceType"] == instance
+                        and cpu.get("CoreCount") == INSTANCES[instance]["cores"] and cpu.get("ThreadsPerCore") == 1
                         and item["status"] == "ACTIVE"):
                     return item
-            raise RuntimeError("ECS host did not match the required AMD 16-core topology")
+            raise RuntimeError(f"ECS host did not match the required AMD {INSTANCES[instance]['cores']}-core topology")
         time.sleep(5)
     raise TimeoutError("AMD ECS host did not register before the readiness deadline")
 
@@ -98,8 +110,9 @@ def run(args):
     stack_name = args.stack
     if stack_exists(cf, stack_name):
         raise RuntimeError(f"Stack {stack_name} already exists; inspect it instead of creating a duplicate")
-    outputs = create_stack(cf, stack_name, args.subnets, args.security_groups)
-    definition = task_definition(outputs, args.image, args.datasets, args.methods, args.seeds, args.threads, args.repeats)
+    outputs = create_stack(cf, stack_name, args.subnets, args.security_groups, args.instance)
+    definition = task_definition(outputs, args.image, args.datasets, args.methods, args.seeds, args.threads, args.repeats,
+        args.instance, args.scale)
     registered = ecs.register_task_definition(**definition)["taskDefinition"]
     group_name = outputs["Fleet"]
     current = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[group_name])["AutoScalingGroups"][0]
@@ -110,23 +123,24 @@ def run(args):
     shutdown = arm(autoscaling, group_name, duration_seconds=args.hours * PILOT_SECONDS)
     try:
         # The BRL 400 ledger is fully allocated; this run uses the USD 150 extension.
-        reserve_supplemental(s3, BUCKET, group_name, args.hours)
+        reserve_supplemental(s3, BUCKET, group_name, args.hours, INSTANCES[args.instance]["hour_usd"])
     except Exception:
         autoscaling.delete_scheduled_action(AutoScalingGroupName=group_name, ScheduledActionName=ACTION)
         raise
     state = dict(protocol=EXPERIMENT, stack=stack_name, outputs=outputs,
         image=args.image, task_definition=registered["taskDefinitionArn"], datasets=args.datasets, methods=args.methods, seeds=args.seeds,
-        threads=args.threads, repeats=args.repeats,
-        reserved_usd=str(1.5 * args.hours), budget="supplemental-150-usd", shutdown_at=shutdown.isoformat(), status="reserved")
+        threads=args.threads, repeats=args.repeats, instance=args.instance, scale=args.scale,
+        reserved_usd=str(INSTANCES[args.instance]["hour_usd"] * args.hours), budget="supplemental-150-usd", shutdown_at=shutdown.isoformat(), status="reserved")
     Path(args.state).write_text(json.dumps(state, indent=2) + "\n")
     task_arn = None
     try:
         autoscaling.update_auto_scaling_group(AutoScalingGroupName=group_name, MinSize=0, MaxSize=1, DesiredCapacity=1)
-        host = wait_for_container(ec2, ecs, outputs["Cluster"], shutdown.replace(microsecond=0))
+        host = wait_for_container(ec2, ecs, outputs["Cluster"], shutdown.replace(microsecond=0), args.instance)
+        started = datetime.now(timezone.utc)
         task_response = ecs.run_task(cluster=outputs["Cluster"], taskDefinition=registered["taskDefinitionArn"],
             count=1, launchType="EC2",
             placementConstraints=[dict(type="distinctInstance"),
-                dict(type="memberOf", expression="attribute:ecs.instance-type == c7a.4xlarge")])
+                dict(type="memberOf", expression="attribute:ecs.instance-type == " + args.instance)])
         if task_response.get("failures") or len(task_response.get("tasks", [])) != 1:
             raise RuntimeError(f"ECS rejected native-shadow task: {task_response.get('failures')}")
         task_arn = task_response["tasks"][0]["taskArn"]
@@ -146,7 +160,10 @@ def run(args):
             time.sleep(10)
         else:
             raise TimeoutError("Pilot reached its five-minute shutdown safety margin")
-        keys = s3.list_objects_v2(Bucket=BUCKET, Prefix=f"{EXPERIMENT}/pilot/").get("Contents", [])
+        # Count only this task's artifacts, not earlier runs under the same prefix.
+        suffix = f"-t{args.threads}{'-x2' if args.scale == 2 else ''}.json"
+        keys = [item for page in s3.get_paginator("list_objects_v2").paginate(Bucket=BUCKET, Prefix=f"{EXPERIMENT}/pilot/")
+                for item in page.get("Contents", []) if item["LastModified"] >= started and item["Key"].endswith(suffix)]
         state["result_objects"] = [{"key": item["Key"], "bytes": item["Size"]} for item in keys]
         if len(state["result_objects"]) < len(args.seeds) * len(args.datasets):
             raise RuntimeError("Task completed without one result artifact per seed")
@@ -170,7 +187,9 @@ def main():
     parser.add_argument("--subnets", nargs="+", required=True)
     parser.add_argument("--security-groups", nargs="+", required=True)
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
-    parser.add_argument("--threads", type=int, default=16)
+    parser.add_argument("--instance", choices=sorted(INSTANCES), default="c7a.4xlarge")
+    parser.add_argument("--threads", type=int, help="defaults to the instance's physical cores")
+    parser.add_argument("--scale", type=int, choices=(1, 2), default=1, help="2 doubles synthetic rows and columns")
     parser.add_argument("--datasets", nargs="+", default=["industrial"])
     parser.add_argument("--methods", nargs="+",
         default=["bankai_exact", "bankai_binned", "borutapy", "borutapy_lgbm"])
@@ -178,7 +197,9 @@ def main():
     parser.add_argument("--stack", default="bankai-native-shadow-max40")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--state", default="verification/native-shadow-max40-amd-20261019.json")
-    run(parser.parse_args())
+    args = parser.parse_args()
+    args.threads = args.threads or INSTANCES[args.instance]["cores"]
+    run(args)
 
 
 if __name__ == "__main__":

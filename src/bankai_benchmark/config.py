@@ -65,6 +65,9 @@ def profile(dataset, mode):
         return replace(cfg, n=400, p=max(40, RELEVANT_COUNTS[dataset]), trees=8, depth=3, max_iter=4)
     if mode == "smoke-matrix":
         return replace(cfg, n=int(cfg.n*.05), p=max(RELEVANT_COUNTS[dataset], round(cfg.p*.3)), max_iter=10)
+    if mode == "full2x":
+        # Native-shadow 2x: doubled rows and columns; the extra columns are noise.
+        return replace(cfg, n=2*cfg.n, p=2*cfg.p)
     if mode != "full":
         raise ValueError(mode)
     return cfg

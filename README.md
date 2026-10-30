@@ -77,6 +77,18 @@ uv run --no-sync python scripts/native_shadow_auc.py /tmp/ns /tmp/ns/auc.json
 uv run --no-sync python scripts/prepare_cicids2017.py /tmp/cicids2017
 ```
 
+### Próxima rodada: dados 2× em 32 threads
+
+Os quatro perfis sintéticos com N e P dobrados (`--scale 2`: Industrial 400k × 1.000, Crédito 600k × 600, Bioinformática 100k × 4.000, Cibersegurança 800k × 300, com as mesmas features relevantes) numa `c7a.8xlarge` (32 núcleos AMD físicos, 64 GiB). Mesmos métodos, versões (a12/a20) e protocolo; o CIC-IDS2017 roda de novo em 32 threads, sem escala. Os artefatos têm sufixo `-x2`. Ainda não há resultados; custos e etapas em [política de preço 2×](verification/native-shadow-x2-cost-policy-20261030.md).
+
+```sh
+BANKAI_BENCHMARK_SRC=src uv run --no-sync python scripts/native_shadow_pilot.py --datasets industrial --seeds 42 --repeats 1 --threads 8 --scale 2 --output-dir /tmp/ns2
+# Na AWS, com a imagem native-shadow publicada (a12/a20):
+uv run python scripts/run_native_shadow_aws.py --image <uri@sha256> --subnets <subnet> --security-groups <sg> \
+  --instance c7a.8xlarge --scale 2 --datasets industrial credito bioinformatica ciberseguranca --seeds 42 --repeats 1 --hours 2 \
+  --stack bankai-native-shadow-x2-cal --state verification/native-shadow-x2-calibration.json
+```
+
 Na AWS, `scripts/run_candidate_probe_aws.py` sobe a stack, roda wheels Linux escolhidas (`--wheel`, `--extra-wheel`) sobre a imagem publicada e apaga a stack no fim. O desligamento é armado antes de qualquer capacidade, e as horas são reservadas no ledger de [orçamento](BUDGET.md).
 
 ## Protocolo v2 (a6, histórico)
