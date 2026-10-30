@@ -2,7 +2,8 @@
 
 For each dataset and seed, fits the suite's downstream ExtraTrees (200 trees,
 balanced classes) on every distinct confirmed set, on all features and on the
-generator's relevant features. Results are deterministic given the seed.
+generator's relevant features, using the artifact's profile (1x or 2x).
+Results are deterministic given the seed.
 
 Usage: python scripts/native_shadow_auc.py ARTIFACT_DIR OUTPUT_JSON [THREADS]
 """
@@ -25,9 +26,11 @@ def main():
         artifact = json.loads(path.read_text())
         name, seed = artifact["configuration"].get("dataset", "industrial"), artifact["configuration"]["seed"]
         key = f"{name}-{seed}"
-        if key in output:
+        # Real data records its held-out AUC inside the artifact.
+        if key in output or "auc" in artifact:
             continue
-        bundle = generate_dataset(name, seed, "full")
+        # 2x artifacts record profile_mode "full2x"; older ones predate the field.
+        bundle = generate_dataset(name, seed, artifact["configuration"].get("profile_mode", "full"))
         sets = {"all": list(range(bundle.X_train.shape[1])),
                 "relevant": sorted(int(i) for i in bundle.relevant_features)}
         for result in artifact["results"]:
