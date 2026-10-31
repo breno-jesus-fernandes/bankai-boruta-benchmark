@@ -21,8 +21,8 @@ COPY scripts/prepare_cicids2017.py /opt/prepare_cicids2017.py
 RUN /opt/candidate/bin/python /opt/prepare_cicids2017.py /opt/data/cicids2017 --downloads /tmp/cicids2017-csv \
     && rm -rf /tmp/cicids2017-csv
 RUN /opt/candidate/bin/python /opt/native_shadow_pilot.py --seeds 42 --repeats 1 --threads 2 \
-        --rows 3000 --max-iter 3 --output-dir /tmp/native-shadow-smoke \
-    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a12'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a20'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; print('native-shadow image verified')" \
+        --rows 3000 --max-iter 3 --auc --output-dir /tmp/native-shadow-smoke \
+    && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/industrial-seed42-t2.json')); r={x['method']: x for x in d['results']}; assert r['bankai_exact']['packages']['bankai-boruta'] == '0.1.0a12'; assert r['bankai_exact']['packages']['bankai-random-forest'] == '0.1.0a20'; assert r['bankai_exact']['storage_mode'] == 'shadow_session'; assert r['bankai_binned']['storage_mode'] == 'shadow_session'; assert set(d['auc']['by_method']) == set(r) and 0 < d['auc']['relevant'] <= 1; print('native-shadow image verified')" \
     && /opt/candidate/bin/python /opt/native_shadow_pilot.py --datasets bioinformatica --seeds 42 --repeats 1 --threads 2 \
         --rows 3000 --max-iter 3 --scale 2 --output-dir /tmp/native-shadow-smoke \
     && /opt/candidate/bin/python -c "import json; d=json.load(open('/tmp/native-shadow-smoke/bioinformatica-seed42-t2-x2.json')); c=d['configuration']; assert c['scale'] == 2 and c['n_features'] == 4000 and d['dataset_hash_consistency'] == 'passed'; assert all(len(r['relevant']) == 30 for r in d['results']); print('2x profile verified')" \
