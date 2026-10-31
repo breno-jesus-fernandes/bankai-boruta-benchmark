@@ -3,7 +3,8 @@
 For each dataset and seed, fits the suite's downstream ExtraTrees (200 trees,
 balanced classes) on every distinct confirmed set, on all features and on the
 generator's relevant features, using the artifact's profile (1x or 2x).
-Results are deterministic given the seed.
+Results are deterministic given the seed and the platform (arm64 and x86 differ
+slightly), whatever the thread count.
 
 Usage: python scripts/native_shadow_auc.py ARTIFACT_DIR OUTPUT_JSON [THREADS]
 """

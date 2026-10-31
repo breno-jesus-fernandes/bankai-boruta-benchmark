@@ -1,11 +1,12 @@
 # Bankai Boruta benchmark
 
-Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernandes/bankai-boruta) contra o BorutaPy. A rodada mais recente usa o protocolo `native-shadow-max40-v1` com o **Bankai Boruta 0.1.0a12** e o **BankaiRF 0.1.0a20**, publicados no PyPI, com dados 2× numa máquina de 32 núcleos. As rodadas anteriores continuam documentadas abaixo, da mais nova para a mais antiga.
+Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernandes/bankai-boruta) contra o BorutaPy. A rodada mais recente usa o protocolo `native-shadow-max40-v1` com o **Bankai Boruta 0.1.0a12** e o **BankaiRF 0.1.0a20**, publicados no PyPI, com dados 2× em máquinas de 32 e 64 núcleos. As rodadas anteriores continuam documentadas abaixo, da mais nova para a mais antiga.
 
 ## Histórico dos benchmarks
 
 | Data | Rodada | Versões | Máquina | Dados | Resultado principal | Detalhes |
 |---|---|---|---|---|---|---|
+| 31/10/2026 | Escala 2× até 64 threads | 0.1.0a12 / RF 0.1.0a20 | c7a.16xlarge, 64 núcleos | Industrial 2×, 8/16/32/64 threads, 5 seeds | De 8 para 64 threads o Bankai exato ficou 3,7× mais rápido e o BorutaPy 1,5×; a vantagem sobre o BorutaPy + ExtraTrees sobe de 4,3× para 11,2× | [escala](#escala-até-64-threads-31102026) |
 | 31/10/2026 | Native-shadow 2× | 0.1.0a12 / RF 0.1.0a20 | c7a.8xlarge, 32 núcleos | 4 perfis com N e P dobrados, 5 seeds × 5 repetições; CIC-IDS2017 | Bankai exato de 1,9 a 8,0× mais rápido que o BorutaPy + ExtraTrees, com metade da memória; precisão 1,00 nos 400 fits | [2×](#dados-2-em-32-núcleos-31102026) |
 | 23/10/2026 | Native-shadow a12 | 0.1.0a12 / RF 0.1.0a20 | c7a.4xlarge, 16 núcleos | 4 perfis, 5 seeds × 5 repetições; CIC-IDS2017 | Bankai exato com 76% menos tempo (mediana) e 48% menos memória que o BorutaPy + ExtraTrees | [a12](#0110a12-em-16-núcleos-23102026) |
 | 23/10/2026 | CIC-IDS2017 a8 | 0.1.0a8 / RF 0.1.0a17 | c7a.4xlarge, 16 núcleos | CIC-IDS2017, 5 seeds | Bankai exato 98,7 s contra 128,8 s do BorutaPy + ExtraTrees, mas com mais memória (5,0 contra 4,0 GiB); motivou a a12 | [a12 vs a8](verification/native-shadow-cicids2017-a12-amd-20261023/README.md) |
@@ -27,6 +28,21 @@ Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernan
   - o tempo cobre só o `fit`;
   - a memória é o pico de RSS acima do que os dados já ocupam, amostrado de fora a cada 5 ms;
   - a AUC vem de um ExtraTrees de 200 árvores treinado só com as features confirmadas e avaliado no teste.
+
+## Escala até 64 threads (31/10/2026)
+
+A Industrial 2× (400k × 1.000, 12 relevantes) com 8, 16, 32 e 64 threads, em sequência, numa EC2 c7a.16xlarge (64 núcleos AMD físicos, SMT desligado, 128 GiB); mesmos métodos e versões da rodada 2×, seeds 42–46, uma repetição, AUC calculada no próprio container ([detalhes](verification/native-shadow-scaling64-a12-amd64-20261031/README.md)). Mediana das seeds:
+
+| Método | 8 threads (s) | 16 (s) | 32 (s) | 64 (s) | Ganho 8→64 | RSS 8 → 64 threads (MiB) |
+|---|---:|---:|---:|---:|---:|---:|
+| Bankai exato | 39,1 | 21,6 | 13,6 | **10,2** | 3,7× | 3.211 → 3.780 |
+| Bankai bins | 46,2 | 27,3 | 18,5 | 14,8 | 3,1× | **1.301 → 1.963** |
+| BorutaPy + ExtraTrees | 171,5 | 135,3 | 120,5 | 116,2 | 1,5× | 6.387 → 7.509 |
+| BorutaPy + LightGBM | 267,9 | 211,5 | 191,8 | 181,5 | 1,5× | 13.183 → 13.300 |
+
+- **Escala:** o Bankai continua ganhando de 32 para 64 threads (1,3×); os dois BorutaPy praticamente param depois de 32.
+- **Vantagem cresce com os núcleos:** o Bankai exato é 4,3× mais rápido que o BorutaPy + ExtraTrees com 8 threads, 6,1× com 16, 8,9× com 32 e 11,2× com 64; contra o BorutaPy + LightGBM, de 6,9× a 18,2×. A memória do Bankai exato fica na metade da do BorutaPy + ExtraTrees em todas as contagens.
+- **Seleção:** os quatro métodos confirmaram as mesmas 8 features em todas as seeds e contagens de threads, com o mesmo número de rodadas e os mesmos conjuntos da rodada 2× (precisão 1,00, recall 0,67, AUC 0,840).
 
 ## Dados 2× em 32 núcleos (31/10/2026)
 

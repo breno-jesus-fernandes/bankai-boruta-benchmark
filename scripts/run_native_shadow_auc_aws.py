@@ -5,7 +5,8 @@ auc.json under the experiment's auc/<stamp>/ prefix, then runs the published
 native-shadow image once: the container downloads them, runs the AUC script
 with the image's benchmark sources (so 2x artifacts regenerate their 2x data)
 and uploads the updated auc.json, which is copied back into ARTIFACT_DIR.
-The AUC is deterministic given the seed, so the host does not change it.
+The AUC is deterministic given the seed and the platform: the thread count does
+not change it, but arm64 and x86 differ slightly (up to 0.0016).
 
 Usage: run_native_shadow_auc_aws.py --image URI@sha256:... --artifacts DIR --subnets ... --security-groups ...
 """
