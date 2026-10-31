@@ -178,24 +178,34 @@ def run_one(args, name, method, seed, repeat, cache=None):
         return result
 
 
-def held_out_auc(results, seed, threads, rows):
-    # The suite's downstream ExtraTrees on each distinct confirmed set and on all
-    # features, after every timed fit of the seed.
+def held_out_auc(results, seed, threads, rows, cache=None):
+    # The suite's downstream ExtraTrees on each distinct confirmed set, on all
+    # features and (synthetic data) on the relevant ones, after every timed fit of the seed.
     from types import SimpleNamespace
     import numpy as np
     sys.path.insert(0, BENCHMARK_SRC)
     from bankai_benchmark.metrics import downstream
-    X_train, y_train = real_split("train")
-    X_test, y_test = real_split("test")
+    if cache is None:
+        X_train, y_train = real_split("train")
+        X_test, y_test = real_split("test")
+        relevant = None
+    else:
+        X_train, y_train, X_test, y_test, relevant = (np.load(Path(cache) / f"{name}.npy", allow_pickle=False)
+            for name in ("X_train", "y_train", "X_test", "y_test", "relevant_features"))
     if rows:
         X_train, y_train, X_test, y_test = X_train[:rows], y_train[:rows], X_test[:rows], y_test[:rows]
     bundle = SimpleNamespace(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     sets = {"all": list(range(X_train.shape[1]))}
+    if relevant is not None:
+        sets["relevant"] = sorted(int(i) for i in relevant)
     for result in results:
         sets.setdefault(",".join(map(str, result["support"])), result["support"])
     scores = {label: downstream(bundle, np.asarray(indices, dtype=int), seed, threads)["roc_auc"]
               for label, indices in sets.items()}
-    return dict(all=scores["all"], by_method={r["method"]: scores[",".join(map(str, r["support"]))] for r in results})
+    auc = dict(all=scores["all"], by_method={r["method"]: scores[",".join(map(str, r["support"]))] for r in results})
+    if relevant is not None:
+        auc["relevant"] = scores["relevant"]
+    return auc
 
 
 def summarize(results):
@@ -224,6 +234,7 @@ def main():
     parser.add_argument("--rows", type=int, help="Truncate the training split (smoke only)")
     parser.add_argument("--scale", type=int, choices=(1, 2), default=1, help="2 doubles synthetic rows and columns")
     parser.add_argument("--cache", help=argparse.SUPPRESS)
+    parser.add_argument("--auc", action="store_true", help="Also record the downstream AUC of synthetic data (CIC-IDS2017 always does)")
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--output-dir", help="Also write each seed JSON locally")
     parser.add_argument("--worker-output")
@@ -259,6 +270,8 @@ def main():
                 results.append(result)
                 print(json.dumps({k: result[k] for k in ("dataset", "method", "seed", "repeat", "rounds",
                     "elapsed_seconds", "peak_rss_delta_bytes", "support")}), flush=True)
+        # Untimed: after every fit of the seed, on the same bytes.
+        auc = held_out_auc(results, seed, args.threads, args.rows, cache) if name == "cicids2017" or args.auc else None
         cache_root.cleanup()
         payload = dict(protocol=args.experiment, run_id=run_id, host=host,
             configuration=dict(dataset=name, seed=seed, threads=args.threads, scale=args.scale, profile_mode=mode(name, args.scale),
@@ -267,8 +280,8 @@ def main():
                 bootstrap=True, perc=100, alpha=.05, two_step=True),
             dataset_hash_consistency="passed" if len({r["data_sha256"] for r in results}) == 1 else "failed",
             summary=summarize(results), results=results)
-        if name == "cicids2017":
-            payload["auc"] = held_out_auc(results, seed, args.threads, args.rows)
+        if auc:
+            payload["auc"] = auc
         data = json.dumps(payload, allow_nan=False, indent=1).encode()
         artifact = f"{name}-seed{seed}-t{args.threads}{'-x2' if args.scale == 2 else ''}.json"
         if args.output_dir:

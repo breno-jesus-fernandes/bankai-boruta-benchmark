@@ -1,10 +1,21 @@
 # Bankai Boruta benchmark
 
-Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernandes/bankai-boruta) contra o BorutaPy. Os resultados atuais usam o protocolo `native-shadow-max40-v1` com o **Bankai Boruta 0.1.0a12** e o **BankaiRF 0.1.0a20**, publicados no PyPI. O protocolo v2 (a6) e as campanhas anteriores continuam documentados mais abaixo.
+Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernandes/bankai-boruta) contra o BorutaPy. A rodada mais recente usa o protocolo `native-shadow-max40-v1` com o **Bankai Boruta 0.1.0a12** e o **BankaiRF 0.1.0a20**, publicados no PyPI, com dados 2× numa máquina de 32 núcleos. As rodadas anteriores continuam documentadas abaixo, da mais nova para a mais antiga.
 
-## Resultados atuais (0.1.0a12)
+## Histórico dos benchmarks
 
-- **Máquina:** uma EC2 c7a.4xlarge (16 núcleos AMD físicos, SMT desligado, 32 GiB) no ECS, 16 threads.
+| Data | Rodada | Versões | Máquina | Dados | Resultado principal | Detalhes |
+|---|---|---|---|---|---|---|
+| 31/10/2026 | Native-shadow 2× | 0.1.0a12 / RF 0.1.0a20 | c7a.8xlarge, 32 núcleos | 4 perfis com N e P dobrados, 5 seeds × 5 repetições; CIC-IDS2017 | Bankai exato de 1,9 a 8,0× mais rápido que o BorutaPy + ExtraTrees, com metade da memória; precisão 1,00 nos 400 fits | [2×](#dados-2-em-32-núcleos-31102026) |
+| 23/10/2026 | Native-shadow a12 | 0.1.0a12 / RF 0.1.0a20 | c7a.4xlarge, 16 núcleos | 4 perfis, 5 seeds × 5 repetições; CIC-IDS2017 | Bankai exato com 76% menos tempo (mediana) e 48% menos memória que o BorutaPy + ExtraTrees | [a12](#0110a12-em-16-núcleos-23102026) |
+| 23/10/2026 | CIC-IDS2017 a8 | 0.1.0a8 / RF 0.1.0a17 | c7a.4xlarge, 16 núcleos | CIC-IDS2017, 5 seeds | Bankai exato 98,7 s contra 128,8 s do BorutaPy + ExtraTrees, mas com mais memória (5,0 contra 4,0 GiB); motivou a a12 | [a12 vs a8](verification/native-shadow-cicids2017-a12-amd-20261023/README.md) |
+| 19/10/2026 | Native-shadow a8 | 0.1.0a8 / RF 0.1.0a17 | c7a.4xlarge, 16 núcleos | 4 perfis, 5 seeds; escala 4/8/16 threads na Industrial | Bankai exato mais rápido que o BorutaPy + ExtraTrees em 20/20 pares (0,27–0,96 do tempo); de 4 para 16 threads, o Bankai ficou ~3× mais rápido e o BorutaPy 1,8–1,9× | [perfis](verification/native-shadow-amd-20261019/README.md), [escala](verification/native-shadow-scaling-amd-20261019/README.md) |
+| 18/10/2026 | Candidato exato a7 | 0.1.0a7 / RF 0.1.0a16 | c7a.4xlarge, 16 núcleos | Industrial, piloto de 40 rodadas | Sessão exata sem matriz de shadows; base do protocolo native-shadow | [a7](docs/exact-session-a7.md) |
+| 18/10/2026 | Protocolo v2 | 0.1.0a6 / RF 0.1.0a15 | c7a.4xlarge, 16 núcleos | Smoke ECS e calibração interrompida | Sem resultados de desempenho | [v2](#protocolo-v2-a6-histórico) |
+| 17/10/2026 | Campanha a4 | 0.1.0a4 | c7i.4xlarge, 16 vCPUs Intel | 4 perfis, 5 seeds, 210 medições | Bankai 1,50× mais rápido que o BorutaPy + ExtraTrees e 1,57× que o BorutaPy + LightGBM (média geométrica) | [a4](docs/history/a4-20261017/README.md) |
+
+## Protocolo native-shadow
+
 - **Métodos:**
   - Bankai exato: Extra Trees do BankaiRF com cortes nos valores originais;
   - Bankai bins: Extra Trees do BankaiRF com 63 bins;
@@ -16,6 +27,76 @@ Benchmark reproduzível do [Bankai Boruta](https://github.com/breno-jesus-fernan
   - o tempo cobre só o `fit`;
   - a memória é o pico de RSS acima do que os dados já ocupam, amostrado de fora a cada 5 ms;
   - a AUC vem de um ExtraTrees de 200 árvores treinado só com as features confirmadas e avaliado no teste.
+
+## Dados 2× em 32 núcleos (31/10/2026)
+
+Os quatro perfis sintéticos com N e P dobrados (`--scale 2`) e as mesmas features relevantes, de modo que só o ruído cresce, numa EC2 c7a.8xlarge (32 núcleos AMD físicos, SMT desligado, 64 GiB) com 32 threads. Métodos, versões (0.1.0a12/0.1.0a20) e protocolo são os mesmos da [rodada de 16 núcleos](#0110a12-em-16-núcleos-23102026); cinco seeds × cinco repetições, 400 fits ([detalhes](verification/native-shadow-x2-a12-amd32-20261031/README.md)). As colunas 1× repetem a tabela dessa rodada.
+
+| Perfil (treino n × p, relevantes) | Método | Tempo (s) | RSS (MiB) | Precisão | Recall | AUC | Tempo 1× (s) | Recall 1× |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Industrial 400k × 1.000 (12) | Bankai exato | **15,5** | 3.490 | 1,00 | 0,67 | 0,840 | 9,2 | 0,67 |
+| | Bankai bins | 19,8 | **1.592** | 1,00 | 0,67 | 0,840 | 10,8 | 0,67 |
+| | BorutaPy + ExtraTrees | 123,9 | 6.945 | 1,00 | 0,67 | 0,840 | 37,1 | 0,67 |
+| | BorutaPy + LightGBM | 186,7 | 13.208 | 1,00 | 0,67 | 0,840 | 75,1 | 0,67 |
+| Crédito 600k × 600 (20) | Bankai exato | **17,3** | 3.406 | 1,00 | 0,85 | 0,854 | 9,5 | 0,85 |
+| | Bankai bins | 23,3 | **1.698** | 1,00 | 0,85 | 0,854 | 10,9 | 0,85 |
+| | BorutaPy + ExtraTrees | 125,0 | 6.758 | 1,00 | 0,85 | 0,854 | 46,2 | 0,85 |
+| | BorutaPy + LightGBM | 154,5 | 9.951 | 1,00 | 0,85 | 0,854 | 52,7 | 0,85 |
+| Cibersegurança 800k × 300 (60) | Bankai exato | **37,4** | 2.744 | 1,00 | 0,70 | 0,838 | 24,5 | 0,67 |
+| | Bankai bins | 38,6 | **1.590** | 1,00 | 0,77 | 0,838 | 23,5 | 0,62 |
+| | BorutaPy + ExtraTrees | 202,3 | 5.413 | 1,00 | 0,70 | 0,839 | 110,4 | 0,65 |
+| | BorutaPy + LightGBM | 164,3 | 5.934 | 1,00 | 0,67 | 0,839 | 79,9 | 0,55 |
+| Bioinformática 100k × 4.000 (30) | Bankai exato | 173,5 | 3.193 | 1,00 | 1,00 | 0,755 | 85,7 | 1,00 |
+| | Bankai bins | **162,2** | **1.303** | 1,00 | 1,00 | 0,755 | 71,1 | 1,00 |
+| | BorutaPy + ExtraTrees | 337,2 | 6.378 | 1,00 | 1,00 | 0,755 | 145,1 | 1,00 |
+| | BorutaPy + LightGBM | 338,7 | 22.290 | 1,00 | 1,00 | 0,755 | 130,0 | 0,80 |
+
+- **Tempo e memória:** os dois modos do Bankai foram mais rápidos e usaram menos memória que BorutaPy + ExtraTrees e BorutaPy + LightGBM em todas as 20 combinações de perfil e seed.
+  - Com quatro vezes mais dados e o dobro de núcleos, o Bankai exato levou de 1,5 a 2,0 vezes o tempo do 1×; o BorutaPy + ExtraTrees, de 1,8 a 3,3 vezes.
+  - A vantagem do Bankai exato sobre o BorutaPy + ExtraTrees cresceu em todos os perfis: 8,0× na Industrial (4,0× no 1×), 7,2× no Crédito (4,9×), 5,4× na Cibersegurança (4,5×) e 1,9× na Bioinformática (1,7×).
+  - O Bankai exato usa cerca de metade da memória do BorutaPy + ExtraTrees, e o modo com bins de 20% a 30%. Na Bioinformática, o BorutaPy + LightGBM chegou a 21,8 GiB, 17 vezes o Bankai bins.
+- **Seleção:**
+  - Nenhum método confirmou feature irrelevante nos 400 fits, e cada método confirmou o mesmo conjunto nas cinco repetições de cada seed.
+  - Em Industrial, Crédito e Bioinformática, os quatro métodos confirmaram os mesmos conjuntos em todas as seeds. Com o dobro de linhas, o BorutaPy + LightGBM passou a achar as 30 relevantes da Bioinformática.
+  - Na Cibersegurança, todos chegaram às 40 rodadas e o recall subiu em todos os métodos. O Bankai exato coincidiu com o BorutaPy + ExtraTrees em três seeds e diferiu em uma ou duas features limítrofes nas outras duas.
+- **AUC:** onde os conjuntos coincidem, a AUC é a mesma. Na Cibersegurança, os quatro métodos ficaram entre 0,838 e 0,839. Em todos os perfis, a seleção supera o modelo com todas as features (0,815; 0,810; 0,801; 0,684).
+
+### CIC-IDS2017 em 32 núcleos
+
+Os mesmos dados reais, sem escala, com 32 threads na c7a.8xlarge ([detalhes](verification/native-shadow-cicids2017-a12-amd32-20261031/README.md)).
+
+| Método | Tempo (s) | RSS (MiB) | s/rodada | Rodadas | Confirmadas | AUC | Tempo com 16 threads (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Bankai exato | **22,3** | 3.033 | 1,84 | 12 | 68 | 0,99872 | 39,8 |
+| Bankai bins | 75,3 | **2.428** | 1,88 | 40 | 66 | 0,99874 | 129,2 |
+| BorutaPy + ExtraTrees | 92,1 | 5.888 | 7,72 | 12 | 68 | 0,99872 | 130,8 |
+| BorutaPy + LightGBM | 250,6 | 2.759 | 6,27 | 40 | 66 | 0,99874 | 280,3 |
+
+Cada método confirmou as mesmas features, no mesmo número de rodadas, que com 16 threads, em todas as seeds. Com o dobro de núcleos, o Bankai exato ficou 1,8 vez mais rápido, contra 1,4 do BorutaPy + ExtraTrees e 1,1 do BorutaPy + LightGBM, e agora é 4,1 vezes mais rápido que o BorutaPy + ExtraTrees. Os buffers por thread somam cerca de 0,9 GiB aos dois modos do Bankai e 1,7 GiB ao BorutaPy + ExtraTrees.
+
+### Reproduzir 2×
+
+Custos e etapas em [política de preço 2×](verification/native-shadow-x2-cost-policy-20261030.md).
+
+```sh
+BANKAI_BENCHMARK_SRC=src uv run --no-sync python scripts/native_shadow_pilot.py --datasets industrial --seeds 42 --repeats 1 --threads 8 --scale 2 --output-dir /tmp/ns2
+# Na AWS, com a imagem native-shadow publicada (a12/a20), um lançamento por perfil, como na campanha:
+uv run python scripts/run_native_shadow_aws.py --image <uri@sha256> --subnets <subnet> --security-groups <sg> \
+  --instance c7a.8xlarge --scale 2 --datasets industrial --seeds 42 43 44 45 46 --repeats 5 --hours 4 \
+  --stack bankai-ns-x2-industrial --state verification/native-shadow-x2-industrial.json
+# O runner zera a frota no fim; a stack é apagada depois que o host termina.
+aws cloudformation delete-stack --stack-name bankai-ns-x2-industrial
+```
+
+Se a sessão AWS local expirar durante o acompanhamento, o runner espera um novo `aws login` (o desligamento armado limita o custo) e `--resume <state.json>` finaliza o lançamento a partir do estado. Com `--threads 8 16 32 64`, uma tarefa roda o piloto uma vez por contagem de threads no mesmo host; `--auc` grava a AUC no próprio artefato.
+
+A AUC dos perfis 2× grandes não cabe na memória de um notebook; `scripts/run_native_shadow_auc_aws.py --image <uri@sha256> --artifacts <dir> --subnets <subnet> --security-groups <sg> --state <json>` a calcula numa c7a.8xlarge e grava o `auc.json` de volta na pasta.
+
+Na AWS, `scripts/run_candidate_probe_aws.py` sobe a stack, roda wheels Linux escolhidas (`--wheel`, `--extra-wheel`) sobre a imagem publicada e apaga a stack no fim. O desligamento é armado antes de qualquer capacidade, e as horas são reservadas no ledger de [orçamento](BUDGET.md).
+
+## 0.1.0a12 em 16 núcleos (23/10/2026)
+
+- **Máquina:** uma EC2 c7a.4xlarge (16 núcleos AMD físicos, SMT desligado, 32 GiB) no ECS, 16 threads.
 
 ### Perfis sintéticos
 
@@ -76,70 +157,6 @@ uv run --no-sync python scripts/native_shadow_auc.py /tmp/ns /tmp/ns/auc.json
 # CIC-IDS2017: baixa e prepara os CSVs com hash conferido
 uv run --no-sync python scripts/prepare_cicids2017.py /tmp/cicids2017
 ```
-
-## Resultados 2× (32 threads)
-
-Os quatro perfis sintéticos com N e P dobrados (`--scale 2`) e as mesmas features relevantes, de modo que só o ruído cresce, numa EC2 c7a.8xlarge (32 núcleos AMD físicos, SMT desligado, 64 GiB) com 32 threads. Métodos, versões (0.1.0a12/0.1.0a20) e protocolo são os mesmos de cima; cinco seeds × cinco repetições, 400 fits ([detalhes](verification/native-shadow-x2-a12-amd32-20261031/README.md)). As colunas 1× repetem a tabela de 16 threads.
-
-| Perfil (treino n × p, relevantes) | Método | Tempo (s) | RSS (MiB) | Precisão | Recall | AUC | Tempo 1× (s) | Recall 1× |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Industrial 400k × 1.000 (12) | Bankai exato | **15,5** | 3.490 | 1,00 | 0,67 | 0,840 | 9,2 | 0,67 |
-| | Bankai bins | 19,8 | **1.592** | 1,00 | 0,67 | 0,840 | 10,8 | 0,67 |
-| | BorutaPy + ExtraTrees | 123,9 | 6.945 | 1,00 | 0,67 | 0,840 | 37,1 | 0,67 |
-| | BorutaPy + LightGBM | 186,7 | 13.208 | 1,00 | 0,67 | 0,840 | 75,1 | 0,67 |
-| Crédito 600k × 600 (20) | Bankai exato | **17,3** | 3.406 | 1,00 | 0,85 | 0,854 | 9,5 | 0,85 |
-| | Bankai bins | 23,3 | **1.698** | 1,00 | 0,85 | 0,854 | 10,9 | 0,85 |
-| | BorutaPy + ExtraTrees | 125,0 | 6.758 | 1,00 | 0,85 | 0,854 | 46,2 | 0,85 |
-| | BorutaPy + LightGBM | 154,5 | 9.951 | 1,00 | 0,85 | 0,854 | 52,7 | 0,85 |
-| Cibersegurança 800k × 300 (60) | Bankai exato | **37,4** | 2.744 | 1,00 | 0,70 | 0,838 | 24,5 | 0,67 |
-| | Bankai bins | 38,6 | **1.590** | 1,00 | 0,77 | 0,838 | 23,5 | 0,62 |
-| | BorutaPy + ExtraTrees | 202,3 | 5.413 | 1,00 | 0,70 | 0,839 | 110,4 | 0,65 |
-| | BorutaPy + LightGBM | 164,3 | 5.934 | 1,00 | 0,67 | 0,839 | 79,9 | 0,55 |
-| Bioinformática 100k × 4.000 (30) | Bankai exato | 173,5 | 3.193 | 1,00 | 1,00 | 0,755 | 85,7 | 1,00 |
-| | Bankai bins | **162,2** | **1.303** | 1,00 | 1,00 | 0,755 | 71,1 | 1,00 |
-| | BorutaPy + ExtraTrees | 337,2 | 6.378 | 1,00 | 1,00 | 0,755 | 145,1 | 1,00 |
-| | BorutaPy + LightGBM | 338,7 | 22.290 | 1,00 | 1,00 | 0,755 | 130,0 | 0,80 |
-
-- **Tempo e memória:** os dois modos do Bankai foram mais rápidos e usaram menos memória que BorutaPy + ExtraTrees e BorutaPy + LightGBM em todas as 20 combinações de perfil e seed.
-  - Com quatro vezes mais dados e o dobro de núcleos, o Bankai exato levou de 1,5 a 2,0 vezes o tempo do 1×; o BorutaPy + ExtraTrees, de 1,8 a 3,3 vezes.
-  - A vantagem do Bankai exato sobre o BorutaPy + ExtraTrees cresceu em todos os perfis: 8,0× na Industrial (4,0× no 1×), 7,2× no Crédito (4,9×), 5,4× na Cibersegurança (4,5×) e 1,9× na Bioinformática (1,7×).
-  - O Bankai exato usa cerca de metade da memória do BorutaPy + ExtraTrees, e o modo com bins de 20% a 30%. Na Bioinformática, o BorutaPy + LightGBM chegou a 21,8 GiB, 17 vezes o Bankai bins.
-- **Seleção:**
-  - Nenhum método confirmou feature irrelevante nos 400 fits, e cada método confirmou o mesmo conjunto nas cinco repetições de cada seed.
-  - Em Industrial, Crédito e Bioinformática, os quatro métodos confirmaram os mesmos conjuntos em todas as seeds. Com o dobro de linhas, o BorutaPy + LightGBM passou a achar as 30 relevantes da Bioinformática.
-  - Na Cibersegurança, todos chegaram às 40 rodadas e o recall subiu em todos os métodos. O Bankai exato coincidiu com o BorutaPy + ExtraTrees em três seeds e diferiu em uma ou duas features limítrofes nas outras duas.
-- **AUC:** onde os conjuntos coincidem, a AUC é a mesma. Na Cibersegurança, os quatro métodos ficaram entre 0,838 e 0,839. Em todos os perfis, a seleção supera o modelo com todas as features (0,815; 0,810; 0,801; 0,684).
-
-### CIC-IDS2017 em 32 threads
-
-Os mesmos dados reais, sem escala, com 32 threads na c7a.8xlarge ([detalhes](verification/native-shadow-cicids2017-a12-amd32-20261031/README.md)).
-
-| Método | Tempo (s) | RSS (MiB) | s/rodada | Rodadas | Confirmadas | AUC | Tempo com 16 threads (s) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Bankai exato | **22,3** | 3.033 | 1,84 | 12 | 68 | 0,99872 | 39,8 |
-| Bankai bins | 75,3 | **2.428** | 1,88 | 40 | 66 | 0,99874 | 129,2 |
-| BorutaPy + ExtraTrees | 92,1 | 5.888 | 7,72 | 12 | 68 | 0,99872 | 130,8 |
-| BorutaPy + LightGBM | 250,6 | 2.759 | 6,27 | 40 | 66 | 0,99874 | 280,3 |
-
-Cada método confirmou as mesmas features, no mesmo número de rodadas, que com 16 threads, em todas as seeds. Com o dobro de núcleos, o Bankai exato ficou 1,8 vez mais rápido, contra 1,4 do BorutaPy + ExtraTrees e 1,1 do BorutaPy + LightGBM, e agora é 4,1 vezes mais rápido que o BorutaPy + ExtraTrees. Os buffers por thread somam cerca de 0,9 GiB aos dois modos do Bankai e 1,7 GiB ao BorutaPy + ExtraTrees.
-
-### Reproduzir 2× (32 threads)
-
-Custos e etapas em [política de preço 2×](verification/native-shadow-x2-cost-policy-20261030.md).
-
-```sh
-BANKAI_BENCHMARK_SRC=src uv run --no-sync python scripts/native_shadow_pilot.py --datasets industrial --seeds 42 --repeats 1 --threads 8 --scale 2 --output-dir /tmp/ns2
-# Na AWS, com a imagem native-shadow publicada (a12/a20), um lançamento por perfil, como na campanha:
-uv run python scripts/run_native_shadow_aws.py --image <uri@sha256> --subnets <subnet> --security-groups <sg> \
-  --instance c7a.8xlarge --scale 2 --datasets industrial --seeds 42 43 44 45 46 --repeats 5 --hours 4 \
-  --stack bankai-ns-x2-industrial --state verification/native-shadow-x2-industrial.json
-# O runner zera a frota no fim; a stack é apagada depois que o host termina.
-aws cloudformation delete-stack --stack-name bankai-ns-x2-industrial
-```
-
-A AUC dos perfis 2× grandes não cabe na memória de um notebook; `scripts/run_native_shadow_auc_aws.py --image <uri@sha256> --artifacts <dir> --subnets <subnet> --security-groups <sg> --state <json>` a calcula numa c7a.8xlarge e grava o `auc.json` de volta na pasta.
-
-Na AWS, `scripts/run_candidate_probe_aws.py` sobe a stack, roda wheels Linux escolhidas (`--wheel`, `--extra-wheel`) sobre a imagem publicada e apaga a stack no fim. O desligamento é armado antes de qualquer capacidade, e as horas são reservadas no ledger de [orçamento](BUDGET.md).
 
 ## Protocolo v2 (a6, histórico)
 
@@ -206,4 +223,4 @@ A campanha v2 de escala usa baseline de quatro CPUs e apenas observações novas
 
 ### Candidato exato a7
 
-A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). Ela foi publicada e depois substituída pelas versões medidas em [Resultados atuais](#resultados-atuais-010a12).
+A otimização a7/RF a16 tem [protocolo, diagnósticos, reprodução e critérios próprios](docs/exact-session-a7.md). Ela foi publicada e depois substituída pelas versões medidas em [0.1.0a12 em 16 núcleos](#0110a12-em-16-núcleos-23102026).

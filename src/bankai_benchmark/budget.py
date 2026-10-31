@@ -161,15 +161,20 @@ def stop(autoscaling, fleet):
 
 
 SUPPLEMENTAL_KEY = 'bankai-budget/supplemental-150-usd.json'
-SUPPLEMENTAL_TOTAL_USD = Decimal('150')
+# Approved on 2026-10-31: USD 150 raised to 165 for the 64-core scaling run. The
+# key keeps its original name; the ledger records the raise.
+SUPPLEMENTAL_TOTAL_USD = Decimal('165')
+SUPPLEMENTAL_RAISES = {Decimal('150'): '2026-10-31: c7a.16xlarge Industrial 2x thread scaling'}
 # Conservative c7a.4xlarge hour: on-demand price plus EBS, IPv4 and contingency.
 SUPPLEMENTAL_HOUR_USD = Decimal('1.50')
 # c7a.8xlarge (about USD 1.99/h with contingency) reserves two 4xlarge slots per hour.
 SUPPLEMENTAL_HOUR_USD_8XL = Decimal('3.00')
+# c7a.16xlarge: USD 3.28448/h on demand on 2026-10-31, about 3.97/h with contingency.
+SUPPLEMENTAL_HOUR_USD_16XL = Decimal('6.00')
 
 
 def reserve_supplemental(s3, bucket, launch_id, hours, hour_usd=SUPPLEMENTAL_HOUR_USD):
-    """Reserve armed hours against the separately approved USD 150 extension.
+    """Reserve armed hours against the separately approved USD extension (150, raised to 165).
 
     The BRL 400 ledger is left untouched; this ledger is created on first use
     and, like it, never refunds a reservation.
@@ -185,6 +190,11 @@ def reserve_supplemental(s3, bucket, launch_id, hours, hour_usd=SUPPLEMENTAL_HOU
             raise
         ledger = dict(schema_version=1, total_usd=str(SUPPLEMENTAL_TOTAL_USD), launches={})
         condition = dict(IfNoneMatch='*')
+    previous = Decimal(ledger.get('total_usd', '0'))
+    if ledger.get('schema_version') == 1 and previous in SUPPLEMENTAL_RAISES:
+        ledger['total_usd'] = str(SUPPLEMENTAL_TOTAL_USD)
+        ledger.setdefault('raises', []).append(dict(from_usd=str(previous), to_usd=str(SUPPLEMENTAL_TOTAL_USD),
+            reason=SUPPLEMENTAL_RAISES[previous], at=datetime.now(timezone.utc).isoformat()))
     if ledger.get('schema_version') != 1 or Decimal(ledger.get('total_usd', '0')) != SUPPLEMENTAL_TOTAL_USD:
         raise RuntimeError('Incompatible supplemental budget ledger')
     launches = ledger['launches']
