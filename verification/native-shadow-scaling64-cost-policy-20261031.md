@@ -16,3 +16,7 @@ Um lançamento: Industrial 2× (400k × 1.000), os quatro métodos, seeds 42–4
 | 64 | ~5 min |
 
 Cerca de 2,6 h de tarefa mais a AUC: **4 h armadas, US$24 reservados**, custo real estimado em ~US$12.
+
+## Execução
+
+Lançado em 31/10/2026 com a imagem `sha256:610ec1cb…1f61480` (stack `bankai-ns-scaling64`, estado `native-shadow-scaling64-amd64-20261031.json`). A tarefa rodou das 18:07Z às 20:33Z: 8 threads levaram 46 min, 16 threads 35 min, 32 threads 31 min e 64 threads 32 min, incluindo a AUC. Cerca de 2,5 h de host, ~US$8–9 on demand. O runner drenou a frota e a stack foi apagada. O ledger suplementar fica com US$160,50 reservados de US$165.

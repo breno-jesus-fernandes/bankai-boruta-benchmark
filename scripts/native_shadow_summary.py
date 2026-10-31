@@ -1,6 +1,8 @@
 """Summarize native-shadow artifacts: per-dataset medians over seeds of per-seed medians.
 
 Usage: python scripts/native_shadow_summary.py ARTIFACT_DIR [AUC_JSON]
+
+A directory with several thread counts (a thread sweep) gets one row per thread count.
 """
 import json
 from pathlib import Path
@@ -21,10 +23,12 @@ def main():
             # Real data records its held-out AUC inside the artifact.
             auc[f"{artifact['configuration']['dataset']}-{artifact['configuration']['seed']}"] = artifact["auc"]
         for result in artifact["results"]:
-            key = (result.get("dataset", "industrial"), result["method"])
+            key = (result.get("dataset", "industrial"), artifact["configuration"]["threads"], result["method"])
             table.setdefault(key, {}).setdefault(result["seed"], []).append(result)
+    # A thread sweep keys each row by its thread count too.
+    sweep = len({threads for _, threads, _ in table}) > 1
     summary = {}
-    for (dataset, method), seeds in sorted(table.items()):
+    for (dataset, threads, method), seeds in sorted(table.items()):
         rows = list(seeds.values())
         seconds = [st.median(r["elapsed_seconds"] for r in rs) for rs in rows]
         rss = [st.median(r["peak_rss_delta_bytes"] for r in rs) / 2**20 for rs in rows]
@@ -33,7 +37,7 @@ def main():
         recall = [st.median(r["recall"] for r in rs) for rs in rows if "recall" in rs[0]] or [None]
         aucs = [auc[f"{dataset}-{seed}"]["by_method"][method] for seed in seeds
                 if method in auc.get(f"{dataset}-{seed}", {}).get("by_method", {})]
-        summary[f"{dataset}/{method}"] = dict(seeds=sorted(seeds), repeats=[len(rs) for rs in rows],
+        summary[f"{dataset}/t{threads}/{method}" if sweep else f"{dataset}/{method}"] = dict(seeds=sorted(seeds), repeats=[len(rs) for rs in rows],
             median_seconds=st.median(seconds), min_seconds=min(seconds), max_seconds=max(seconds),
             median_rss_mib=st.median(rss), min_rss_mib=min(rss), max_rss_mib=max(rss),
             rounds=[rs[0]["rounds"] for rs in rows], median_rounds=st.median(rs[0]["rounds"] for rs in rows),

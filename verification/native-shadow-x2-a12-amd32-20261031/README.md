@@ -15,7 +15,7 @@ record `scale`, `profile_mode`, `n_rows` and `n_features`.
 - **Host:** one EC2 c7a.8xlarge (32 physical AMD cores, SMT off, 64 GiB) on ECS, 32 threads.
 - **Data:** float32, seeds 42–46, generated once per seed in the parent process and loaded whole (no mmap) by each fit's worker before its RSS baseline. Every artifact passed the data hash check across methods.
 - **Repeats:** 5 per seed, methods interleaved within each repeat: 400 fits.
-- **AUC:** `scripts/native_shadow_auc.py` on each artifact's 2× profile. Industrial, Crédito and Bioinformática ran locally; Cibersegurança (800k training rows) did not fit a laptop's memory and ran on a c7a.8xlarge with `scripts/run_native_shadow_auc_aws.py`. The AUC is deterministic given the seed and the set, so the host does not change it.
+- **AUC:** `scripts/native_shadow_auc.py` on each artifact's 2× profile. Industrial, Crédito and Bioinformática ran locally; Cibersegurança (800k training rows) did not fit a laptop's memory and ran on a c7a.8xlarge with `scripts/run_native_shadow_auc_aws.py`. The AUC is deterministic given the seed, the set and the platform; the thread count does not change it, but arm64 and x86 differ by up to 0.0016 (see `../native-shadow-scaling64-a12-amd64-20261031/README.md`).
 
 | Launch | Seeds | Run | State | Reserved (USD) |
 |---|---|---|---|---:|
