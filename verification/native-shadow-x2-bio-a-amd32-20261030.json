@@ -1,0 +1,49 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-ns-x2-bio-a",
+  "outputs": {
+    "Fleet": "bankai-ns-x2-bio-a-Fleet-sRLE5Q1GFUtp",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-bio-a-TaskRole-gvfGTFwJeOaG",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-bio-a-ExecutionRole-rg6Fndu3LRaO"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:16",
+  "datasets": [
+    "bioinformatica"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43
+  ],
+  "threads": 32,
+  "repeats": 5,
+  "instance": "c7a.8xlarge",
+  "scale": 2,
+  "reserved_usd": "12.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-31T05:14:17+00:00",
+  "status": "completed",
+  "host": "i-01966ac9dc2277770",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/7977a7235c0f494db6b050ffc6242bdc",
+  "exit_code": 0,
+  "stopped_at": "2026-10-31T04:08:09.078183+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T011511Z/bioinformatica-seed42-t32-x2.json",
+      "bytes": 31014
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T011511Z/bioinformatica-seed43-t32-x2.json",
+      "bytes": 31386
+    }
+  ]
+}
