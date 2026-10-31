@@ -1,0 +1,59 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-native-shadow-x2-cal",
+  "outputs": {
+    "Fleet": "bankai-native-shadow-x2-cal-Fleet-5BfOOZyLiktg",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-x2-cal-TaskRole-nK5w13LxK9va",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-native-shadow-x2-cal-ExecutionRole-Dm7u2Me1xffv"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:13",
+  "datasets": [
+    "industrial",
+    "credito",
+    "bioinformatica",
+    "ciberseguranca"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42
+  ],
+  "threads": 32,
+  "repeats": 1,
+  "instance": "c7a.8xlarge",
+  "scale": 2,
+  "reserved_usd": "6.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-30T21:22:08+00:00",
+  "status": "completed",
+  "host": "i-0a9609f217cd5ca01",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/08ecbf254ada4ccfa134beb62f3c8f23",
+  "exit_code": 0,
+  "stopped_at": "2026-10-30T20:02:52.980631+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T192313Z/bioinformatica-seed42-t32-x2.json",
+      "bytes": 8256
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T192313Z/ciberseguranca-seed42-t32-x2.json",
+      "bytes": 10106
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T192313Z/credito-seed42-t32-x2.json",
+      "bytes": 6656
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T192313Z/industrial-seed42-t32-x2.json",
+      "bytes": 5784
+    }
+  ]
+}

@@ -49,3 +49,14 @@ def test_runner_targets_the_32_core_host():
     default = runner.task_definition(outputs, 'repo@sha256:'+'a'*64, ['industrial'], ['bankai_exact'], [42], 16, 5)
     assert (default['cpu'], default['memory']) == ('16384', '28672')
     assert runner.INSTANCES['c7a.8xlarge']['hour_usd'] == 2*runner.INSTANCES['c7a.4xlarge']['hour_usd']
+
+
+def test_auc_runner_uses_the_image_sources_on_the_32_core_host():
+    pytest.importorskip('boto3')
+    auc = load('run_native_shadow_auc_aws')
+    outputs = dict(ExecutionRole='execution', TaskRole='task', Logs='/bankai/x')
+    definition = auc.task_definition(outputs, 'repo@sha256:'+'a'*64, 'native-shadow-max40-v1/auc/x/', 32, 'c7a.8xlarge')
+    assert (definition['cpu'], definition['memory']) == ('32768', '59392')
+    command = definition['containerDefinitions'][0]['command'][0]
+    assert 'PYTHONPATH=/opt/bankai-benchmark/src' in command and 'native_shadow_auc.py /tmp/auc /tmp/auc/auc.json 32' in command
+    assert 'native-shadow-max40-v1/auc/x/input/' in command and 'native-shadow-max40-v1/auc/x/output/auc.json' in command

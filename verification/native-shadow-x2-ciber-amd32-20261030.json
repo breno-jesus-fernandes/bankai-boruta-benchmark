@@ -1,0 +1,64 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-ns-x2-ciber",
+  "outputs": {
+    "Fleet": "bankai-ns-x2-ciber-Fleet-thaI25tFKH3r",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-ciber-TaskRole-X6qcWaeznTGV",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-ciber-ExecutionRole-sqLs5DytlCBp"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:18",
+  "datasets": [
+    "ciberseguranca"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 32,
+  "repeats": 5,
+  "instance": "c7a.8xlarge",
+  "scale": 2,
+  "reserved_usd": "15.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-31T16:13:18+00:00",
+  "status": "completed",
+  "host": "i-0c6ea5e1889e8e9f5",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/011673634e8b444087e2c1df7ee51c6a",
+  "exit_code": 0,
+  "stopped_at": "2026-10-31T14:23:33.445411+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T111424Z/ciberseguranca-seed42-t32-x2.json",
+      "bytes": 38656
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T111424Z/ciberseguranca-seed43-t32-x2.json",
+      "bytes": 38427
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T111424Z/ciberseguranca-seed44-t32-x2.json",
+      "bytes": 38492
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T111424Z/ciberseguranca-seed45-t32-x2.json",
+      "bytes": 38235
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T111424Z/ciberseguranca-seed46-t32-x2.json",
+      "bytes": 38381
+    }
+  ]
+}

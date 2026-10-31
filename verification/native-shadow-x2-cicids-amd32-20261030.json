@@ -1,0 +1,64 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-ns-x2-cicids",
+  "outputs": {
+    "Fleet": "bankai-ns-x2-cicids-Fleet-I7rSEKxJWRSG",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-cicids-TaskRole-t0Rl0DNeUr8A",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-cicids-ExecutionRole-3hgywXzJD6HZ"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:19",
+  "datasets": [
+    "cicids2017"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 32,
+  "repeats": 1,
+  "instance": "c7a.8xlarge",
+  "scale": 1,
+  "reserved_usd": "6.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-31T16:28:48+00:00",
+  "status": "completed",
+  "host": "i-08494e1def63e153b",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/7b910102f4b34e90a5d84c6d0c7d5764",
+  "exit_code": 0,
+  "stopped_at": "2026-10-31T15:12:18.320787+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T142953Z/cicids2017-seed42-t32.json",
+      "bytes": 9138
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T142953Z/cicids2017-seed43-t32.json",
+      "bytes": 9124
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T142953Z/cicids2017-seed44-t32.json",
+      "bytes": 9139
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T142953Z/cicids2017-seed45-t32.json",
+      "bytes": 9150
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261031T142953Z/cicids2017-seed46-t32.json",
+      "bytes": 9133
+    }
+  ]
+}

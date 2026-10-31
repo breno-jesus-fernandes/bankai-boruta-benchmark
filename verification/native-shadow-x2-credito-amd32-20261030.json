@@ -1,0 +1,64 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-ns-x2-credito",
+  "outputs": {
+    "Fleet": "bankai-ns-x2-credito-Fleet-nvuGW0fgTBKb",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-credito-TaskRole-n1XZjEPy0W5U",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-credito-ExecutionRole-fLw2WxtbIDYv"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:15",
+  "datasets": [
+    "credito"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 32,
+  "repeats": 5,
+  "instance": "c7a.8xlarge",
+  "scale": 2,
+  "reserved_usd": "12.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-31T02:47:40+00:00",
+  "status": "completed",
+  "host": "i-07a9760217c0d36e4",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/0c4b08abe7e3485a81c4e1095bf659a6",
+  "exit_code": 0,
+  "stopped_at": "2026-10-31T01:09:02.695051+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T224849Z/credito-seed42-t32-x2.json",
+      "bytes": 25337
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T224849Z/credito-seed43-t32-x2.json",
+      "bytes": 25438
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T224849Z/credito-seed44-t32-x2.json",
+      "bytes": 25310
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T224849Z/credito-seed45-t32-x2.json",
+      "bytes": 25288
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T224849Z/credito-seed46-t32-x2.json",
+      "bytes": 25211
+    }
+  ]
+}

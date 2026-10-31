@@ -1,0 +1,64 @@
+{
+  "protocol": "native-shadow-max40-v1",
+  "stack": "bankai-ns-x2-industrial",
+  "outputs": {
+    "Fleet": "bankai-ns-x2-industrial-Fleet-dpurfp4BgQ4c",
+    "CapacityProvider": "native-shadow-max40-v1",
+    "Cluster": "native-shadow-max40-v1",
+    "Logs": "/bankai/native-shadow-max40-v1",
+    "TaskRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-industrial-TaskRole-O4vv5wrJ80bz",
+    "ExecutionRole": "arn:aws:iam::642504869083:role/bankai-ns-x2-industrial-ExecutionRole-cLzfHjGCKWFs"
+  },
+  "image": "642504869083.dkr.ecr.us-east-1.amazonaws.com/bankai-image-publisher-images@sha256:b4a44fc7d1e13fe37144e7a7bf1af007c62bbed3963845d5d8430d13db24cd6e",
+  "task_definition": "arn:aws:ecs:us-east-1:642504869083:task-definition/native-shadow-max40-v1:14",
+  "datasets": [
+    "industrial"
+  ],
+  "methods": [
+    "bankai_exact",
+    "bankai_binned",
+    "borutapy",
+    "borutapy_lgbm"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "threads": 32,
+  "repeats": 5,
+  "instance": "c7a.8xlarge",
+  "scale": 2,
+  "reserved_usd": "12.00",
+  "budget": "supplemental-150-usd",
+  "shutdown_at": "2026-10-31T00:08:13+00:00",
+  "status": "completed",
+  "host": "i-0220bc5f219b65584",
+  "task": "arn:aws:ecs:us-east-1:642504869083:task/native-shadow-max40-v1/c8b6e425028745989ba0f62a8a223087",
+  "exit_code": 0,
+  "stopped_at": "2026-10-30T22:42:19.711384+00:00",
+  "result_objects": [
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T200922Z/industrial-seed42-t32-x2.json",
+      "bytes": 22413
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T200922Z/industrial-seed43-t32-x2.json",
+      "bytes": 22465
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T200922Z/industrial-seed44-t32-x2.json",
+      "bytes": 22546
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T200922Z/industrial-seed45-t32-x2.json",
+      "bytes": 22426
+    },
+    {
+      "key": "native-shadow-max40-v1/pilot/20261030T200922Z/industrial-seed46-t32-x2.json",
+      "bytes": 22523
+    }
+  ]
+}

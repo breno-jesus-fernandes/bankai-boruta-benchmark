@@ -31,3 +31,18 @@ O piloto gera os dados uma vez por seed e cada worker os carrega inteiros, sem m
 | CIC-IDS2017 | 5 seeds, 1 repetição, 32 threads | 2 | US$6 |
 
 Cada lançamento exige aprovação explícita, com shutdown AWS armado antes da reserva.
+
+## Execução (30–31/10/2026)
+
+| Lançamento | Horas armadas | Reserva |
+|---|---:|---:|
+| Calibração | 2 | US$6 |
+| Industrial 2× | 4 | US$12 |
+| Crédito 2× | 4 | US$12 |
+| Bioinformática 2×, seeds 42–43 | 4 | US$12 |
+| Bioinformática 2×, seeds 44–46 | 6 | US$18 |
+| Cibersegurança 2× | 5 | US$15 |
+| CIC-IDS2017, 32 threads | 2 | US$6 |
+| AUC da Cibersegurança 2× | 2 | US$6 |
+
+Total reservado: **US$87**; o ledger suplementar fica com US$136,50 alocados e **US$13,50** livres. A calibração projetou ~14 h de host para a campanha; os lançamentos usaram cerca de 15 h de tarefa. Na Bioinformática B, a sessão AWS local expirou durante o acompanhamento e o host ficou ocioso das 08:34Z ao shutdown armado das 10:13Z, dentro da reserva. Resultados em `native-shadow-x2-a12-amd32-20261031/` e `native-shadow-cicids2017-a12-amd32-20261031/`.
